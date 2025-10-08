@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name" translatable="false">MediSupply</string>
+    <string name="greeting">Hola</string>
+    <string name="activity_prompt">Estas son tus actividades para hoy</string>
+    <string name="home">Inicio</string>
+    <string name="routes">Rutas</string>
+    <string name="visits">Visitas</string>
+    <string name="orders">Pedidos</string>
+    <string name="users">Usuarios</string>
+    <string name="notifications">Notificaciones</string>
+    <string name="profile">Perfil</string>
+    <string name="earth">Región</string>
+    <string name="settings">Configuración</string>
+    <string name="visits_done">visitas realizadas</string>
+</resources>
