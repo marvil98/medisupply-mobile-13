@@ -12,4 +12,16 @@
     <string name="earth">Región</string>
     <string name="settings">Configuración</string>
     <string name="visits_done">visitas realizadas</string>
+    <string name="routes_title">Mis rutas</string>
+    <string name="routes_subtitle">3/7 visitas realizadas</string>
+    <string name="register_visit">Registrar visita</string>
+    <string name="suggest_product">Sugerir producto</string>
+    <string name="create_order">Crear pedido</string>
+    <string name="follow_order">Seguir pedido</string>
+    <string name="clients">Mis clientes</string>
+    <string name="back">Volver</string>
+    <string name="regional_settings">Ajustes regionales</string>
+    <string name="placeholder_default">Selecciona una opción</string>
+    <string name="required_field">Campo obligatorio</string>
+    <string name="save">Guardar</string>
 </resources>

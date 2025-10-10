@@ -8,11 +8,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Home(
-                userName = "John Doe",
-                selectedRoute = "home",
-                onNavigate = { route -> /* manejar navegación */ }
-            )
+            AppNavigation(userName = "John Doe")
         }
     }
 }
