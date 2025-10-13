@@ -42,13 +42,15 @@ fun Home(userName: String, selectedRoute: String, onNavigate: (String) -> Unit) 
 
                 SectionCard(
                     title = stringResource(R.string.visits),
-                    options = listOf(stringResource(R.string.register_visit), stringResource(R.string.suggest_product)),
+                    options = listOf(Pair(stringResource(R.string.register_visit), "register_visit"),
+                        Pair(stringResource(R.string.suggest_product),"suggest_product" )),
                     onOptionClick = { onNavigate(it) }
                 )
 
                 SectionCard(
                     title = stringResource(R.string.orders),
-                    options = listOf(stringResource(R.string.create_order), stringResource(R.string.follow_order)),
+                    options = listOf(Pair(stringResource(R.string.create_order), "create_order"),
+                        Pair(stringResource(R.string.follow_order), "follow_orders")),
                     onOptionClick = { onNavigate(it) }
                 )
 

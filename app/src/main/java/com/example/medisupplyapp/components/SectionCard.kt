@@ -14,7 +14,7 @@ import com.example.medisupplyapp.R
 @Composable
 fun SectionCard(
     title: String,
-    options: List<String> = emptyList(),
+    options: List<Pair<String, String>> = emptyList(),
     subtitle: String? = null,
     centered: Boolean = false,
     onClick: (() -> Unit)? = null,
@@ -73,12 +73,13 @@ fun SectionCard(
                     )
                 }
                 Spacer(modifier = Modifier.height(12.dp))
-                options.forEach { option ->
+                options.forEach { (title, navigation) ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 6.dp)
-                            .clickable { onOptionClick?.invoke(option) }
+                            .clickable {
+                                onOptionClick?.invoke(navigation) }
                             .background(
                                 color = Color.White,
                                 shape = RoundedCornerShape(percent = 50)
@@ -88,13 +89,13 @@ fun SectionCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = option,
+                            text = title,
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Icon(
                             painter = painterResource(id = R.drawable.ic_arrow),
-                            contentDescription = "Sección: $option",
+                            contentDescription = "Sección: $title",
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(24.dp)
                         )

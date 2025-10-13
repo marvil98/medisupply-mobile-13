@@ -21,7 +21,7 @@ private val MediSupplyColorScheme = lightColorScheme(
     onSecondary = Color(0xFF809CFF),
     onBackground = Color.Black,
     onSurface = Color.Black,
-    error = Color(0xFFEB5757),
+    error = Color(0xFFEB5757)
 )
 
 val LeagueSpartan = FontFamily(

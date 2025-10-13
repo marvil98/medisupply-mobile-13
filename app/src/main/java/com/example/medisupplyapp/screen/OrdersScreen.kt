@@ -49,10 +49,10 @@ fun OrdersScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Orders Card
                 SectionCard(
                     title = stringResource(R.string.orders),
-                    options = listOf(stringResource(R.string.create_order), stringResource(R.string.follow_order)),
+                    options = listOf(Pair(stringResource(R.string.create_order), "create_order"),
+                        Pair(stringResource(R.string.follow_order), "follow_orders")),
                     onOptionClick = { onNavigate(it) }
                 )
 

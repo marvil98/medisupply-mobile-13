@@ -24,4 +24,13 @@
     <string name="placeholder_default">Selecciona una opción</string>
     <string name="required_field">Campo obligatorio</string>
     <string name="save">Guardar</string>
+    <string name="pending_approval">Pendiente</string>
+    <string name="processing">Procesando</string>
+    <string name="in_transit">En camino</string>
+    <string name="delivered">Entregado</string>
+    <string name="cancelled">Cancelado</string>
+    <string name="delayed">Demorado</string>
+    <string name="last_update">Última actualización</string>
+    <string name="order">Pedido</string>
+    <string name="order_history">Historial de pedidos</string>
 </resources>
