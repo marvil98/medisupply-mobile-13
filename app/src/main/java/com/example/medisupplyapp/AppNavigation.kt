@@ -3,6 +3,7 @@ package com.example.medisupplyapp
 import androidx.compose.runtime.*
 import androidx.navigation.compose.*
 import com.example.medisupplyapp.screen.RegionalSettingsScreen
+import com.example.medisupplyapp.screen.OrdersScreen
 import androidx.compose.ui.platform.LocalContext
 import com.example.medisupplyapp.utils.updateLocale
 
@@ -51,7 +52,11 @@ fun AppNavigation(userName: String) {
         }
 
         composable("orders") {
-            OrdersScreen()
+            OrdersScreen(
+                userName = userName,
+                onNavigate = { route -> navController.navigate(route) },
+                selectedRoute = "orders",
+            )
         }
     }
 }
