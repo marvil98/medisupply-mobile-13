@@ -1,4 +1,4 @@
-package com.example.medisupplyapp.utils.entities
+package com.example.medisupplyapp.data.model
 
 import androidx.compose.ui.graphics.Color
 import com.example.medisupplyapp.R

@@ -3,15 +3,13 @@ package com.example.medisupplyapp
 import androidx.compose.runtime.*
 import androidx.navigation.compose.*
 import com.example.medisupplyapp.screen.RegionalSettingsScreen
-import com.example.medisupplyapp.screen.OrdersScreen
+import com.example.medisupplyapp.screen.orders.OrdersHomeScreen
 import androidx.compose.ui.platform.LocalContext
-import com.example.medisupplyapp.screen.FollowOrderScreen
-import com.example.medisupplyapp.utils.entities.Order
-import com.example.medisupplyapp.utils.entities.OrderStatus
+import com.example.medisupplyapp.screen.orders.FollowOrderScreen
+import com.example.medisupplyapp.data.model.Order
+import com.example.medisupplyapp.data.model.OrderStatus
 import com.example.medisupplyapp.utils.updateLocale
-import java.sql.Date
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.util.Locale
 
 @Composable
@@ -59,7 +57,7 @@ fun AppNavigation(userName: String) {
         }
 
         composable("orders") {
-            OrdersScreen(
+            OrdersHomeScreen(
                 userName = userName,
                 onNavigate = { route -> navController.navigate(route) },
                 selectedRoute = "orders",
@@ -70,49 +68,6 @@ fun AppNavigation(userName: String) {
             val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             val date = sdf.parse("13/10/2025") ?: java.util.Date()
             FollowOrderScreen(
-                orders =listOf(
-                Order(
-                    id= "1",
-                    status = OrderStatus.PENDING_APPROVAL,
-                    creation_date = date,
-                    estimated_release_date =date,
-                    last_update = date
-                ),
-                    Order(
-                        id= "2",
-                        status = OrderStatus.PROCESSING,
-                        creation_date = date,
-                        estimated_release_date =date,
-                        last_update = date
-                    ),
-                    Order(
-                        id= "3",
-                        status = OrderStatus.IN_TRANSIT,
-                        creation_date = date,
-                        estimated_release_date =date,
-                        last_update = date
-                    ),
-                    Order(
-                        id= "4",
-                        status = OrderStatus.DELIVERED,
-                        creation_date = date,
-                        estimated_release_date =date,
-                        last_update = date
-                    ),
-                    Order(
-                        id= "5",
-                        status = OrderStatus.CANCELLED,
-                        creation_date = date,
-                        estimated_release_date =date,
-                        last_update = date
-                    ),Order(
-                        id= "6",
-                        status = OrderStatus.DELAYED,
-                        creation_date = date,
-                        estimated_release_date =date,
-                        last_update = date
-                    ),
-            ),
                 onNavigate = { route -> navController.navigate(route) },
                 selectedRoute = "orders",
                 onBack = { navController.popBackStack() }

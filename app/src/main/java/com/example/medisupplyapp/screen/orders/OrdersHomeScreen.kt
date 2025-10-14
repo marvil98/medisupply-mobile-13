@@ -1,29 +1,21 @@
-package com.example.medisupplyapp.screen
+package com.example.medisupplyapp.screen.orders
 
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.*
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.medisupplyapp.R
-import com.example.medisupplyapp.components.CustomDropdown
 import com.example.medisupplyapp.components.SectionCard
-import com.example.medisupplyapp.components.SimpleTopBar
 import com.tuempresa.medisupply.ui.components.FooterNavigation
 import com.tuempresa.medisupply.ui.components.Header
 import com.tuempresa.medisupply.ui.theme.MediSupplyTheme
 
 @Composable
-fun OrdersScreen(
+fun OrdersHomeScreen(
     userName: String,
     onNavigate: (String) -> Unit,
     selectedRoute: String,

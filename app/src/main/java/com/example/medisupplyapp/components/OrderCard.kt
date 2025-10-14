@@ -28,7 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.medisupplyapp.R
-import com.example.medisupplyapp.utils.entities.Order
+import com.example.medisupplyapp.data.model.Order
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -66,7 +66,7 @@ fun OrderCard(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "${stringResource(R.string.last_update)}: ${sdf.format(order.last_update)}",
+                    text = "${stringResource(R.string.last_update)}: ${sdf.format(order.lastUpdate)}",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface
                 )
