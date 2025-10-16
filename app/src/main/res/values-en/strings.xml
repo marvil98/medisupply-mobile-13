@@ -23,4 +23,12 @@
     <string name="placeholder_default">Select an option</string>
     <string name="required_field">Required field</string>
     <string name="save">Save</string>
+    <string name="language_label">Language</string>
+    <string name="language_spanish">Spanish (Colombia)</string>
+    <string name="language_english">English (United States)</string>
+    <string name="country_label">Country</string>
+    <string name="country_colombia">Colombia</string>
+    <string name="country_peru">Peru</string>
+    <string name="country_ecuador">Ecuador</string>
+    <string name="country_mexico">Mexico</string>
 </resources>

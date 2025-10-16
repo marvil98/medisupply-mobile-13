@@ -24,7 +24,7 @@ fun CustomDropdown(
     options: List<String>,
     selected: String?,
     onSelect: (String) -> Unit,
-    hasError: Boolean,
+    hasError: Boolean? = false,
     placeholder: String = stringResource(R.string.placeholder_default),
     errorMessage: String = stringResource(R.string.required_field)
 ) {
@@ -98,7 +98,7 @@ fun CustomDropdown(
             }
         }
 
-        if (hasError) {
+        if (hasError == true) {
             Text(
                 text = errorMessage,
                 color = MaterialTheme.colorScheme.error,
