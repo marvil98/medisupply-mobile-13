@@ -4,6 +4,8 @@ import com.example.medisupplyapp.data.model.Order
 import com.example.medisupplyapp.data.model.OrderStatus
 import com.example.medisupplyapp.data.remote.ApiConnection
 
+
+import android.util.Log
 class OrdersRepository {
     suspend fun getOrders(): Result<List<Order>> {
         return try {
@@ -13,12 +15,13 @@ class OrdersRepository {
                 Result.success(emptyList())
             } else {
                 val orders = response.map { orderResponse ->
+                    Log.d("ORDER_RESPONSE", "Parsed item: $orderResponse")
                     Order(
-                        id = orderResponse.id,
-                        creationDate = orderResponse.creationDate,
-                        estimatedReleaseDate = orderResponse.estimatedReleaseDate,
-                        lastUpdate =  orderResponse.lastUpdate,
-                        status = mapStatus(orderResponse.status)
+                        id = orderResponse.numero_pedido,
+                        creationDate = orderResponse.fecha_creacion,
+                        estimatedReleaseDate = orderResponse.fecha_entrega_estimada,
+                        lastUpdate =  orderResponse.fecha_ultima_actualizacion,
+                        status = mapStatus(orderResponse.estado_nombre)
                     )
                 }
                 Result.success(orders)
@@ -36,12 +39,12 @@ class OrdersRepository {
 
     private fun mapStatus(status: String): OrderStatus {
         return when(status.lowercase()) {
-            "Pendiente de aprobación" -> OrderStatus.PENDING_APPROVAL
-            "Procesando" -> OrderStatus.PROCESSING
-            "En camino" -> OrderStatus.IN_TRANSIT
-            "Entregado" -> OrderStatus.DELIVERED
-            "Cancelado" -> OrderStatus.CANCELLED
-            "Demorado" -> OrderStatus.DELAYED
+            "pendiente de aprobación" -> OrderStatus.PENDING_APPROVAL
+            "procesando" -> OrderStatus.PROCESSING
+            "en camino" -> OrderStatus.IN_TRANSIT
+            "entregado" -> OrderStatus.DELIVERED
+            "cancelado" -> OrderStatus.CANCELLED
+            "demorado" -> OrderStatus.DELAYED
             else -> OrderStatus.PROCESSING
         }
     }
