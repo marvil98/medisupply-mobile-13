@@ -62,3 +62,29 @@ dependencies {
     implementation("androidx.compose.ui:ui-text-google-fonts:1.9.0")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 }
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    val fileFilter = listOf("**/R.class", "**/BuildConfig.*", "**/Manifest*.*", "**/*Test*.*")
+    val debugTree = fileTree("${buildDir}/intermediates/javac/debug") {
+        exclude(fileFilter)
+    }
+    val kotlinDebugTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") {
+        exclude(fileFilter)
+    }
+
+    sourceDirectories.setFrom(files(
+        "${project.projectDir}/src/main/java",
+        "${project.projectDir}/src/main/kotlin"
+    ))
+    classDirectories.setFrom(files(debugTree, kotlinDebugTree))
+    executionData.setFrom(fileTree(buildDir).include(
+        "jacoco/testDebugUnitTest.exec"
+    ))
+}
