@@ -7,11 +7,12 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.medisupplyapp.data.model.Order
+import com.example.medisupplyapp.data.remote.ApiConnection
 import com.example.medisupplyapp.data.remote.repository.OrdersRepository
 import kotlinx.coroutines.launch
 
 class FollowOrdersViewModel(
-    private val repository: OrdersRepository = OrdersRepository()
+    private val repository: OrdersRepository = OrdersRepository(api = ApiConnection.api)
 ) : ViewModel() {
 
     var ordersState by mutableStateOf<OrdersUiState>(OrdersUiState.Loading)

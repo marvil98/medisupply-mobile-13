@@ -6,16 +6,17 @@ import com.example.medisupplyapp.data.remote.ApiConnection
 
 
 import android.util.Log
-class OrdersRepository {
+import com.example.medisupplyapp.data.remote.api.OrdersApi
+
+class OrdersRepository(var api: OrdersApi) {
     suspend fun getOrders(): Result<List<Order>> {
         return try {
-            val response = ApiConnection.api.getOrders(userId = "USER_55")
+            val response = api.getOrders(userId = "USER_55")
 
             if (response.isEmpty()) {
                 Result.success(emptyList())
             } else {
                 val orders = response.map { orderResponse ->
-                    Log.d("ORDER_RESPONSE", "Parsed item: $orderResponse")
                     Order(
                         id = orderResponse.numero_pedido,
                         creationDate = orderResponse.fecha_creacion,
@@ -37,7 +38,7 @@ class OrdersRepository {
         }
     }
 
-    private fun mapStatus(status: String): OrderStatus {
+    fun mapStatus(status: String): OrderStatus {
         return when(status.lowercase()) {
             "pendiente de aprobación" -> OrderStatus.PENDING_APPROVAL
             "procesando" -> OrderStatus.PROCESSING
