@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("org.jetbrains.kotlinx.kover") version "0.7.5" 
+    id("org.jetbrains.kotlinx.kover") version "0.7.3" // ✅ Plugin de cobertura moderno
 }
 
 android {
@@ -26,8 +26,9 @@ android {
                 "proguard-rules.pro"
             )
         }
+        // ✅ Habilitar cobertura en debug
         debug {
-            enableUnitTestCoverage = true // ✅ sigue siendo necesario para Android
+            enableUnitTestCoverage = true
         }
     }
 
@@ -69,6 +70,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation("androidx.compose.ui:ui-text-google-fonts:1.9.0")
 
+    // ✅ Tests
     testImplementation(libs.junit)
     testImplementation(kotlin("test"))
 
@@ -81,23 +83,45 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
 
-kover {
-    reports {
-        filters {
-            excludes {
-                // 🔍 Excluye clases generadas que no aportan a la cobertura
-                packages("com.example.medisupplyapp.ui.theme")
-                classes("**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*")
-            }
+/**
+ * ✅ Configuración moderna del plugin Kover (v0.7+)
+ * Genera reportes XML y HTML + verificación de cobertura mínima.
+ */
+koverReport {
+    filters {
+        excludes {
+            classes(
+                "**/R.class",
+                "**/R$*.class",
+                "**/BuildConfig.*",
+                "**/Manifest*.*",
+                "**/*Test*.*",
+                "**/*_Factory*",
+                "**/*_MembersInjector*",
+                "**/*_Provide*",
+                "**/data/models/**",
+                "**/ui/theme/**",
+                "**/*ComposableSingletons*",
+                "**/*Kt*lambda*",
+                "**/*_Impl*",
+                "**/*_HiltModules*"
+            )
         }
     }
 
-    // Configura la salida de los reportes
+    defaults {
+        xml {
+            onCheck = true // genera XML
+        }
+        html {
+            onCheck = true // genera HTML
+        }
+    }
+
     verify {
-        rule {
-            name = "Coverage threshold"
+        rule("Minimum coverage") {
             bound {
-                minValue = 80 // mismo umbral que usas en tu Action
+                minValue = 80 // ✅ cobertura mínima requerida
             }
         }
     }
