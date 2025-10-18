@@ -1,9 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlinx.kover") version "0.7.5"
-    kotlin("jvm") version "1.9.20"
-    jacoco
+    id("jacoco")
 }
 
 jacoco {
@@ -23,8 +21,41 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    buildTypes {
+        debug {
+            enableUnitTestCoverage = true
+        }
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+
     testOptions {
         unitTests.isIncludeAndroidResources = true
+        unitTests.all {
+            it.useJUnitPlatform()
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    buildFeatures {
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.3"
     }
 }
 
@@ -53,30 +84,93 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
 
-tasks.test {
-    useJUnitPlatform()
-    finalizedBy(tasks.jacocoTestReport)
-}
-
-tasks.jacocoTestReport {
-    dependsOn(tasks.test)
+// Configuración de JaCoCo para Android
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn("testDebugUnitTest")
+    
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports."
+    
     reports {
         xml.required.set(true)
         html.required.set(true)
         csv.required.set(false)
     }
+    
+    // Clases a excluir del reporte
+    val fileFilter = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*",
+        "**/data/model/*",
+        "**/di/*",
+        "**/*\$*.*" // Clases internas generadas
+    )
+    
+    val debugTree = fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
+        exclude(fileFilter)
+    }
+    
+    val mainSrc = "${project.projectDir}/src/main/java"
+    val mainKotlin = "${project.projectDir}/src/main/kotlin"
+    
+    sourceDirectories.setFrom(files(listOf(mainSrc, mainKotlin)))
+    classDirectories.setFrom(files(listOf(debugTree)))
+    executionData.setFrom(fileTree(layout.buildDirectory.get()) {
+        include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+    })
 }
 
-tasks.jacocoTestCoverageVerification {
+tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
+    dependsOn("jacocoTestReport")
+    
+    group = "Verification"
+    description = "Verify Jacoco coverage meets minimum threshold (80%)."
+    
     violationRules {
         rule {
             limit {
-                minimum = "0.80".toBigDecimal() // 80% cobertura
+                minimum = BigDecimal("0.80") // 80% cobertura
+            }
+        }
+        
+        // Regla adicional por tipo de cobertura
+        rule {
+            element = "CLASS"
+            limit {
+                counter = "LINE"
+                value = "COVEREDRATIO"
+                minimum = BigDecimal("0.80")
             }
         }
     }
+    
+    val fileFilter = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*",
+        "**/data/model/*",
+        "**/di/*",
+        "**/*\$*.*"
+    )
+    
+    val debugTree = fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
+        exclude(fileFilter)
+    }
+    
+    classDirectories.setFrom(files(listOf(debugTree)))
+    executionData.setFrom(fileTree(layout.buildDirectory.get()) {
+        include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+    })
 }
 
-tasks.check {
-    dependsOn(tasks.jacocoTestCoverageVerification)
+// Hacer que check ejecute la verificación de cobertura
+tasks.named("check") {
+    dependsOn("jacocoTestCoverageVerification")
 }

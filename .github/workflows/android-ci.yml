@@ -24,8 +24,8 @@ jobs:
     - name: Dar permisos de ejecución a gradlew
       run: chmod +x ./gradlew
       
-    - name: Ejecutar tests con cobertura
-      run: ./gradlew test jacocoTestReport
+    - name: Ejecutar tests unitarios con cobertura
+      run: ./gradlew testDebugUnitTest jacocoTestReport
       
     - name: Verificar cobertura mínima (80%)
       run: ./gradlew jacocoTestCoverageVerification
@@ -35,13 +35,13 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: coverage-report
-        path: build/reports/jacoco/test/html/
+        path: app/build/reports/jacoco/jacocoTestReport/html/
         
     - name: Comentar cobertura en PR
       if: github.event_name == 'pull_request'
       uses: madrapps/jacoco-report@v1.6.1
       with:
-        paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
+        paths: ${{ github.workspace }}/app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
         token: ${{ secrets.GITHUB_TOKEN }}
         min-coverage-overall: 80
         min-coverage-changed-files: 80
