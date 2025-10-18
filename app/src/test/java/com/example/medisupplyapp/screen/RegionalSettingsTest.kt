@@ -56,7 +56,6 @@ class RegionalSettingsUtilsTest {
 
     @Test
     fun `given supported languages when retrieving list then returns Español and English`() {
-         nothing
         val result = getSupportedLanguages()
         val expected = listOf("Español", "English")
         assertEquals(expected, result)
