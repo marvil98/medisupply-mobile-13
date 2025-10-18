@@ -1,0 +1,58 @@
+name: Android CI - Tests y Cobertura JaCoCo
+
+on:
+  pull_request:
+    branches:
+      # Dispara el CI/CD en PRs dirigidos a estas ramas
+      - main
+      - develop
+      - 'feature/**' # Cubre todas las ramas que empiezan con 'feature/'
+
+jobs:
+  test_and_coverage:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      # 1. Configuración de Java
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      # 2. Permisos de Ejecución para Gradle
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # 3. 🚀 Ejecuta Tests y VALIDA la Cobertura (¡El paso que falla el build!)
+      # Si el porcentaje está por debajo del 80% (configurado en Gradle), esta tarea fallará.
+      - name: Run Unit Tests and Validate Coverage (80%)
+        run: ./gradlew jacocoTestCoverageVerification
+
+      # 4. Genera el Reporte JaCoCo Completo (Necesario para las acciones de publicación)
+      # Se ejecuta después de la verificación para asegurar que el archivo .exec se genere.
+      - name: Generate JaCoCo HTML Report
+        run: ./gradlew jacocoTestReport
+
+      # 5. Publica el Porcentaje de Cobertura en el PR
+      # Utiliza el archivo .exec generado para mostrar un resumen de la cobertura.
+      - name: Publish Code Coverage Summary
+        uses: cicirello/jacoco-action@v2
+        with:
+          # Ruta del archivo de datos de JaCoCo generado por la tarea de tests
+          coverage-files: app/build/jacoco/testDebugUnitTest.exec 
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          minimum-coverage-overall: 80 # Verifica el 80% también en el resumen publicado
+          # Si deseas, puedes añadir un título personalizado al comentario
+          # title: "JaCoCo Coverage Check"
+
+      # 6. (Opcional) Publica el reporte de tests (JUnit XML/HTML)
+      - name: Publish JUnit Test Report
+        uses: mikepenz/action-junit-report@v4
+        if: always() # Publica el reporte incluso si la verificación de JaCoCo falló (Paso 3)
+        with:
+          report_paths: '**/build/test-results/testDebugUnitTest/*.xml'
