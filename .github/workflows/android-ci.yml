@@ -1,0 +1,112 @@
+name: Android CI/CD
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+      - 'feature/*'
+  pull_request:
+    branches:
+      - develop
+      - master
+    types: [opened, synchronize, reopened, ready_for_review, closed]
+
+env:
+  MIN_COVERAGE: 50
+  JAVA_VERSION: 17
+  GRADLE_OPTS: -Dorg.gradle.daemon=false
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    outputs:
+      coverage: ${{ steps.coverage-check.outputs.coverage }}
+      branch-type: ${{ steps.branch-info.outputs.type }}
+
+    steps:
+      - name: 🧩 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🧠 Detect branch type
+        id: branch-info
+        run: |
+          if [[ "${{ github.ref_name }}" == "master" ]]; then
+            echo "type=master" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref_name }}" == "develop" ]]; then
+            echo "type=develop" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref_name }}" == feature/* ]]; then
+            echo "type=feature" >> $GITHUB_OUTPUT
+          else
+            echo "type=other" >> $GITHUB_OUTPUT
+          fi
+      - name: ☕ Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: gradle
+
+      - name: 🔐 Grant execute permission for Gradle
+        run: chmod +x gradlew
+
+      - name: 🧹 Clean project
+        run: ./gradlew clean
+
+      - name: 🔎 Run Lint
+        run: ./gradlew lint
+
+      - name: 🧪 Run Unit Tests with Coverage
+        run: ./gradlew app:testDebugUnitTest app:jacocoTestReport
+
+      - name: 📊 Check test coverage
+        id: coverage-check
+        run: |
+          echo "📊 Checking coverage..."
+          REPORT_FILE="app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+          if [ -f "$REPORT_FILE" ]; then
+            COVERAGE=$(grep -oP '(?<=<counter type="LINE" missed=")[0-9]+" covered="[0-9]+"' "$REPORT_FILE" | \
+              awk -F'"' '{missed+=$2; covered+=$4} END {if (covered+missed>0) print covered/(covered+missed)*100; else print 0}')
+            COVERAGE=$(printf "%.2f" "$COVERAGE")
+          else
+            echo "⚠️ Coverage report not found"
+            COVERAGE=0
+          fi
+          echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+          echo "Coverage: ${COVERAGE}%"
+          if (( $(echo "$COVERAGE < $MIN_COVERAGE" | bc -l) )); then
+            echo "❌ Coverage below ${MIN_COVERAGE}%"
+            exit 1
+          fi
+      - name: 🏗️ Build Debug APK
+        run: ./gradlew assembleDebug
+
+      - name: 📦 Upload APK as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: 📤 Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: app/build/reports/jacoco/jacocoTestReport/html
+
+  deploy:
+    needs: build-and-test
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🚀 Simulate Deploy (placeholder)
+        run: echo "Deploying build from master branch..."
+
+  validate-merge-to-develop:
+    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'develop'
+    runs-on: ubuntu-latest
+    steps:
+      - name: ✅ Validación post-merge a develop
+        run: echo "Se ha hecho merge a develop desde ${{ github.event.pull_request.head.ref }}"
