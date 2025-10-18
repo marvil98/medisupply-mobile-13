@@ -2,16 +2,14 @@ package com.example.medisupplyapp.data.remote.repository
 
 import com.example.medisupplyapp.data.model.Order
 import com.example.medisupplyapp.data.model.OrderStatus
-import com.example.medisupplyapp.data.remote.ApiConnection
 
 
-import android.util.Log
 import com.example.medisupplyapp.data.remote.api.OrdersApi
 
 class OrdersRepository(var api: OrdersApi) {
-    suspend fun getOrders(): Result<List<Order>> {
+    suspend fun getOrders(userID: String): Result<List<Order>> {
         return try {
-            val response = api.getOrders(userId = "USER_55")
+            val response = api.getOrders(userId = userID)
 
             if (response.isEmpty()) {
                 Result.success(emptyList())

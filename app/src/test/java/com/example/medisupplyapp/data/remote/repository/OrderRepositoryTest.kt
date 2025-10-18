@@ -1,8 +1,6 @@
 package com.example.medisupplyapp.data.remote.repository
 
-import com.example.medisupplyapp.data.model.Order
 import com.example.medisupplyapp.data.model.OrderStatus
-import com.example.medisupplyapp.data.remote.ApiConnection
 import com.example.medisupplyapp.data.remote.api.OrdersApi // Asume que esta es la interfaz
 import com.example.medisupplyapp.data.remote.dto.OrderResponse
 import kotlinx.coroutines.test.runTest
@@ -59,7 +57,7 @@ class OrdersRepositoryTest {
         `when`(mockApi.getOrders(userId = "USER_55")).thenReturn(apiResponse)
 
         // ACT: Llamar a la función a probar
-        val result = repository.getOrders()
+        val result = repository.getOrders("USER_55")
 
         // ASSERT: Verificar el resultado
         assertTrue(result.isSuccess, "La llamada debería haber sido exitosa")
@@ -82,7 +80,7 @@ class OrdersRepositoryTest {
         `when`(mockApi.getOrders(userId = "USER_55")).thenReturn(emptyList())
 
         // ACT
-        val result = repository.getOrders()
+        val result = repository.getOrders("USER_55")
 
         // ASSERT
         assertTrue(result.isSuccess, "La llamada con respuesta vacía debe ser exitosa")
@@ -98,7 +96,7 @@ class OrdersRepositoryTest {
         `when`(mockApi.getOrders(userId = "USER_55")).thenAnswer { throw httpException }
 
         // ACT
-        val result = repository.getOrders()
+        val result = repository.getOrders("USER_55")
 
         // ASSERT: Debe manejar el 404 y retornar una lista vacía
         assertTrue(result.isSuccess, "El error 404 debe manejarse como éxito con lista vacía")
@@ -114,7 +112,7 @@ class OrdersRepositoryTest {
         `when`(mockApi.getOrders(userId = "USER_55")).thenAnswer { throw httpException }
 
         // ACT
-        val result = repository.getOrders()
+        val result = repository.getOrders("USER_55")
 
         // ASSERT
         assertTrue(result.isFailure, "Los errores HTTP que no son 404 deben retornar Failure")
@@ -128,7 +126,7 @@ class OrdersRepositoryTest {
         `when`(mockApi.getOrders(userId = "USER_55")).thenAnswer { throw networkException }
 
         // ACT
-        val result = repository.getOrders()
+        val result = repository.getOrders("USER_55")
 
         // ASSERT
         assertTrue(result.isFailure, "Los errores de red deben retornar Failure")

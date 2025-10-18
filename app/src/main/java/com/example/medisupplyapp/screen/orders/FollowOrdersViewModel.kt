@@ -27,7 +27,7 @@ class FollowOrdersViewModel(
     fun loadOrders() {
         viewModelScope.launch {
             ordersState = OrdersUiState.Loading
-            repository.getOrders()
+            repository.getOrders("USER_55")
                 .onSuccess { orders ->
                     ordersState = if (orders.isEmpty()) {
                         OrdersUiState.Empty
