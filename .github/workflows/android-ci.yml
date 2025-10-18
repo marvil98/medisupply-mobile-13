@@ -2,10 +2,15 @@ name: Android CI/CD
 
 on:
   push:
-    branches: [ develop, master, 'feature/*' ]
+    branches:
+      - develop
+      - master
+      - 'feature/*'
   pull_request:
-    branches: [ develop, master ]
-    types: [opened, synchronize, reopened]
+    branches:
+      - develop
+      - master
+    types: [opened, synchronize, reopened, ready_for_review, closed]
 
 env:
   MIN_COVERAGE: 50
@@ -53,7 +58,6 @@ jobs:
       - name: 🔎 Run Lint
         run: ./gradlew lint
 
-      # 🔧 Cambié el task a uno estándar compatible con Kotlin/Android
       - name: 🧪 Run Unit Tests with Coverage
         run: ./gradlew testDebugUnitTest jacocoTestReport
 
@@ -85,3 +89,21 @@ jobs:
         with:
           name: app-debug
           path: app/build/outputs/apk/debug/app-debug.apk
+
+  deploy:
+    needs: build-and-test
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔄 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🚀 Simulate Deploy (placeholder)
+        run: echo "Deploying build from master branch..."
+
+  validate-merge-to-develop:
+    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'develop'
+    runs-on: ubuntu-latest
+    steps:
+      - name: ✅ Validación post-merge a develop
+        run: echo "Se ha hecho merge a develop desde ${{ github.event.pull_request.head.ref }}"
