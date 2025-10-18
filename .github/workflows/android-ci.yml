@@ -15,7 +15,6 @@ on:
 env:
   MIN_COVERAGE: 50
   JAVA_VERSION: 17
-  ANDROID_SDK_ROOT: /usr/local/android-sdk
   GRADLE_OPTS: -Dorg.gradle.daemon=false
 
 jobs:
@@ -59,7 +58,7 @@ jobs:
         run: ./gradlew lint
 
       - name: 🧪 Run Unit Tests with Coverage
-        run: ./gradlew testDebugUnitTest jacocoTestReport
+        run: ./gradlew app:testDebugUnitTest app:jacocoTestReport
 
       - name: 📊 Check test coverage
         id: coverage-check
@@ -89,6 +88,12 @@ jobs:
         with:
           name: app-debug
           path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: 📤 Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: app/build/reports/jacoco/jacocoTestReport/html
 
   deploy:
     needs: build-and-test
