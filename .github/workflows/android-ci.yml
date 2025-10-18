@@ -40,6 +40,7 @@ jobs:
           else
             echo "type=other" >> $GITHUB_OUTPUT
           fi
+
       - name: ☕ Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
         with:
@@ -68,6 +69,7 @@ jobs:
             COVERAGE=$(grep -oP '(?<=<counter type="LINE" missed=")[0-9]+" covered="[0-9]+"' "$REPORT_FILE" | \
               awk -F'"' '{missed+=$2; covered+=$4} END {if (covered+missed>0) print covered/(covered+missed)*100; else print 0}')
             COVERAGE=$(printf "%.2f" "$COVERAGE")
+            echo "✅ Coverage XML found"
           else
             echo "⚠️ Coverage report not found"
             COVERAGE=0
@@ -78,6 +80,7 @@ jobs:
             echo "❌ Coverage below ${MIN_COVERAGE}%"
             exit 1
           fi
+
       - name: 🏗️ Build Debug APK
         run: ./gradlew assembleDebug
 

@@ -101,8 +101,6 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     )
     classDirectories.setFrom(files(debugTree, kotlinDebugTree))
     executionData.setFrom(
-        fileTree(layout.buildDirectory.get()).include(
-            "jacoco/testDebugUnitTest.exec"
-        )
+        fileTree(layout.buildDirectory.get()).include("jacoco/testDebugUnitTest.exec")
     )
 }
