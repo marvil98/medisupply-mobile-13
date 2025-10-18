@@ -84,4 +84,32 @@ class LocaleUtilsTest {
         assertNotNull(displayLanguage)
         assertTrue(displayLanguage.isNotEmpty())
     }
+
+    @Test
+    fun localeSetDefault_changesDefaultLocale() {
+        // Arrange
+        val originalDefault = Locale.getDefault()
+        val newLocale = Locale("fr")
+        
+        // Act
+        Locale.setDefault(newLocale)
+        
+        // Assert
+        assertEquals("fr", Locale.getDefault().language)
+        
+        // Restore original locale
+        Locale.setDefault(originalDefault)
+    }
+
+    @Test
+    fun localeToString_returnsCorrectString() {
+        // Arrange
+        val locale = Locale("es", "ES")
+        
+        // Act
+        val localeString = locale.toString()
+        
+        // Assert
+        assertEquals("es_ES", localeString)
+    }
 }

@@ -67,6 +67,8 @@ dependencies {
 
     // Dependencias de pruebas
     testImplementation(libs.junit)
+    testImplementation("org.mockito:mockito-core:5.1.1")
+    testImplementation("org.mockito:mockito-inline:5.1.1")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
