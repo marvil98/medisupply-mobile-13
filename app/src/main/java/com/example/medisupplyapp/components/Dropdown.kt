@@ -26,7 +26,8 @@ fun CustomDropdown(
     onSelect: (String) -> Unit,
     hasError: Boolean? = false,
     placeholder: String = stringResource(R.string.placeholder_default),
-    errorMessage: String = stringResource(R.string.required_field)
+    errorMessage: String = stringResource(R.string.required_field),
+    onDismissWithoutSelection: (() -> Unit)? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selectWidthPx by remember { mutableStateOf(0) }
@@ -57,8 +58,8 @@ fun CustomDropdown(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = selected ?: placeholder,
-                    color = if (selected == null) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.primary,
+                    text = if (selected.isNullOrBlank()) placeholder else selected,
+                    color = if (selected.isNullOrBlank()) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.primary,
                     fontFamily = FontFamily(Font(R.font.league_spartan_regular)),
                     fontSize = 16.sp,
                     modifier = Modifier.weight(1f)
@@ -77,10 +78,15 @@ fun CustomDropdown(
 
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false },
             modifier = Modifier
                 .width(with(LocalDensity.current) { selectWidthPx.toDp() })
-                .background(Color.White)
+                .background(Color.White),
+            onDismissRequest = {
+                expanded = false
+                if (selected.isNullOrBlank()) {
+                    onDismissWithoutSelection?.invoke()
+                }
+            },
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
