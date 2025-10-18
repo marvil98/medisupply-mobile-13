@@ -3,10 +3,9 @@ name: Android CI - Tests y Cobertura JaCoCo
 on:
   pull_request:
     branches:
-      # Dispara el CI/CD en PRs dirigidos a estas ramas
       - main
       - develop
-      - 'feature/**' # Cubre todas las ramas que empiezan con 'feature/'
+      - 'feature/**'
 
 jobs:
   test_and_coverage:
@@ -28,23 +27,25 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # 3. 🚀 Ejecuta Tests y VALIDA la Cobertura (¡El paso que falla el build!)
-      # Verifica el 80% configurado en Gradle.
+      # 3. 🚀 Ejecuta Tests y VALIDA la Cobertura (80%)
       - name: Run Unit Tests and Validate Coverage (80%)
+        # Esta tarea genera el archivo .exec y el reporte XML (necesario para el paso 5)
         run: ./gradlew jacocoTestCoverageVerification
 
-      # 4. Genera el Reporte JaCoCo Completo
-      - name: Generate JaCoCo HTML Report
+      # 4. Genera el Reporte JaCoCo HTML Report
+      # NOTA: Asegúrate de que tu configuración de Gradle también genere el archivo .xml
+      # La tarea jacocoTestReport debería generarlo por defecto junto al .html
+      - name: Generate JaCoCo HTML/XML Report
         run: ./gradlew jacocoTestReport
 
-      # 5. Publica el Porcentaje de Cobertura en el PR (¡CORRECCIÓN A @main!)
-      # Usar @main garantiza la última versión disponible si las etiquetas fallan.
-      - name: Publish Code Coverage Summary
-        uses: cicirello/jacoco-badge-action@main 
+      # 5. Publica la Cobertura usando una alternativa (simple-elf)
+      - name: Publish Code Coverage Summary (Alternative)
+        uses: simple-elf/all-in-one-coverage@v3 # ⬅️ LA ACCIÓN ALTERNATIVA
         with:
-          coverage-files: app/build/jacoco/testDebugUnitTest.exec 
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          minimum-coverage-overall: 80 
+          # Ruta al archivo XML de JaCoCo que Gradle genera.
+          # Esta ruta es estándar después de ejecutar jacocoTestReport.
+          jacoco-coverage-path: app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
+          # La acción automáticamente publica el resultado en el PR.
           
       # 6. Publica el reporte de tests (JUnit XML/HTML)
       - name: Publish JUnit Test Report
