@@ -42,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report-html
-          path: app/build/reports/coverage/debug/
+          path: app/build/reports/coverage/test/debug/
           retention-days: 7
 
       # 6. Mostrar Resumen de Cobertura en el Log
@@ -52,6 +52,7 @@ jobs:
           
           # Rutas posibles donde puede estar el reporte XML
           POSSIBLE_PATHS=(
+            "app/build/reports/coverage/test/debug/report.xml"
             "app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
             "app/build/reports/coverage/debug/jacocoTestReport.xml"
             "app/build/reports/jacoco/testDebugUnitTestCoverage/testDebugUnitTestCoverage.xml"
