@@ -18,7 +18,7 @@ fun Home(userName: String, selectedRoute: String, onNavigate: (String) -> Unit) 
         Scaffold(
             topBar = { Header(userName, onNavigate) },
             bottomBar = { FooterNavigation(selectedRoute, onNavigate) },
-            containerColor = MaterialTheme.colorScheme.background
+                containerColor = MaterialTheme.colorScheme.background
         ) { innerPadding ->
             val scrollState = rememberScrollState()
             Column(

@@ -74,35 +74,13 @@ fun SectionCard(
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 options.forEach { (title, navigation) ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 6.dp)
-                            .clickable {
-                                onOptionClick?.invoke(navigation) }
-                            .background(
-                                color = Color.White,
-                                shape = RoundedCornerShape(percent = 50)
-                            )
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = title,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_arrow),
-                            contentDescription = "Sección: $title",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
+                    RoundedButton(
+                        onOptionClick =  onOptionClick,
+                        navigation = navigation,
+                        title = title
+                    )
                 }
             }
         }
     }
 }
-

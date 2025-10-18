@@ -35,14 +35,12 @@ import java.util.Locale
 @Composable
 fun OrderCard(
     order: Order,
-    onClick: () -> Unit
 ) {
     val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         ),

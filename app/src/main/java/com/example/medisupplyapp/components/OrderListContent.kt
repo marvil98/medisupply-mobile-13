@@ -20,7 +20,7 @@ import com.example.medisupplyapp.data.model.Order
 fun OrdersListContent(
     orders: List<Order>,
     paddingValues: PaddingValues,
-    onOrderClick: (String) -> Unit
+    onNavigate: (String) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -30,9 +30,15 @@ fun OrdersListContent(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         item {
-            Spacer(modifier = Modifier.height(15.dp))
+            Spacer(modifier = Modifier.height(5.dp))
         }
-
+        item{
+            RoundedButton(
+                title = stringResource(R.string.follow_order),
+                navigation = "create_order",
+                onOptionClick = { onNavigate(it) }
+            )
+        }
         item {
             Text(
                 text = stringResource(R.string.order_history),
@@ -49,7 +55,6 @@ fun OrdersListContent(
         items(orders.size) { i ->
             OrderCard(
                 order = orders[i],
-                onClick = { onOrderClick(orders[i].id) }
             )
         }
     }

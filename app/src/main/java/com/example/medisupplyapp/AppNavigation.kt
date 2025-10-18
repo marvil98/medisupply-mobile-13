@@ -3,11 +3,8 @@ package com.example.medisupplyapp
 import androidx.compose.runtime.*
 import androidx.navigation.compose.*
 import com.example.medisupplyapp.screen.RegionalSettingsScreen
-import com.example.medisupplyapp.screen.orders.OrdersHomeScreen
 import androidx.compose.ui.platform.LocalContext
 import com.example.medisupplyapp.screen.orders.FollowOrderScreen
-import com.example.medisupplyapp.data.model.Order
-import com.example.medisupplyapp.data.model.OrderStatus
 import com.example.medisupplyapp.utils.updateLocale
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -57,16 +54,14 @@ fun AppNavigation(userName: String) {
         }
 
         composable("orders") {
-            OrdersHomeScreen(
-                userName = userName,
+            FollowOrderScreen(
                 onNavigate = { route -> navController.navigate(route) },
                 selectedRoute = "orders",
+                onBack = { navController.popBackStack() }
             )
         }
 
         composable("follow_orders") {
-            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            val date = sdf.parse("13/10/2025") ?: java.util.Date()
             FollowOrderScreen(
                 onNavigate = { route -> navController.navigate(route) },
                 selectedRoute = "orders",
@@ -74,11 +69,6 @@ fun AppNavigation(userName: String) {
             )
         }
     }
-}
-
-@Composable
-fun OrdersScreen() {
-    TODO("Not yet implemented")
 }
 
 @Composable
