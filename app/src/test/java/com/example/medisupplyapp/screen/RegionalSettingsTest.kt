@@ -24,6 +24,11 @@ fun getSupportedLanguages(): List<String> {
     return listOf("Español", "English")
 }
 
+object RegionalSettingsLogic {
+    fun getLanguageOptions(): List<String> = listOf("Español", "English")
+    fun isLanguageValid(language: String?): Boolean = language != null
+}
+
 class RegionalSettingsUtilsTest {
 
     @Test
@@ -59,5 +64,11 @@ class RegionalSettingsUtilsTest {
         val result = getSupportedLanguages()
         val expected = listOf("Español", "English")
         assertEquals(expected, result)
+    }
+
+    @Test
+    fun `given valid language when checking validity then returns true`() {
+        val result = RegionalSettingsLogic.isLanguageValid("Español")
+        assertTrue(result)
     }
 }

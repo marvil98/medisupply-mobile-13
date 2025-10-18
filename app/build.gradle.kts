@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("jacoco")
+    id("jacoco") // ✅ Plugin de JaCoCo aplicado
 }
 
 android {
@@ -25,6 +25,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        // 👇 CORRECCIÓN CLAVE: Habilitar la cobertura de pruebas unitarias para 'debug'
+        debug {
+            enableUnitTestCoverage = true
         }
     }
 
@@ -77,30 +81,67 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
+// -----------------------------------------------------------------------------
+
+/**
+ * Tarea personalizada de JaCoCo para generar el reporte de cobertura.
+ */
 tasks.register<JacocoReport>("jacocoTestReport") {
+    // Asegura que las pruebas unitarias se ejecuten antes de generar el reporte
     dependsOn("testDebugUnitTest")
 
     reports {
-        xml.required.set(true)
+        xml.required.set(true) // ✅ Necesario para que GitHub Action lea el porcentaje
         html.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/jacocoTestReport/html"))
     }
 
-    val fileFilter = listOf("**/R.class", "**/BuildConfig.*", "**/Manifest*.*", "**/*Test*.*")
-    val debugTree = fileTree("${layout.buildDirectory.get()}/intermediates/javac/debug") {
-        exclude(fileFilter)
-    }
-    val kotlinDebugTree = fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
-        exclude(fileFilter)
-    }
+    // 👇 MEJORA: Lista de exclusiones expandida para Android/Compose/Kotlin
+    val coverageExclusions = listOf(
+        // Clases generadas por Android/Kotlin
+        "**/R.class",
+        "**/R\$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*",
+        // Clases de Composable y ViewBinding
+        "**/*_Factory*",
+        "**/*_MembersInjector*",
+        "**/*_Provide*",
+        "**/data/models/**", // Si son solo data classes
+        "**/ui/theme/**", // Archivos de tema
+        "**/*ComposableSingletons*", // Clases singleton de Compose
+        "**/*Kt\$lambda\$*", // Lambdas generadas por el compilador Kotlin
+        "**/*_Impl*", // Clases de Room/otros ORMs
+        "**/*_HiltModules*", // Módulos de Hilt si usas Hilt
+    )
 
+    // 👇 CORRECCIÓN: Directorios de clases para instrumentación. Se simplifica el acceso.
+    classDirectories.setFrom(
+        fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
+            exclude(coverageExclusions)
+        }
+    )
+
+    // Directorios de código fuente (para el reporte HTML)
     sourceDirectories.setFrom(
         files(
             "${project.projectDir}/src/main/java",
             "${project.projectDir}/src/main/kotlin"
         )
     )
-    classDirectories.setFrom(files(debugTree, kotlinDebugTree))
+
+    // 👇 CORRECCIÓN: Ubicación del archivo de ejecución (.exec) de las pruebas unitarias.
+    // Esta ruta suele ser la más confiable para versiones recientes de Gradle/Android.
     executionData.setFrom(
-        fileTree(layout.buildDirectory.get()).include("jacoco/testDebugUnitTest.exec")
+        fileTree(project.buildDir) {
+            include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+        }
     )
+}
+
+// Tarea extra para mantener el nombre de tu Action
+tasks.register<JacocoReport>("createDebugCoverageReport") {
+    dependsOn("jacocoTestReport")
 }
