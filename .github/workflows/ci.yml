@@ -28,29 +28,24 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # 3. 🚀 Ejecuta Tests Unitarios
-      - name: Run Unit Tests
-        run: ./gradlew testDebugUnitTest
+      # 3. 🚀 Ejecuta Tests Unitarios y Genera Reporte de Cobertura
+      - name: Run Unit Tests and Generate Coverage Report
+        run: ./gradlew testDebugUnitTest createDebugUnitTestCoverageReport
 
-      # 4. Genera el Reporte JaCoCo HTML y XML
-      # El XML es esencial para el paso 6.
-      - name: Generate JaCoCo HTML/XML Report
-        run: ./gradlew jacocoTestReport
-
-      # 5. VALIDA la Cobertura (80%)
+      # 4. VALIDA la Cobertura (80%)
       # Esta tarea falla el build si la cobertura es menor al umbral (configurado en build.gradle)
       - name: Validate Coverage (80%)
         run: ./gradlew jacocoTestCoverageVerification
 
-      # 6. Sube el reporte HTML como Artifact
+      # 5. Sube el reporte HTML como Artifact
       - name: Upload JaCoCo HTML Report
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report-html
-          path: app/build/reports/jacoco/jacocoTestReport/html/
+          path: app/build/reports/coverage/debug/
           retention-days: 7
 
-      # 7. Publica el Resumen de Cobertura en el PR (Solución Robusta)
+      # 6. Publica el Resumen de Cobertura en el PR (Solución Robusta)
       # Usa una acción oficial de GitHub para leer el XML y postear el comentario.
       - name: Publish Code Coverage Summary via Script
         uses: actions/github-script@v7
@@ -59,29 +54,57 @@ jobs:
           script: |
             // Importa el módulo para leer archivos del runner
             const fs = require('fs');
-            // Lee el contenido del reporte XML generado por Gradle
-            const xml = fs.readFileSync('app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml', 'utf8');
-
-            // Expresión regular para extraer la cobertura de líneas (LINE)
-            // Busca <counter type="LINE" missed="[N]" covered="[N]"/>
-            const lineCoverageMatch = xml.match(/<counter type="LINE" missed="(\d+)" covered="(\d+)"\/>/);
+            const path = require('path');
             
-            let comment = "## ⚠️ Resumen de Cobertura JaCoCo\n\nNo se pudo calcular la cobertura de líneas. Verifica el log del build.";
+            // Rutas posibles donde puede estar el reporte XML
+            const possiblePaths = [
+              'app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml',
+              'app/build/reports/coverage/debug/jacocoTestReport.xml',
+              'app/build/reports/jacoco/testDebugUnitTestCoverage/testDebugUnitTestCoverage.xml',
+              'app/build/reports/jacoco/jacocoTestReport.xml'
+            ];
             
-            if (lineCoverageMatch) {
-              const missedLines = parseInt(lineCoverageMatch[1]);
-              const coveredLines = parseInt(lineCoverageMatch[2]);
-              const totalLines = missedLines + coveredLines;
-              const percentage = ((coveredLines / totalLines) * 100).toFixed(2);
+            let xml = null;
+            let reportPath = null;
+            
+            // Busca el archivo XML en las rutas posibles
+            for (const xmlPath of possiblePaths) {
+              try {
+                if (fs.existsSync(xmlPath)) {
+                  xml = fs.readFileSync(xmlPath, 'utf8');
+                  reportPath = xmlPath;
+                  console.log(`Reporte encontrado en: ${xmlPath}`);
+                  break;
+                }
+              } catch (error) {
+                console.log(`No se encontró reporte en: ${xmlPath}`);
+              }
+            }
+            
+            let comment = "## ⚠️ Resumen de Cobertura JaCoCo\n\nNo se pudo encontrar el reporte de cobertura. Verifica el log del build.";
+            
+            if (xml) {
+              // Expresión regular para extraer la cobertura de líneas (LINE)
+              const lineCoverageMatch = xml.match(/<counter type="LINE" missed="(\d+)" covered="(\d+)"\/>/);
               
-              // Define el ícono y el mensaje basado en el umbral (80%)
-              const icon = percentage >= 80 ? '✅' : '❌';
+              if (lineCoverageMatch) {
+                const missedLines = parseInt(lineCoverageMatch[1]);
+                const coveredLines = parseInt(lineCoverageMatch[2]);
+                const totalLines = missedLines + coveredLines;
+                const percentage = ((coveredLines / totalLines) * 100).toFixed(2);
+                
+                // Define el ícono y el mensaje basado en el umbral (80%)
+                const icon = percentage >= 80 ? '✅' : '❌';
 
-              comment = `## ${icon} Cobertura de Código JaCoCo\n\n` +
-                        `| Métrica | Cobertura | Umbral Mínimo |\n` +
-                        `| :--- | :---: | :---: |\n` +
-                        `| **Líneas** | **${percentage}%** | **80.00%** |\n\n` +
-                        `_El reporte HTML completo está disponible en el panel de **Artifacts**._`;
+                comment = `## ${icon} Cobertura de Código JaCoCo\n\n` +
+                          `| Métrica | Cobertura | Umbral Mínimo |\n` +
+                          `| :--- | :---: | :---: |\n` +
+                          `| **Líneas** | **${percentage}%** | **80.00%** |\n\n` +
+                          `_Reporte generado desde: \`${reportPath}\`_\n` +
+                          `_El reporte HTML completo está disponible en el panel de **Artifacts**._`;
+              } else {
+                comment = `## ⚠️ Resumen de Cobertura JaCoCo\n\nSe encontró el reporte XML pero no se pudo extraer la información de cobertura de líneas.\n_Reporte encontrado en: \`${reportPath}\`_`;
+              }
             }
 
             // Publica el comentario en el Pull Request
@@ -92,7 +115,7 @@ jobs:
               body: comment
             });
 
-      # 8. Publica el reporte de tests (JUnit XML/HTML)
+      # 7. Publica el reporte de tests (JUnit XML/HTML)
       - name: Publish JUnit Test Report
         uses: mikepenz/action-junit-report@v4
         if: always() 
