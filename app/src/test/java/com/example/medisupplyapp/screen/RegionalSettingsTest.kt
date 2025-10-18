@@ -4,71 +4,83 @@ import org.junit.Assert.*
 import org.junit.Test
 
 /**
- * Returns true if the selected language is valid.
+ * Lógica de configuración regional para selección de idioma.
  */
-fun isLanguageValid(language: String?): Boolean {
-    return language != null
-}
-
-/**
- * Returns true if the language selection should show an error.
- */
-fun shouldShowLanguageError(language: String?): Boolean {
-    return language == null
-}
-
-/**
- * Returns the list of supported languages.
- */
-fun getSupportedLanguages(): List<String> {
-    return listOf("Español", "English")
-}
-
 object RegionalSettingsLogic {
-    fun getLanguageOptions(): List<String> = listOf("Español", "English")
-    fun isLanguageValid(language: String?): Boolean = language != null
+
+    private val supportedLanguages = listOf("Español", "English")
+
+    /**
+     * Devuelve la lista de idiomas soportados.
+     */
+    fun getLanguageOptions(): List<String> = supportedLanguages
+
+    /**
+     * Retorna true si el idioma es válido (no nulo y dentro de los soportados).
+     */
+    fun isLanguageValid(language: String?): Boolean {
+        return language != null && supportedLanguages.contains(language)
+    }
+
+    /**
+     * Retorna true si debe mostrarse un error (idioma nulo o no válido).
+     */
+    fun shouldShowLanguageError(language: String?): Boolean {
+        return language == null || !supportedLanguages.contains(language)
+    }
 }
 
+/**
+ * Pruebas unitarias para la lógica de configuración regional.
+ */
 class RegionalSettingsUtilsTest {
 
     @Test
     fun `given a valid language when checking validity then returns true`() {
-        val language = "Español"
-        val result = isLanguageValid(language)
-        assertTrue(result)
-    }
-
-    @Test
-    fun `given a null language when checking validity then returns false`() {
-        val language: String? = null
-        val result = isLanguageValid(language)
-        assertFalse(result)
-    }
-
-    @Test
-    fun `given a null language when checking error state then returns true`() {
-        val language: String? = null
-        val result = shouldShowLanguageError(language)
-        assertTrue(result)
-    }
-
-    @Test
-    fun `given a valid language when checking error state then returns false`() {
-        val language = "English"
-        val result = shouldShowLanguageError(language)
-        assertFalse(result)
-    }
-
-    @Test
-    fun `given supported languages when retrieving list then returns Español and English`() {
-        val result = getSupportedLanguages()
-        val expected = listOf("Español", "English")
-        assertEquals(expected, result)
-    }
-
-    @Test
-    fun `given valid language when checking validity then returns true`() {
         val result = RegionalSettingsLogic.isLanguageValid("Español")
         assertTrue(result)
+    }
+
+    @Test
+    fun `given null language when checking validity then returns false`() {
+        val result = RegionalSettingsLogic.isLanguageValid(null)
+        assertFalse(result)
+    }
+
+    @Test
+    fun `given unsupported language when checking validity then returns false`() {
+        val result = RegionalSettingsLogic.isLanguageValid("Français")
+        assertFalse(result)
+    }
+
+    @Test
+    fun `given empty string when checking validity then returns false`() {
+        val result = RegionalSettingsLogic.isLanguageValid("")
+        assertFalse(result)
+    }
+
+    @Test
+    fun `given null language when checking error state then returns true`() {
+        val result = RegionalSettingsLogic.shouldShowLanguageError(null)
+        assertTrue(result)
+    }
+
+    @Test
+    fun `given unsupported language when checking error state then returns true`() {
+        val result = RegionalSettingsLogic.shouldShowLanguageError("Italiano")
+        assertTrue(result)
+    }
+
+    @Test
+    fun `given valid language when checking error state then returns false`() {
+        val result = RegionalSettingsLogic.shouldShowLanguageError("English")
+        assertFalse(result)
+    }
+
+    @Test
+    fun `when retrieving supported languages then returns Español and English`() {
+        val result = RegionalSettingsLogic.getLanguageOptions()
+        val expected = listOf("Español", "English")
+        assertEquals(expected, result)
     }
 }

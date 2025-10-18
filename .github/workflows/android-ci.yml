@@ -13,7 +13,6 @@ on:
     types: [opened, synchronize, reopened, ready_for_review, closed]
 
 env:
-  # Se recomienda 80, pero para pruebas iniciales, puedes bajarlo.
   MIN_COVERAGE: 80
   JAVA_VERSION: 17
   GRADLE_OPTS: -Dorg.gradle.daemon=false
@@ -53,39 +52,38 @@ jobs:
         run: chmod +x gradlew
 
       - name: 🧹 Clean project
-        # Se mantiene para una limpieza previa, aunque 'build' ya lo hace
         run: ./gradlew clean
 
       - name: 🔎 Run Lint
         run: ./gradlew lint
 
-      - name: 🧪 Run Unit Tests with Coverage
-        # Ejecuta las pruebas unitarias y luego la tarea que genera el reporte de JaCoCo
-        # ¡IMPORTANTE!: Asegúrate de que tu configuración de JaCoCo en Gradle genere el archivo XML esperado.
-        run: ./gradlew testDebugUnitTest **createDebugCoverageReport**
+      - name: 🧪 Run Unit Tests with Coverage (Kover)
+        # Ejecuta pruebas unitarias Kotlin con reporte XML/HTML
+        run: ./gradlew testDebugUnitTest koverXmlReport koverHtmlReport
 
       - name: 📊 Check test coverage
         id: coverage-check
         run: |
           echo "📊 Checking coverage..."
-          # JaCoCoTestReport es el nombre de la carpeta por defecto de JaCoCo en Gradle,
-          # y el archivo XML que necesitamos para el cálculo.
-          REPORT_FILE="app/build/reports/jacoco/**jacocoTestReport.xml**"
+          REPORT_FILE="app/build/reports/kover/report.xml"
+
+          # Mostrar archivos de reporte encontrados (para depuración)
+          find app/build/reports -type f || true
+
           if [ -f "$REPORT_FILE" ]; then
-            # Este comando grep/awk es robusto pero asume el formato de JaCoCo.
-            COVERAGE=$(grep -oP '(?<=<counter type="LINE" missed=")[0-9]+" covered="[0-9]+"' "$REPORT_FILE" | \
-              awk -F'"' '{missed+=$2; covered+=$4} END {if (covered+missed>0) print covered/(covered+missed)*100; else print 0}')
-            COVERAGE=$(printf "%.2f" "$COVERAGE")
-            echo "✅ Coverage XML found"
+            echo "✅ Coverage XML found at $REPORT_FILE"
+            COVERAGE=$(xmllint --xpath \
+              "round(100 * sum(//counter[@type='LINE']/@covered) div sum(//counter[@type='LINE']/(@covered + @missed)))" \
+              "$REPORT_FILE" 2>/dev/null || echo 0)
           else
-            echo "⚠️ Coverage report not found at ${REPORT_FILE}. **Check JaCoCo Gradle setup.**"
+            echo "⚠️ Coverage report not found at ${REPORT_FILE}"
             COVERAGE=0
           fi
-          
+
           echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
           echo "Coverage: ${COVERAGE}%"
-          
-          # La comparación de números flotantes debe ser precisa.
+
+          # Validar umbral mínimo
           if (( $(echo "$COVERAGE < $MIN_COVERAGE" | bc -l) )); then
             echo "❌ Coverage below ${MIN_COVERAGE}%"
             exit 1
@@ -100,12 +98,11 @@ jobs:
           name: app-debug
           path: app/build/outputs/apk/debug/app-debug.apk
 
-      - name: 📤 Upload coverage report
-        # La ruta del reporte HTML debe coincidir con la de tu configuración JaCoCo en Gradle.
+      - name: 📤 Upload coverage report (HTML)
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report-html
-          path: app/build/reports/jacoco/**jacocoTestReport/html**
+          path: app/build/reports/kover/html
 
   deploy:
     needs: build-and-test
