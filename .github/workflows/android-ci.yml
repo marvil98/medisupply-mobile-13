@@ -13,7 +13,7 @@ on:
     types: [opened, synchronize, reopened, ready_for_review, closed]
 
 env:
-  MIN_COVERAGE: 50
+  MIN_COVERAGE: 80
   JAVA_VERSION: 17
   GRADLE_OPTS: -Dorg.gradle.daemon=false
 
