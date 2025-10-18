@@ -29,22 +29,24 @@ jobs:
         run: chmod +x gradlew
 
       # 3. 🚀 Ejecuta Tests y VALIDA la Cobertura (¡El paso que falla el build!)
+      # Verifica el 80% configurado en Gradle.
       - name: Run Unit Tests and Validate Coverage (80%)
         run: ./gradlew jacocoTestCoverageVerification
 
-      # 4. Genera el Reporte JaCoCo Completo (Necesario para las acciones de publicación)
+      # 4. Genera el Reporte JaCoCo Completo
       - name: Generate JaCoCo HTML Report
         run: ./gradlew jacocoTestReport
 
-      # 5. Publica el Porcentaje de Cobertura en el PR (¡CORREGIDO!)
+      # 5. Publica el Porcentaje de Cobertura en el PR (¡CORRECCIÓN A @main!)
+      # Usar @main garantiza la última versión disponible si las etiquetas fallan.
       - name: Publish Code Coverage Summary
-        uses: cicirello/jacoco-badge-action@v3 
+        uses: cicirello/jacoco-badge-action@main 
         with:
           coverage-files: app/build/jacoco/testDebugUnitTest.exec 
           github-token: ${{ secrets.GITHUB_TOKEN }}
           minimum-coverage-overall: 80 
           
-      # 6. (Opcional) Publica el reporte de tests (JUnit XML/HTML)
+      # 6. Publica el reporte de tests (JUnit XML/HTML)
       - name: Publish JUnit Test Report
         uses: mikepenz/action-junit-report@v4
         if: always() 
