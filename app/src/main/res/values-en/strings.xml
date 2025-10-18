@@ -32,4 +32,6 @@
     <string name="last_update">Last update</string>
     <string name="order">Order</string>
     <string name="order_history">Order history</string>
+    <string name="no_order_history">Oops! You do not have any orders yet.</string>
+    <string name="error_order_history">Oops! We could not get your orders. Please try again.</string>
 </resources>
