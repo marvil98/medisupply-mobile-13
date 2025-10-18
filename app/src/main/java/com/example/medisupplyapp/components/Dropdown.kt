@@ -37,7 +37,7 @@ fun CustomDropdown(
             text = label,
             modifier = Modifier.padding(bottom = 8.dp),
             fontSize = 16.sp,
-            fontWeight = FontWeight.Normal
+            fontWeight = FontWeight.Bold
         )
 
         Box(
