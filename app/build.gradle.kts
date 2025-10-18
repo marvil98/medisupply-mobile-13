@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("jacoco") // ✅ Plugin de JaCoCo aplicado
+    id("org.jetbrains.kotlinx.kover") version "0.7.5" 
 }
 
 android {
@@ -26,9 +26,8 @@ android {
                 "proguard-rules.pro"
             )
         }
-        // 👇 CORRECCIÓN CLAVE: Habilitar la cobertura de pruebas unitarias para 'debug'
         debug {
-            enableUnitTestCoverage = true
+            enableUnitTestCoverage = true // ✅ sigue siendo necesario para Android
         }
     }
 
@@ -71,77 +70,35 @@ dependencies {
     implementation("androidx.compose.ui:ui-text-google-fonts:1.9.0")
 
     testImplementation(libs.junit)
+    testImplementation(kotlin("test"))
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.0")
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-    testImplementation(kotlin("test"))
 }
 
-// -----------------------------------------------------------------------------
-
-/**
- * Tarea personalizada de JaCoCo para generar el reporte de cobertura.
- */
-tasks.register<JacocoReport>("jacocoTestReport") {
-    // Asegura que las pruebas unitarias se ejecuten antes de generar el reporte
-    dependsOn("testDebugUnitTest")
-
+kover {
     reports {
-        xml.required.set(true) // ✅ Necesario para que GitHub Action lea el porcentaje
-        html.required.set(true)
-        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/jacocoTestReport/html"))
+        filters {
+            excludes {
+                // 🔍 Excluye clases generadas que no aportan a la cobertura
+                packages("com.example.medisupplyapp.ui.theme")
+                classes("**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*")
+            }
+        }
     }
 
-    // 👇 MEJORA: Lista de exclusiones expandida para Android/Compose/Kotlin
-    val coverageExclusions = listOf(
-        // Clases generadas por Android/Kotlin
-        "**/R.class",
-        "**/R\$*.class",
-        "**/BuildConfig.*",
-        "**/Manifest*.*",
-        "**/*Test*.*",
-        "android/**/*.*",
-        // Clases de Composable y ViewBinding
-        "**/*_Factory*",
-        "**/*_MembersInjector*",
-        "**/*_Provide*",
-        "**/data/models/**", // Si son solo data classes
-        "**/ui/theme/**", // Archivos de tema
-        "**/*ComposableSingletons*", // Clases singleton de Compose
-        "**/*Kt\$lambda\$*", // Lambdas generadas por el compilador Kotlin
-        "**/*_Impl*", // Clases de Room/otros ORMs
-        "**/*_HiltModules*", // Módulos de Hilt si usas Hilt
-    )
-
-    // 👇 CORRECCIÓN: Directorios de clases para instrumentación. Se simplifica el acceso.
-    classDirectories.setFrom(
-        fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
-            exclude(coverageExclusions)
+    // Configura la salida de los reportes
+    verify {
+        rule {
+            name = "Coverage threshold"
+            bound {
+                minValue = 80 // mismo umbral que usas en tu Action
+            }
         }
-    )
-
-    // Directorios de código fuente (para el reporte HTML)
-    sourceDirectories.setFrom(
-        files(
-            "${project.projectDir}/src/main/java",
-            "${project.projectDir}/src/main/kotlin"
-        )
-    )
-
-    // 👇 CORRECCIÓN: Ubicación del archivo de ejecución (.exec) de las pruebas unitarias.
-    // Esta ruta suele ser la más confiable para versiones recientes de Gradle/Android.
-    executionData.setFrom(
-        fileTree(project.buildDir) {
-            include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
-        }
-    )
-}
-
-// Tarea extra para mantener el nombre de tu Action
-tasks.register<JacocoReport>("createDebugCoverageReport") {
-    dependsOn("jacocoTestReport")
+    }
 }
