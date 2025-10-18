@@ -45,75 +45,44 @@ jobs:
           path: app/build/reports/coverage/debug/
           retention-days: 7
 
-      # 6. Publica el Resumen de Cobertura en el PR (Solución Robusta)
-      # Usa una acción oficial de GitHub para leer el XML y postear el comentario.
-      - name: Publish Code Coverage Summary via Script
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            // Importa el módulo para leer archivos del runner
-            const fs = require('fs');
-            const path = require('path');
-            
-            // Rutas posibles donde puede estar el reporte XML
-            const possiblePaths = [
-              'app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml',
-              'app/build/reports/coverage/debug/jacocoTestReport.xml',
-              'app/build/reports/jacoco/testDebugUnitTestCoverage/testDebugUnitTestCoverage.xml',
-              'app/build/reports/jacoco/jacocoTestReport.xml'
-            ];
-            
-            let xml = null;
-            let reportPath = null;
-            
-            // Busca el archivo XML en las rutas posibles
-            for (const xmlPath of possiblePaths) {
-              try {
-                if (fs.existsSync(xmlPath)) {
-                  xml = fs.readFileSync(xmlPath, 'utf8');
-                  reportPath = xmlPath;
-                  console.log(`Reporte encontrado en: ${xmlPath}`);
-                  break;
-                }
-              } catch (error) {
-                console.log(`No se encontró reporte en: ${xmlPath}`);
-              }
-            }
-            
-            let comment = "## ⚠️ Resumen de Cobertura JaCoCo\n\nNo se pudo encontrar el reporte de cobertura. Verifica el log del build.";
-            
-            if (xml) {
-              // Expresión regular para extraer la cobertura de líneas (LINE)
-              const lineCoverageMatch = xml.match(/<counter type="LINE" missed="(\d+)" covered="(\d+)"\/>/);
+      # 6. Mostrar Resumen de Cobertura en el Log
+      - name: Display Coverage Summary
+        run: |
+          echo "📊 Verificando reportes de cobertura..."
+          
+          # Rutas posibles donde puede estar el reporte XML
+          POSSIBLE_PATHS=(
+            "app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+            "app/build/reports/coverage/debug/jacocoTestReport.xml"
+            "app/build/reports/jacoco/testDebugUnitTestCoverage/testDebugUnitTestCoverage.xml"
+            "app/build/reports/jacoco/jacocoTestReport.xml"
+          )
+          
+          REPORT_FOUND=false
+          for xml_path in "${POSSIBLE_PATHS[@]}"; do
+            if [ -f "$xml_path" ]; then
+              echo "✅ Reporte encontrado en: $xml_path"
+              REPORT_FOUND=true
               
-              if (lineCoverageMatch) {
-                const missedLines = parseInt(lineCoverageMatch[1]);
-                const coveredLines = parseInt(lineCoverageMatch[2]);
-                const totalLines = missedLines + coveredLines;
-                const percentage = ((coveredLines / totalLines) * 100).toFixed(2);
-                
-                // Define el ícono y el mensaje basado en el umbral (80%)
-                const icon = percentage >= 80 ? '✅' : '❌';
-
-                comment = `## ${icon} Cobertura de Código JaCoCo\n\n` +
-                          `| Métrica | Cobertura | Umbral Mínimo |\n` +
-                          `| :--- | :---: | :---: |\n` +
-                          `| **Líneas** | **${percentage}%** | **80.00%** |\n\n` +
-                          `_Reporte generado desde: \`${reportPath}\`_\n` +
-                          `_El reporte HTML completo está disponible en el panel de **Artifacts**._`;
-              } else {
-                comment = `## ⚠️ Resumen de Cobertura JaCoCo\n\nSe encontró el reporte XML pero no se pudo extraer la información de cobertura de líneas.\n_Reporte encontrado en: \`${reportPath}\`_`;
-              }
-            }
-
-            // Publica el comentario en el Pull Request
-            await github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
+              # Extraer cobertura de líneas
+              COVERAGE=$(grep -oP '(?<=<counter type="LINE" missed=")[0-9]+" covered="[0-9]+"' "$xml_path" | awk -F'"' '{missed+=$2; covered+=$4} END {if(covered+missed>0) print covered/(covered+missed)*100; else print 0}')
+              COVERAGE=$(printf "%.2f" "$COVERAGE")
+              
+              echo "📈 Cobertura de líneas: ${COVERAGE}%"
+              if (( $(echo "$COVERAGE >= 80" | bc -l) )); then
+                echo "✅ Cobertura cumple con el umbral mínimo del 80%"
+              else
+                echo "❌ Cobertura por debajo del umbral mínimo del 80%"
+              fi
+              break
+            fi
+          done
+          
+          if [ "$REPORT_FOUND" = false ]; then
+            echo "⚠️ No se encontró reporte de cobertura en ninguna ubicación esperada"
+            echo "📁 Contenido del directorio de reportes:"
+            find app/build/reports -name "*.xml" 2>/dev/null || echo "No se encontraron archivos XML"
+          fi
 
       # 7. Publica el reporte de tests (JUnit XML/HTML)
       - name: Publish JUnit Test Report
