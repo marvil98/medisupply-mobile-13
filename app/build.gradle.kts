@@ -33,9 +33,9 @@ android {
 
         // 🛠️ 2. Habilitar la Cobertura en la Variante 'debug'
         debug {
-            // Esta propiedad le dice a Gradle que prepare la recopilación de datos de JaCoCo.
-            // Es lo que automáticamente genera la tarea 'createDebugUnitTestCoverageReport'.
-            isTestCoverageEnabled = true
+            // Habilitar cobertura de tests unitarios y de instrumentación
+            enableUnitTestCoverage = true
+            enableAndroidTestCoverage = true
         }
     }
 
@@ -76,18 +76,70 @@ dependencies {
     implementation("androidx.compose.ui:ui-text-google-fonts:1.9.0")
 }
 
-tasks.withType<JacocoCoverageVerification> {
-    // Requiere que los tests se ejecuten antes
-    dependsOn("testDebugUnitTest")
+// Configuración de JaCoCo
+jacoco {
+    toolVersion = "0.8.8"
+}
 
+// Configurar la tarea de reporte de cobertura
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn("testDebugUnitTest")
+    
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+    
+    val fileFilter = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*"
+    )
+    
+    val debugTree = fileTree("${buildDir}/intermediates/javac/debug/classes") {
+        exclude(fileFilter)
+    }
+    val mainSrc = "${project.projectDir}/src/main/java"
+    
+    sourceDirectories.setFrom(files(mainSrc))
+    classDirectories.setFrom(files(debugTree))
+    executionData.setFrom(fileTree("${buildDir}/jacoco") {
+        include("**/*.exec")
+    })
+}
+
+// Configurar la tarea de verificación de cobertura
+tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
+    dependsOn("jacocoTestReport")
+    
     violationRules {
         rule {
-            // Regla a nivel de proyecto
             limit {
-                // El porcentaje mínimo aceptado para la cobertura de línea (LINE)
-                minimum = 0.8.toBigDecimal() // Establecido en 80%
+                minimum = "0.80".toBigDecimal()
             }
         }
-        // Opcional: puedes añadir más reglas para clases, métodos, etc.
     }
+    
+    val fileFilter = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*"
+    )
+    
+    val debugTree = fileTree("${buildDir}/intermediates/javac/debug/classes") {
+        exclude(fileFilter)
+    }
+    val mainSrc = "${project.projectDir}/src/main/java"
+    
+    sourceDirectories.setFrom(files(mainSrc))
+    classDirectories.setFrom(files(debugTree))
+    executionData.setFrom(fileTree("${buildDir}/jacoco") {
+        include("**/*.exec")
+    })
 }
