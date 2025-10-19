@@ -35,6 +35,10 @@ jobs:
           api-level: 33 # Puedes ajustar el nivel de la API según tus necesidades
           arch: x86_64 # Especificar arquitectura 64-bit para API 33
           disable-animations: true # Mejorar rendimiento del emulador
+          # Configuración para modo headless y renderizado por software
+          emulator-options: "-no-window -no-snapshot -no-boot-anim -gpu swiftshader_indirect"
+          ram-size: 2048M # Asignar más memoria RAM
+          disk-size: 2048M # Asignar más espacio en disco
           script: ./gradlew clean jacocoTestReport
 
       # 4. VALIDA la Cobertura (0%)
