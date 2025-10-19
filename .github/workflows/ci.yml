@@ -33,6 +33,8 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 33 # Puedes ajustar el nivel de la API según tus necesidades
+          arch: x86_64 # Especificar arquitectura 64-bit para API 33
+          disable-animations: true # Mejorar rendimiento del emulador
           script: ./gradlew clean jacocoTestReport
 
       # 4. VALIDA la Cobertura (0%)
