@@ -35,7 +35,8 @@ android {
         debug {
             // Habilitar cobertura de tests unitarios y de instrumentación
             enableUnitTestCoverage = true
-            enableAndroidTestCoverage = true
+            // Deshabilitar cobertura de androidTest para evitar ejecutar connectedDebugAndroidTest en CI
+            enableAndroidTestCoverage = false
         }
     }
 
@@ -85,7 +86,8 @@ jacoco {
 
 // Configurar la tarea de reporte de cobertura unificado
 tasks.register<JacocoReport>("jacocoTestReport") {
-    dependsOn("testDebugUnitTest", "createDebugCoverageReport")
+    // Solo unit tests: no invocar createDebugCoverageReport (dispara connectedDebugAndroidTest)
+    dependsOn("testDebugUnitTest", "createDebugUnitTestCoverageReport")
     
     reports {
         xml.required.set(true)
@@ -113,9 +115,8 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     executionData.setFrom(
         fileTree(buildDir) {
             include(
-                // Ubicación de los reportes de tests unitarios e instrumentados
-                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
-                "outputs/code_coverage/debugAndroidTest/connected/*/*.ec"
+                // Solo el coverage de unit tests
+                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec"
             )
         }
     )
@@ -130,7 +131,8 @@ tasks.register<JacocoReport>("jacocoTestReport") {
 
 // Configurar la tarea de verificación de cobertura
 tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
-    dependsOn("jacocoTestReport")
+    // Asegurar que solo se generen y verifiquen unit tests
+    dependsOn("testDebugUnitTest", "createDebugUnitTestCoverageReport", "jacocoTestReport")
     
     violationRules {
         rule {
@@ -162,9 +164,8 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
     executionData.setFrom(
         fileTree(buildDir) {
             include(
-                // Ubicación de los reportes de tests unitarios e instrumentados
-                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
-                "outputs/code_coverage/debugAndroidTest/connected/*/*.ec"
+                // Solo el coverage de unit tests
+                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec"
             )
         }
     )
