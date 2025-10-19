@@ -32,9 +32,9 @@ jobs:
       - name: Run Unit Tests and Generate Coverage Report
         run: ./gradlew testDebugUnitTest jacocoTestReport
 
-      # 4. VALIDA la Cobertura (0% - solo código ejecutado)
-      # Esta tarea valida la cobertura solo del código que se ejecutó
-      - name: Validate Coverage (0% - solo código ejecutado)
+      # 4. VALIDA la Cobertura (80%)
+      # Esta tarea valida que la cobertura sea al menos 80%
+      - name: Validate Coverage (80%)
         run: ./gradlew jacocoTestCoverageVerification
 
       # 5. Sube el reporte HTML como Artifact

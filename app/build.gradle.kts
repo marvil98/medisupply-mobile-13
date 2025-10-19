@@ -137,9 +137,9 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
     
     violationRules {
         rule {
-            // Solo verificar cobertura de código que se ejecutó
+            // Verificar cobertura de código que se ejecutó
             limit {
-                minimum = "0.00".toBigDecimal() // Cambiar a 0% para no fallar
+                minimum = "0.80".toBigDecimal() // 80% de cobertura
             }
         }
     }
