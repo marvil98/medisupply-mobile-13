@@ -107,7 +107,7 @@ class RealCodeCoverageTest {
         val originalDefault = Locale.getDefault()
         
         // Act - Test the logic from LocaleUtils
-        val locale = Locale(languageCode)
+        val locale = Locale.forLanguageTag(languageCode)
         Locale.setDefault(locale)
         
         // Assert
@@ -212,7 +212,7 @@ class RealCodeCoverageTest {
         val originalDefault = Locale.getDefault()
         
         // Act - Test the functionality
-        val locale = Locale(languageCode)
+        val locale = Locale.forLanguageTag(languageCode)
         Locale.setDefault(locale)
         
         // Assert

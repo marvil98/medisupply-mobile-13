@@ -29,7 +29,7 @@ class UpdateLocaleTest {
         val languageCode = "es"
         
         // Act
-        val locale = Locale(languageCode)
+        val locale = Locale.forLanguageTag(languageCode)
         Locale.setDefault(locale)
         
         // Assert
@@ -44,7 +44,7 @@ class UpdateLocaleTest {
         val languageCode = "en"
         
         // Act
-        val locale = Locale(languageCode)
+        val locale = Locale.forLanguageTag(languageCode)
         Locale.setDefault(locale)
         
         // Assert
@@ -59,7 +59,7 @@ class UpdateLocaleTest {
         val languageCode = "fr"
         
         // Act
-        val locale = Locale(languageCode)
+        val locale = Locale.forLanguageTag(languageCode)
         Locale.setDefault(locale)
         
         // Assert

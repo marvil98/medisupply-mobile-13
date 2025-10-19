@@ -17,7 +17,7 @@ class RealLocaleTest {
         // Act
         // We can't call updateLocale without a real Context, but we can test
         // the Locale logic that it uses
-        val locale = Locale(languageCode)
+        val locale = Locale.forLanguageTag(languageCode)
         Locale.setDefault(locale)
         
         // Assert
@@ -35,7 +35,7 @@ class RealLocaleTest {
         // Act
         // We can't call updateLocale without a real Context, but we can test
         // the Locale logic that it uses
-        val locale = Locale(languageCode)
+        val locale = Locale.forLanguageTag(languageCode)
         Locale.setDefault(locale)
         
         // Assert
@@ -53,7 +53,7 @@ class RealLocaleTest {
         // Act
         // We can't call updateLocale without a real Context, but we can test
         // the Locale logic that it uses
-        val locale = Locale(languageCode)
+        val locale = Locale.forLanguageTag(languageCode)
         Locale.setDefault(locale)
         
         // Assert
@@ -71,7 +71,7 @@ class RealLocaleTest {
         // Act
         // We can't call updateLocale without a real Context, but we can test
         // the Locale logic that it uses
-        val locale = Locale(languageCode)
+        val locale = Locale.forLanguageTag(languageCode)
         Locale.setDefault(locale)
         
         // Assert
@@ -89,7 +89,7 @@ class RealLocaleTest {
         // Act
         // We can't call updateLocale without a real Context, but we can test
         // the Locale logic that it uses
-        val locale = Locale(languageCode)
+        val locale = Locale.forLanguageTag(languageCode)
         Locale.setDefault(locale)
         
         // Assert
@@ -107,7 +107,7 @@ class RealLocaleTest {
         // Act
         // We can't call updateLocale without a real Context, but we can test
         // the Locale logic that it uses
-        val locale = Locale(languageCode)
+        val locale = Locale.forLanguageTag(languageCode)
         Locale.setDefault(locale)
         
         // Assert
@@ -125,7 +125,7 @@ class RealLocaleTest {
         // Act
         // We can't call updateLocale without a real Context, but we can test
         // the Locale logic that it uses
-        val locale = Locale(languageCode)
+        val locale = Locale.forLanguageTag(languageCode)
         Locale.setDefault(locale)
         
         // Assert
@@ -143,7 +143,7 @@ class RealLocaleTest {
         // Act
         // We can't call updateLocale without a real Context, but we can test
         // the Locale logic that it uses
-        val locale = Locale(languageCode)
+        val locale = Locale.forLanguageTag(languageCode)
         Locale.setDefault(locale)
         
         // Assert
@@ -161,7 +161,7 @@ class RealLocaleTest {
         // Act
         // We can't call updateLocale without a real Context, but we can test
         // the Locale logic that it uses
-        val locale = Locale(languageCode)
+        val locale = Locale.forLanguageTag(languageCode)
         Locale.setDefault(locale)
         
         // Assert
@@ -179,7 +179,7 @@ class RealLocaleTest {
         // Act
         // We can't call updateLocale without a real Context, but we can test
         // the Locale logic that it uses
-        val locale = Locale(languageCode)
+        val locale = Locale.forLanguageTag(languageCode)
         Locale.setDefault(locale)
         
         // Assert

@@ -61,7 +61,7 @@ class RealLocaleUtilsTest {
         verify(context).resources
         verify(resources).configuration
         verify(resources).displayMetrics
-        verify(config).setLocale(Locale("es"))
+        verify(config).setLocale(Locale.forLanguageTag("es"))
         verify(resources).updateConfiguration(eq(config), eq(displayMetrics))
     }
 
@@ -88,7 +88,7 @@ class RealLocaleUtilsTest {
         verify(context).resources
         verify(resources).configuration
         verify(resources).displayMetrics
-        verify(config).setLocale(Locale("en"))
+        verify(config).setLocale(Locale.forLanguageTag("en"))
         verify(resources).updateConfiguration(eq(config), eq(displayMetrics))
     }
 
@@ -115,7 +115,7 @@ class RealLocaleUtilsTest {
         verify(context).resources
         verify(resources).configuration
         verify(resources).displayMetrics
-        verify(config).setLocale(Locale("fr"))
+        verify(config).setLocale(Locale.forLanguageTag("fr"))
         verify(resources).updateConfiguration(eq(config), eq(displayMetrics))
     }
 
@@ -142,7 +142,7 @@ class RealLocaleUtilsTest {
         verify(context).resources
         verify(resources).configuration
         verify(resources).displayMetrics
-        verify(config).setLocale(Locale("de"))
+        verify(config).setLocale(Locale.forLanguageTag("de"))
         verify(resources).updateConfiguration(eq(config), eq(displayMetrics))
     }
 
@@ -169,7 +169,7 @@ class RealLocaleUtilsTest {
         verify(context).resources
         verify(resources).configuration
         verify(resources).displayMetrics
-        verify(config).setLocale(Locale("it"))
+        verify(config).setLocale(Locale.forLanguageTag("it"))
         verify(resources).updateConfiguration(eq(config), eq(displayMetrics))
     }
 
@@ -196,7 +196,7 @@ class RealLocaleUtilsTest {
         verify(context).resources
         verify(resources).configuration
         verify(resources).displayMetrics
-        verify(config).setLocale(Locale("pt"))
+        verify(config).setLocale(Locale.forLanguageTag("pt"))
         verify(resources).updateConfiguration(eq(config), eq(displayMetrics))
     }
 
@@ -223,7 +223,7 @@ class RealLocaleUtilsTest {
         verify(context).resources
         verify(resources).configuration
         verify(resources).displayMetrics
-        verify(config).setLocale(Locale("ru"))
+        verify(config).setLocale(Locale.forLanguageTag("ru"))
         verify(resources).updateConfiguration(eq(config), eq(displayMetrics))
     }
 
@@ -250,7 +250,7 @@ class RealLocaleUtilsTest {
         verify(context).resources
         verify(resources).configuration
         verify(resources).displayMetrics
-        verify(config).setLocale(Locale("zh"))
+        verify(config).setLocale(Locale.forLanguageTag("zh"))
         verify(resources).updateConfiguration(eq(config), eq(displayMetrics))
     }
 
@@ -277,7 +277,7 @@ class RealLocaleUtilsTest {
         verify(context).resources
         verify(resources).configuration
         verify(resources).displayMetrics
-        verify(config).setLocale(Locale("ja"))
+        verify(config).setLocale(Locale.forLanguageTag("ja"))
         verify(resources).updateConfiguration(eq(config), eq(displayMetrics))
     }
 }
