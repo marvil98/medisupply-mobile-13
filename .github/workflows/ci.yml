@@ -26,13 +26,14 @@ jobs:
       run: chmod +x gradlew
 
     - name: Run unit tests and check coverage threshold
-      # 1. Corre las pruebas y genera el reporte.
-      # 2. Ejecuta la verificación. Si es menor a 70%, este comando fallará.
-      run: ./gradlew createDebugUnitTestCoverageReport jacocoTestCoverageVerification
+      # ⬇️ ESTE ES EL COMANDO CORRECTO Y COMPLETO ⬇️
+      # 1. Ejecuta solo pruebas unitarias y crea el reporte.
+      # 2. Verifica si el reporte cumple el umbral del 70%.
+      run: ./gradlew testDebugUnitTestCoverage jacocoTestCoverageVerification
 
     - name: Upload coverage report as artifact
+      # Este paso es opcional, pero útil para ver el reporte detallado.
       uses: actions/upload-artifact@v4
       with:
-        name: unit-test-coverage-html
-        # Ruta del reporte generado por createDebugUnitTestCoverageReport
-        path: app/build/reports/coverage/test/debug
+        name: jacoco-html-report
+        path: app/build/reports/jacoco/testDebugUnitTestCoverage/html
