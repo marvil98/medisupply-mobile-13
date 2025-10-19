@@ -32,12 +32,4 @@
     <string name="country_peru">Perú</string>
     <string name="country_ecuador">Ecuador</string>
     <string name="country_mexico">México</string>
-    <string name="label_client">Cliente</string>
-    <string name="label_client_placeholder">Cliente asignado</string>
-    <string name="total">Total</string>
-    <string name="total_label" translatable="false">%1$s</string>
-    <string name="product_label">Producto</string>
-    <string name="product_placeholder">Selecciona el producto</string>
-    <string name="observations_label">Observaciones</string>
-    <string name="observations_placeholder">Escribe aquí el comentario del pedido...</string>
 </resources>

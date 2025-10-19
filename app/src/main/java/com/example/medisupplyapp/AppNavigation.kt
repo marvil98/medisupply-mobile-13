@@ -6,7 +6,6 @@ import androidx.navigation.compose.*
 import com.example.medisupplyapp.screen.RegionalSettingsScreen
 import androidx.compose.ui.platform.LocalContext
 import com.example.medisupplyapp.data.CountryPreferencesRepository
-import com.example.medisupplyapp.screen.orders.CreateOrderScreen
 import com.example.medisupplyapp.utils.updateLocale
 import kotlinx.coroutines.launch
 
@@ -69,13 +68,6 @@ fun AppNavigation(userName: String) {
 
         composable("orders") {
             OrdersScreen()
-        }
-
-        composable("orders/create") {
-            CreateOrderScreen(
-                onNavigate = { route -> navController.navigate(route) },
-                onBack = { navController.popBackStack() },
-            )
         }
     }
 }
