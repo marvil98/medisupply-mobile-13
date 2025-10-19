@@ -12,15 +12,7 @@ import androidx.compose.ui.res.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import com.example.medisupplyapp.R
-
-
-data class Product(
-    val id: String,
-    val name: String,
-    val price: String,
-    val stock: Int,
-    val imageUrl: String = ""
-)
+import com.example.medisupplyapp.data.model.Product
 
 @Composable
 fun ProductCard(
@@ -57,13 +49,13 @@ fun ProductCard(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = product.name,
+                    text = product.categoryName,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Text(
-                    text = "$${product.price}",
+                    text = "$${product.value}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -88,8 +80,8 @@ fun ProductCard(
                 )
 
                 IconButton(
-                    onClick = { if (quantity < product.stock) onQuantityChange(quantity + 1) },
-                    enabled = quantity < product.stock,
+                    onClick = { if (quantity < product.totalQuantity) onQuantityChange(quantity + 1) },
+                    enabled = quantity < product.totalQuantity,
                     colors = IconButtonDefaults.iconButtonColors(
                         contentColor = MaterialTheme.colorScheme.primary,
                         disabledContentColor = MaterialTheme.colorScheme.inverseSurface

@@ -38,4 +38,8 @@
     <string name="product_placeholder">Select the product</string>
     <string name="observations_label">Observations</string>
     <string name="observations_placeholder">Write your order comment here...</string>
+    <string name="confirm_order">Confirm order</string>
+    <string name="cancel">Cancel</string>
+    <string name="client_selected">Client selected</string>
+    <string name="product_selected">Selected products</string>
 </resources>

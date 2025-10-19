@@ -4,36 +4,47 @@ import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewModelScope
+import com.example.medisupplyapp.data.model.Client
+import com.example.medisupplyapp.data.model.Product
+import com.example.medisupplyapp.data.repository.ClientRepository
+import com.example.medisupplyapp.data.repository.ProductRepository
+import kotlinx.coroutines.launch
 
 class CreateOrderViewModel : ViewModel() {
-    var selectedClient by mutableStateOf("")
-    var selectedProduct by mutableStateOf("")
-    var notes by mutableStateOf("")
-
+    var selectedClient by mutableStateOf<String?>(null)
     var clientError by mutableStateOf(false)
+    var clients by mutableStateOf<List<Client>>(emptyList())
+    var products by mutableStateOf<List<Product>>(emptyList())
+    var selectedProducts by mutableStateOf<List<Product>>(emptyList())
     var productError by mutableStateOf(false)
-    var notesError by mutableStateOf(false)
 
-    fun validate(): Boolean {
-        clientError = selectedClient.isBlank()
-        productError = selectedProduct.isBlank()
-        notesError = notes.isBlank()
-        return !(clientError || productError || notesError)
-    }
+    init {
+        viewModelScope.launch {
+            try {
+                val repo = ClientRepository()
+                val result = repo.fetchClients()
+                clients = result
+            } catch (e: Exception) {
+            }
 
-    fun createOrder(onSuccess: () -> Unit) {
-        if (validate()) {
-            onSuccess()
+            try {
+                val productRepo = ProductRepository()
+                products = productRepo.fetchProducts()
+            } catch (e: Exception) {
+            }
         }
     }
 
     fun validateClientOnDismiss() {
-        if (selectedClient.isBlank()) clientError = true
+        clientError = selectedClient == null
     }
 
     fun isFormValid(): Boolean {
-        return selectedClient.isNotBlank() &&
-                selectedProduct.isNotBlank() &&
-                notes.isNotBlank()
+        return selectedClient != null && !clientError
+    }
+
+    fun createOrder(onSuccess: () -> Unit) {
+        onSuccess()
     }
 }

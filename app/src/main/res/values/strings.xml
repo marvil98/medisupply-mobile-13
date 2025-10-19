@@ -40,4 +40,8 @@
     <string name="product_placeholder">Selecciona el producto</string>
     <string name="observations_label">Observaciones</string>
     <string name="observations_placeholder">Escribe aquí el comentario del pedido...</string>
+    <string name="confirm_order">Confirmar pedido</string>
+    <string name="cancel">Cancelar</string>
+    <string name="client_selected">Cliente seleccionado</string>
+    <string name="product_selected">Productos seleccionados</string>
 </resources>
