@@ -1,9 +1,13 @@
 package com.example.medisupplyapp
 
+import android.app.Activity
 import androidx.compose.runtime.*
 import androidx.navigation.compose.*
 import com.example.medisupplyapp.screen.RegionalSettingsScreen
 import androidx.compose.ui.platform.LocalContext
+import com.example.medisupplyapp.data.CountryPreferencesRepository
+import com.example.medisupplyapp.utils.updateLocale
+import kotlinx.coroutines.launch
 import com.example.medisupplyapp.screen.orders.FollowOrderScreen
 import com.example.medisupplyapp.utils.updateLocale
 import java.text.SimpleDateFormat
@@ -14,6 +18,8 @@ fun AppNavigation(userName: String) {
     val navController = rememberNavController()
     var currentLanguage by remember { mutableStateOf("es") }
     val context = LocalContext.current
+    val repository = remember { CountryPreferencesRepository(context) }
+    val coroutineScope = rememberCoroutineScope()
 
     NavHost(
         navController = navController,
@@ -36,16 +42,27 @@ fun AppNavigation(userName: String) {
         }
 
         composable("ajustes_regionales") {
+            val spanishLabel = context.getString(R.string.language_spanish)
+            val englishLabel = context.getString(R.string.language_english)
+
             RegionalSettingsScreen(
-                currentLanguage = if (currentLanguage == "es") "Español" else "English",
                 onLanguageChange = { lang ->
-                    currentLanguage = if (lang == "Español") "es" else "en"
+                    currentLanguage = when (lang) {
+                        spanishLabel -> "es"
+                        englishLabel -> "en"
+                        else -> "en"
+                    }
                     updateLocale(context, currentLanguage)
+                    (context as? Activity)?.recreate()
                 },
-                onSave = { navController.popBackStack() },
                 onNavigate = { route -> navController.navigate(route) },
                 selectedRoute = "ajustes_regionales",
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onCountryChange = { country ->
+                    coroutineScope.launch {
+                        repository.saveCountry(country)
+                    }
+                }
             )
         }
 
