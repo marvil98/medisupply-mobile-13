@@ -75,7 +75,7 @@ class RealCodeCoverageTest {
         
         // Arrange
         val currentLanguage = "Español"
-        var selectedLanguage = currentLanguage
+        var selectedLanguage: String? = currentLanguage
         val languageOptions = listOf("Español", "English")
         
         // Act - Test the logic from RegionalSettingsScreen
@@ -181,7 +181,7 @@ class RealCodeCoverageTest {
         
         // Arrange
         val currentLanguage = "Español"
-        var selectedLanguage = currentLanguage
+        var selectedLanguage: String? = currentLanguage
         val languageOptions = listOf("Español", "English")
         
         // Act - Test the validation logic
