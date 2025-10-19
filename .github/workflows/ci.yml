@@ -33,7 +33,7 @@ jobs:
         arch: x86_64
         disable-animations: true
         # Mantenemos las opciones de estabilidad, pero quitamos "-accel off"
-        # ya que KVM en Linux sí funciona.
+        # ya que KVM en Linux sí funciona - configuración optimizada para Ubuntu.
         emulator-options: "-no-window -no-snapshot -no-boot-anim -gpu swiftshader_indirect"
         script: ./gradlew clean jacocoTestReport
 
