@@ -83,7 +83,7 @@ jacoco {
     toolVersion = "0.8.8"
 }
 
-// Configurar la tarea de reporte de cobertura
+// Configurar la tarea de reporte de cobertura optimizada para tests unitarios
 tasks.register<JacocoReport>("jacocoTestReport") {
     dependsOn("testDebugUnitTest")
     
@@ -103,28 +103,31 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "android/**/*.*"
     )
     
-    // Solo incluir clases que tienen tests
-    val debugTree = fileTree("${buildDir}/intermediates/javac/debug/classes") {
+    // Incluir tanto clases Java como Kotlin compiladas
+    val javaDebugTree = fileTree("${buildDir}/intermediates/javac/debug/classes") {
         exclude(fileFilter)
-        // Solo incluir clases que se ejecutaron en los tests
-        include("**/utils/**") // Solo utils que tiene tests
-        include("**/MainActivity*") // Solo MainActivity que tiene tests
     }
+    val kotlinDebugTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") {
+        exclude(fileFilter)
+    }
+    
     val mainSrc = "${project.projectDir}/src/main/java"
     
     sourceDirectories.setFrom(files(mainSrc))
-    classDirectories.setFrom(files(debugTree))
-    executionData.setFrom(fileTree("${buildDir}/jacoco") {
-        include("**/*.exec")
+    classDirectories.setFrom(files(javaDebugTree, kotlinDebugTree))
+    executionData.setFrom(fileTree("${buildDir}") {
+        include("jacoco/testDebugUnitTest.exec")
+        include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
     })
     
-    // Configurar para solo medir código ejecutado
+    // Configurar para solo medir código ejecutado en tests unitarios
     doFirst {
-        println("📊 Generando reporte de cobertura JaCoCo...")
-        println("📁 Directorio de clases: ${buildDir}/intermediates/javac/debug/classes")
-        println("📁 Directorio de fuentes: $mainSrc")
-        println("📁 Datos de ejecución: ${buildDir}/jacoco")
-        println("📁 Solo se medirá código que se ejecutó en los tests")
+        println("📊 Generando reporte de cobertura JaCoCo (solo tests unitarios)...")
+        println("📁 Clases Java: ${buildDir}/intermediates/javac/debug/classes")
+        println("📁 Clases Kotlin: ${buildDir}/tmp/kotlin-classes/debug")
+        println("📁 Fuentes: $mainSrc")
+        println("📁 Datos de ejecución: ${buildDir}/jacoco/testDebugUnitTest.exec")
+        println("📁 Solo se medirá código que se ejecutó en tests unitarios")
     }
 }
 
@@ -150,15 +153,21 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
         "android/**/*.*"
     )
     
-    val debugTree = fileTree("${buildDir}/intermediates/javac/debug/classes") {
+    // Incluir tanto clases Java como Kotlin compiladas
+    val javaDebugTree = fileTree("${buildDir}/intermediates/javac/debug/classes") {
         exclude(fileFilter)
     }
+    val kotlinDebugTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") {
+        exclude(fileFilter)
+    }
+    
     val mainSrc = "${project.projectDir}/src/main/java"
     
     sourceDirectories.setFrom(files(mainSrc))
-    classDirectories.setFrom(files(debugTree))
-    executionData.setFrom(fileTree("${buildDir}/jacoco") {
-        include("**/*.exec")
+    classDirectories.setFrom(files(javaDebugTree, kotlinDebugTree))
+    executionData.setFrom(fileTree("${buildDir}") {
+        include("jacoco/testDebugUnitTest.exec")
+        include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
     })
     
     // Configurar para solo medir código ejecutado
