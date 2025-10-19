@@ -113,6 +113,14 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     executionData.setFrom(fileTree("${buildDir}/jacoco") {
         include("**/*.exec")
     })
+    
+    // Configurar para incluir todas las clases
+    doFirst {
+        println("📊 Generando reporte de cobertura JaCoCo...")
+        println("📁 Directorio de clases: ${buildDir}/intermediates/javac/debug/classes")
+        println("📁 Directorio de fuentes: $mainSrc")
+        println("📁 Datos de ejecución: ${buildDir}/jacoco")
+    }
 }
 
 // Configurar la tarea de verificación de cobertura
