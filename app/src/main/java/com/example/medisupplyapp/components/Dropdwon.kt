@@ -28,9 +28,13 @@ fun CustomDropdown(
     onSelect: (String) -> Unit,
     hasError: Boolean? = false,
     placeholder: String = stringResource(R.string.placeholder_default),
+<<<<<<< HEAD:app/src/main/java/com/example/medisupplyapp/components/Dropdown.kt
     errorMessage: String = stringResource(R.string.required_field),
     onDismissWithoutSelection: (() -> Unit)? = null,
     enableSearch: Boolean = false
+=======
+    errorMessage: String = stringResource(R.string.required_field)
+>>>>>>> develop:app/src/main/java/com/example/medisupplyapp/components/Dropdwon.kt
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selector by remember { mutableStateOf(false) }

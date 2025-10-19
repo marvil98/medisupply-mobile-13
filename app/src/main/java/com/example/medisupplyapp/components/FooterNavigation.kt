@@ -70,7 +70,7 @@ fun FooterNavigation(selectedRoute: String, onNavigate: (String) -> Unit) {
                 )
             },
             label = { Text(stringResource(R.string.orders)) },
-            selected = selectedRoute == "orders" || selectedRoute == "orders/create",
+            selected = selectedRoute == "orders",
             onClick = { onNavigate("orders") },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = Color.White,
