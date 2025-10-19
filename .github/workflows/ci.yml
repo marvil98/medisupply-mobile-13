@@ -7,8 +7,8 @@ on:
     branches: [ "main", "feature/**" ]
 
 jobs:
-  build:
-    # 1. Cambiamos a un runner de Linux, que es más estable para emuladores.
+  test:
+    # Usaremos un runner de Linux, que es el estándar
     runs-on: ubuntu-latest
 
     steps:
@@ -25,20 +25,13 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    - name: Run Android Emulator and Tests
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: 33
-        # 2. Volvemos a la arquitectura x86_64 para que coincida con el runner de Ubuntu.
-        arch: x86_64
-        disable-animations: true
-        # Mantenemos las opciones de estabilidad, pero quitamos "-accel off"
-        # ya que KVM en Linux sí funciona - configuración optimizada para Ubuntu.
-        emulator-options: "-no-window -no-snapshot -no-boot-anim -gpu swiftshader_indirect"
-        script: ./gradlew clean jacocoTestReport
+    - name: Run unit tests and generate coverage report
+      # Esta tarea solo ejecuta pruebas unitarias y genera su reporte
+      run: ./gradlew testDebugUnitTestCoverage
 
     - name: Upload coverage report as artifact
       uses: actions/upload-artifact@v4
       with:
         name: jacoco-html-report
-        path: app/build/reports/jacoco/jacocoTestReport/html
+        # La ruta del reporte cambia ligeramente con esta nueva tarea
+        path: app/build/reports/jacoco/testDebugUnitTestCoverage/html
