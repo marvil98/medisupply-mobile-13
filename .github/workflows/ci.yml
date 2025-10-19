@@ -33,7 +33,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 33 # Puedes ajustar el nivel de la API según tus necesidades
-          arch: x86_64 # Especificar arquitectura 64-bit para API 33
+          arch: arm64-v8a # Cambiar a arquitectura ARM para compatibilidad con runners de GitHub
           disable-animations: true # Mejorar rendimiento del emulador
           # Configuración para modo headless y renderizado por software
           emulator-options: "-no-window -no-snapshot -no-boot-anim -gpu swiftshader_indirect"
