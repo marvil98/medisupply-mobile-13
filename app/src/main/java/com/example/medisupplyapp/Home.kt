@@ -49,7 +49,7 @@ fun Home(userName: String, selectedRoute: String, onNavigate: (String) -> Unit) 
                 SectionCard(
                     title = stringResource(R.string.orders),
                     options = listOf(stringResource(R.string.create_order), stringResource(R.string.follow_order)),
-                    onOptionClick = { onNavigate("orders/create") }
+                    onOptionClick = { onNavigate(it) }
                 )
 
                 SectionCard(
