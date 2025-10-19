@@ -1,10 +1,8 @@
 plugins {
-    // Plugins ya existentes
+    // Tus plugins existentes
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-
-    // 🛠️ 1. Aplicación del Plugin JaCoCo (Ya lo tenías, pero es crucial)
     id("jacoco")
 }
 
@@ -18,7 +16,6 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -30,17 +27,12 @@ android {
                 "proguard-rules.pro"
             )
         }
-
-        // 🛠️ 2. Habilitar la Cobertura en la Variante 'debug'
         debug {
-            // Habilitar cobertura de tests unitarios y de instrumentación
+            // Habilitamos cobertura solo para pruebas unitarias
             enableUnitTestCoverage = true
-            // Deshabilitar cobertura de androidTest para evitar ejecutar connectedDebugAndroidTest en CI
             enableAndroidTestCoverage = false
         }
     }
-
-    // ... el resto de la configuración ...
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -55,7 +47,7 @@ android {
 }
 
 dependencies {
-    // ... tus dependencias existentes ...
+    // ... tus dependencias ...
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -65,8 +57,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.navigation.compose)
-
-    // Dependencias de pruebas
     testImplementation(libs.junit)
     testImplementation("org.mockito:mockito-core:5.1.1")
     testImplementation("org.mockito:mockito-inline:5.1.1")
@@ -79,148 +69,57 @@ dependencies {
     implementation("androidx.compose.ui:ui-text-google-fonts:1.9.0")
 }
 
-// Configuración de JaCoCo
+// Versión de la herramienta JaCoCo
 jacoco {
     toolVersion = "0.8.8"
 }
 
-// Configurar la tarea de reporte de cobertura unificado
+// ------------------- CONFIGURACIÓN UNIFICADA Y CORRECTA -------------------
+
+// 1. Tarea para CREAR el reporte HTML/XML (opcional, pero buena práctica)
 tasks.register<JacocoReport>("jacocoTestReport") {
-    // Solo unit tests: no invocar createDebugCoverageReport (dispara connectedDebugAndroidTest)
-    dependsOn("testDebugUnitTest", "createDebugUnitTestCoverageReport")
-    
+    dependsOn("testDebugUnitTest")
+
     reports {
         xml.required.set(true)
         html.required.set(true)
     }
-    
-    val fileFilter = listOf(
-        // Excluir archivos generados por Android o librerías
-        "**/R.class",
-        "**/R$*.class",
-        "**/BuildConfig.*",
-        "**/Manifest*.*",
-        "**/android/**/*.*",
-        "**/androidx/**/*.*",
-        "**/com/google/**/*.*"
-    )
-    
-    val debugTree = fileTree("${buildDir}/intermediates/classes/debug") {
-        exclude(fileFilter)
-    }
+
+    val fileFilter = listOf("**/R.class", "**/BuildConfig.*", "**/Manifest*.*")
+    val debugTree = fileTree("${buildDir}/intermediates/classes/debug") { exclude(fileFilter) }
     val mainSrc = "${project.projectDir}/src/main/java"
-    
+
     sourceDirectories.setFrom(files(mainSrc))
     classDirectories.setFrom(files(debugTree))
-    executionData.setFrom(
-        fileTree(buildDir) {
-            include(
-                // Solo el coverage de unit tests
-                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec"
-            )
-        }
-    )
-    
-    doFirst {
-        println("📊 Generando reporte de cobertura JaCoCo unificado...")
-        println("📁 Clases: ${buildDir}/intermediates/classes/debug")
-        println("📁 Fuentes: $mainSrc")
-        println("📁 Datos de ejecución: outputs/unit_test_code_coverage/ y outputs/code_coverage/")
-    }
+    executionData.setFrom(fileTree(buildDir) {
+        include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+    })
 }
 
-// Configurar la tarea de verificación de cobertura
+// 2. Tarea para VERIFICAR el umbral de cobertura
 tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
-    // Asegurar que solo se generen y verifiquen unit tests
-    dependsOn("testDebugUnitTest", "createDebugUnitTestCoverageReport", "jacocoTestReport")
-    
-    violationRules {
-        rule {
-            // Verificar cobertura de código que se ejecutó
-            limit {
-                minimum = "0.00".toBigDecimal() // 80% de cobertura
-            }
-        }
-    }
-    
-    val fileFilter = listOf(
-        // Excluir archivos generados por Android o librerías
-        "**/R.class",
-        "**/R$*.class",
-        "**/BuildConfig.*",
-        "**/Manifest*.*",
-        "**/android/**/*.*",
-        "**/androidx/**/*.*",
-        "**/com/google/**/*.*"
-    )
-    
-    val debugTree = fileTree("${buildDir}/intermediates/classes/debug") {
-        exclude(fileFilter)
-    }
-    val mainSrc = "${project.projectDir}/src/main/java"
-    
-    sourceDirectories.setFrom(files(mainSrc))
-    classDirectories.setFrom(files(debugTree))
-    executionData.setFrom(
-        fileTree(buildDir) {
-            include(
-                // Solo el coverage de unit tests
-                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec"
-            )
-        }
-    )
-    
-    // Configurar para solo medir código ejecutado
-    doFirst {
-        println("📊 Verificando cobertura de código ejecutado...")
-        println("📁 Solo se medirá código que se ejecutó en los tests")
-    }
-}
+    // Esta tarea depende de que las pruebas unitarias se hayan ejecutado
+    dependsOn("testDebugUnitTest")
 
-// Configurar verificación de umbral de cobertura
-tasks.withType<JacocoCoverageVerification>().configureEach {
     violationRules {
         rule {
-            // Define qué elemento quieres medir (CLASS, PACKAGE, etc.)
             element = "CLASS"
-
-            // Define la métrica y el umbral mínimo
             limit {
-                // El tipo de métrica: LINE, BRANCH, INSTRUCTION, etc.
                 counter = "LINE"
-                // El valor a medir: COVEREDRATIO (porcentaje), MISSEDCOUNT (conteo), etc.
                 value = "COVEREDRATIO"
-                // El valor mínimo aceptado (0.70 es 70%)
-                minimum = 0.70.toBigDecimal()
+                minimum = 0.70.toBigDecimal() // <-- ¡Aquí está tu umbral del 70%!
             }
         }
     }
-    
-    // Configurar las mismas rutas que jacocoTestReport
-    val fileFilter = listOf(
-        "**/R.class",
-        "**/R$*.class",
-        "**/BuildConfig.*",
-        "**/Manifest*.*",
-        "**/*Test*.*",
-        "**/android/**/*.*",
-        "**/androidx/**/*.*",
-        "**/com/google/**/*.*"
-    )
-    
-    val debugTree = fileTree("${buildDir}/intermediates/classes/debug") {
-        exclude(fileFilter)
-    }
+
+    val fileFilter = listOf("**/R.class", "**/BuildConfig.*", "**/Manifest*.*")
+    val debugTree = fileTree("${buildDir}/intermediates/classes/debug") { exclude(fileFilter) }
     val mainSrc = "${project.projectDir}/src/main/java"
     
     sourceDirectories.setFrom(files(mainSrc))
     classDirectories.setFrom(files(debugTree))
-    executionData.setFrom(
-        fileTree(buildDir) {
-            include(
-                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
-                "outputs/code_coverage/debugAndroidTest/connected/*/*.ec"
-            )
-        }
-    )
+    executionData.setFrom(fileTree(buildDir) {
+        // MUY IMPORTANTE: Solo usa los datos de las pruebas unitarias
+        include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+    })
 }
