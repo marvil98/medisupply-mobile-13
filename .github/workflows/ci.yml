@@ -27,11 +27,11 @@ jobs:
 
     - name: Run unit tests and generate coverage report
       # Esta tarea solo ejecuta pruebas unitarias y genera su reporte
-      run: ./gradlew testDebugUnitTestCoverage
+      run: ./gradlew testDebugUnitTest jacocoTestReport
 
     - name: Upload coverage report as artifact
       uses: actions/upload-artifact@v4
       with:
         name: jacoco-html-report
-        # La ruta del reporte cambia ligeramente con esta nueva tarea
-        path: app/build/reports/jacoco/testDebugUnitTestCoverage/html
+        # Ruta del reporte generado por jacocoTestReport
+        path: app/build/reports/jacoco/jacocoTestReport/html
