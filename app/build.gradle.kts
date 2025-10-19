@@ -85,12 +85,16 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         html.required.set(true)
     }
 
-    val fileFilter = listOf("**/R.class", "**/BuildConfig.*", "**/Manifest*.*")
-    val debugTree = fileTree("${buildDir}/intermediates/classes/debug") { exclude(fileFilter) }
-    val mainSrc = "${project.projectDir}/src/main/java"
+    val fileFilter = listOf("**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*", "**/*Test*.*")
+    val javaTree = fileTree("${buildDir}/intermediates/javac/debug/classes") { exclude(fileFilter) }
+    val kotlinTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") { exclude(fileFilter) }
+    val mainSrc = files(
+        "${project.projectDir}/src/main/java",
+        "${project.projectDir}/src/main/kotlin"
+    )
 
-    sourceDirectories.setFrom(files(mainSrc))
-    classDirectories.setFrom(files(debugTree))
+    sourceDirectories.setFrom(mainSrc)
+    classDirectories.setFrom(files(javaTree, kotlinTree))
     executionData.setFrom(fileTree(buildDir) {
         include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
     })
@@ -112,12 +116,16 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
         }
     }
 
-    val fileFilter = listOf("**/R.class", "**/BuildConfig.*", "**/Manifest*.*")
-    val debugTree = fileTree("${buildDir}/intermediates/classes/debug") { exclude(fileFilter) }
-    val mainSrc = "${project.projectDir}/src/main/java"
-    
-    sourceDirectories.setFrom(files(mainSrc))
-    classDirectories.setFrom(files(debugTree))
+    val fileFilter = listOf("**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*", "**/*Test*.*")
+    val javaTree = fileTree("${buildDir}/intermediates/javac/debug/classes") { exclude(fileFilter) }
+    val kotlinTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") { exclude(fileFilter) }
+    val mainSrc = files(
+        "${project.projectDir}/src/main/java",
+        "${project.projectDir}/src/main/kotlin"
+    )
+
+    sourceDirectories.setFrom(mainSrc)
+    classDirectories.setFrom(files(javaTree, kotlinTree))
     executionData.setFrom(fileTree(buildDir) {
         // MUY IMPORTANTE: Solo usa los datos de las pruebas unitarias
         include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
