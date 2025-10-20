@@ -8,12 +8,15 @@ import androidx.compose.ui.*
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.unit.*
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medisupplyapp.components.SimpleTopBar
 import com.example.medisupplyapp.data.model.*
 import java.text.*
 import java.util.*
 import com.example.medisupplyapp.R
 import com.tuempresa.medisupply.ui.theme.MediSupplyTheme
+import com.example.medisupplyapp.components.FloatingToast
+import com.example.medisupplyapp.components.ToastType
 
 @Composable
 fun ConfirmOrderScreen(
@@ -21,40 +24,29 @@ fun ConfirmOrderScreen(
     selectedQuantities: Map<String, Int>,
     products: List<Product>,
     totalAmount: Double,
-    onConfirm: () -> Unit,
     onCancel: () -> Unit,
-    onNavigate: (String) -> Unit = {}
+    onNavigateDetail: (String) -> Unit
 ) {
     val currencyFormatter = remember { NumberFormat.getCurrencyInstance(Locale.US) }
-    val selectedRoute = "orders/confirm"
 
     val productMap = remember(products) { products.associateBy { it.productId } }
 
-    val displayText = remember(selectedQuantities) {
-        products
-            .filter { (selectedQuantities[it.productId] ?: 0) > 0 }
-            .joinToString { "${it.categoryName} (${selectedQuantities[it.productId]})" }
-    }
+    var toastMessage by remember { mutableStateOf("") }
+    var showToast by remember { mutableStateOf(false) }
+    var toastType by remember { mutableStateOf(ToastType.SUCCESS) }
+    val viewModel: CreateOrderViewModel = viewModel()
+    var orderSuccess by remember { mutableStateOf(false) }
 
-    val viewModel = remember { CreateOrderViewModel() }
-
-    fun handleOrderConfirm() {
-        val selectedProducts = products.filter {
-            val qty = selectedQuantities[it.productId] ?: 0
-            qty > 0
+    if (orderSuccess) {
+        LaunchedEffect(Unit) {
+            val delaySeconds = 2.0f
+            kotlinx.coroutines.delay((delaySeconds * 1000).toLong())
+            onNavigateDetail("dashboard")
         }
-
-        viewModel.selectedClient = selectedClient
-        viewModel.selectedProducts = selectedProducts
-
-        viewModel.createOrder(
-            onSuccess = { orderId, message ->
-                onConfirm()
-            },
-            onError = { error ->
-            }
-        )
     }
+
+    val successMessage = stringResource(R.string.order_success)
+    val errorMessage = stringResource(R.string.order_error)
 
     MediSupplyTheme {
         Scaffold(
@@ -64,17 +56,65 @@ fun ConfirmOrderScreen(
                     onBack = onCancel
                 )
             },
-            bottomBar = {
-                Column(
+            containerColor = MaterialTheme.colorScheme.onPrimary
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp)
+            ) {
+                FloatingToast(
+                    message = toastMessage,
+                    type = toastType,
+                    visible = showToast,
+                    onDismiss = { showToast = false }
+                )
+
+                Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = stringResource(R.string.client_selected),
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                    )
+                    Text(
+                        text = selectedClient.takeIf { !it.isNullOrBlank() }
+                            ?: stringResource(R.string.client_not_selected)
+                        ,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                selectedQuantities.forEach { (productId, quantity) ->
+                    val product = productMap[productId]
+                    val price = product?.value ?: 0.0
+                    val subtotal = price * quantity
 
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
+                            .padding(vertical = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(text = "${product?.name} x $quantity")
+                        Text(text = currencyFormatter.format(subtotal))
+                    }
+                }
+
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -88,7 +128,7 @@ fun ConfirmOrderScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(48.dp))
 
                     Row(
                         modifier = Modifier
@@ -104,7 +144,21 @@ fun ConfirmOrderScreen(
                         }
 
                         Button(
-                            onClick = onConfirm,
+                            onClick = {
+                                viewModel.createOrder(
+                                    onSuccess = { _, _ ->
+                                        toastMessage = successMessage
+                                        toastType = ToastType.SUCCESS
+                                        showToast = true
+                                        orderSuccess = true
+                                    },
+                                    onError = { error ->
+                                        toastMessage = errorMessage
+                                        toastType = ToastType.ERROR
+                                        showToast = true
+                                    }
+                                )
+                            },
                             modifier = Modifier.height(48.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.primary,
@@ -116,57 +170,6 @@ fun ConfirmOrderScreen(
                     }
                     Spacer(modifier = Modifier.height(48.dp))
                 }
-            },
-            containerColor = MaterialTheme.colorScheme.onPrimary
-        ) { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.client_selected, selectedClient),
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text(
-                    text = stringResource(R.string.product_selected),
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                selectedQuantities.forEach { (productId, quantity) ->
-                    val product = productMap[productId]
-                    val price = product?.value ?: 0.0
-                    val subtotal = price * quantity
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(text = "${product?.value} x$quantity")
-                        Text(text = currencyFormatter.format(subtotal))
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text(
-                    text = stringResource(R.string.total),
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium)
-                )
-
-                Text(
-                    text = displayText,
-                    style = MaterialTheme.typography.bodyMedium
-                )
             }
         }
     }

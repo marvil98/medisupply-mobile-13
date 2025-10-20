@@ -55,4 +55,14 @@
     <string name="cancel">Cancelar</string>
     <string name="client_selected">Cliente seleccionado</string>
     <string name="product_selected">Productos seleccionados</string>
+    <string name="open_close">Abrir o cerrar lista</string>
+    <string name="no_results">No hay resultados</string>
+    <string name="picture">Foto</string>
+    <string name="decrease">Disminuir</string>
+    <string name="increase">Aumentar</string>
+    <string name="no_results_to">No hay resultados para %1$s</string>
+    <string name="section_description">Sección: %1$s</string>
+    <string name="client_not_selected">Cliente no seleccionado</string>
+    <string name="order_success">Pedido creado exitosamente.</string>
+    <string name="order_error">¡Ups! No fue posible crear el pedido. Intenta nuevamente.</string>
 </resources>

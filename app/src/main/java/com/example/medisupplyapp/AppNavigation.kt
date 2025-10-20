@@ -91,6 +91,7 @@ fun AppNavigation(userName: String) {
             CreateOrderScreen(
                     onNavigate = { route -> navController.navigate(route) },
                     onBack = { navController.popBackStack() },
+                    onNavigateDetail = { route -> navController.navigate("home") },
             )
         }
     }

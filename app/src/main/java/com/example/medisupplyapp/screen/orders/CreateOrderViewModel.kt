@@ -1,5 +1,6 @@
 package com.example.medisupplyapp.screen.orders
 
+import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
@@ -50,43 +51,43 @@ class CreateOrderViewModel : ViewModel() {
 
     fun createOrder(onSuccess: (orderId: Int, message: String) -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
-            try {
-                val clientId = selectedClient?.toIntOrNull()
-                if (clientId == null) {
-                    clientError = true
-                    onError("Cliente inválido")
-                    return@launch
-                }
+                try {
+                    val clientId = selectedClient?.toIntOrNull()
+                    if (clientId == null) {
+                        clientError = true
+                        onError("Cliente inválido")
+                        return@launch
+                    }
 
-                if (selectedProducts.isEmpty()) {
-                    productError = true
-                    onError("Debe seleccionar al menos un producto")
-                    return@launch
-                }
+                    if (selectedProducts.isEmpty()) {
+                        productError = true
+                        onError("Debe seleccionar al menos un producto")
+                        return@launch
+                    }
 
-                val orderRepo = OrdersRepository(api = ApiConnection.api)
+                    val orderRepo = OrdersRepository(api = ApiConnection.api)
 
-                val productRequests = selectedProducts.map {
-                    ProductRequest(
-                        productId = it.productId.toInt(),
-                        quantity = 1
+                    val productRequests = selectedProducts.map {
+                        ProductRequest(
+                            productId = it.productId.toInt(),
+                            quantity = 1
+                        )
+                    }
+
+                    val request = CreateOrderRequest(
+                        client_id = clientId,
+                        products = productRequests,
+                        estimated_delivery_time = "2025-10-25T14:00:00",
+                        status_id = 3
                     )
+
+                    val response = orderRepo.createOrder(request)
+
+                    onSuccess(response.order_id, response.message)
+
+                } catch (e: Exception) {
+                    onError("Error al crear orden: ${e.message}")
                 }
-
-                val request = CreateOrderRequest(
-                    client_id = clientId,
-                    products = productRequests,
-                    estimated_delivery_time = "2025-10-25T14:00:00",
-                    status_id = 3
-                )
-
-                val response = orderRepo.createOrder(request)
-
-                onSuccess(response.order_id, response.message)
-
-            } catch (e: Exception) {
-                onError("Error al crear orden: ${e.message}")
             }
-        }
     }
 }

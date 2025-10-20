@@ -7,7 +7,8 @@ data class Product(
     @SerializedName("product_id") val productId: String,
     @SerializedName("sku") val sku: String,
     @SerializedName("total_quantity") val totalQuantity: Int,
-    @SerializedName("value") val value: Double
+    @SerializedName("value") val value: Double,
+    @SerializedName("name") val name: String
 )
 
 data class ProductRequest(

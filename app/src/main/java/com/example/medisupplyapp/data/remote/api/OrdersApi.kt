@@ -16,6 +16,6 @@ interface OrdersApi {
         @Path("userId") userId: String,
     ): List<OrderResponse>
 
-    @POST("api/orders/")
+    @POST("orders/")
     suspend fun createOrder(@Body order: CreateOrderRequest): CreateOrderResponse
 }

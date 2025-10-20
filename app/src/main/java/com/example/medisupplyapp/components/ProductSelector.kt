@@ -55,7 +55,7 @@ fun ProductSelector(
         if (totalSelectedProducts > 0) {
             products
                 .filter { (selectedQuantities[it.productId] ?: 0) > 0 }
-                .joinToString { "${it.categoryName} (${selectedQuantities[it.productId]})" }
+                .joinToString { "${it.name} (${selectedQuantities[it.productId]})" }
         } else ""
     }
 
@@ -86,7 +86,7 @@ fun ProductSelector(
         if (searchQuery.isBlank()) products
         else products.filter {
             it.sku.contains(searchQuery, ignoreCase = true) ||
-                    it.categoryName.contains(searchQuery, ignoreCase = true)
+                    it.name.contains(searchQuery, ignoreCase = true)
         }
     }
 
@@ -164,7 +164,7 @@ fun ProductSelector(
 
                 Icon(
                     painter = painterResource(id = R.drawable.ic_arrow_down),
-                    contentDescription = "Abrir o cerrar lista",
+                    contentDescription = stringResource(id = R.string.open_close),
                     modifier = Modifier
                         .size(20.dp)
                         .rotate(if (expanded) 180f else 0f)
@@ -218,7 +218,7 @@ fun ProductSelector(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = "No hay resultados para '$searchQuery'",
+                                    text = stringResource(R.string.no_results, searchQuery),
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     fontSize = 16.sp,
                                     fontFamily = FontFamily(Font(R.font.league_spartan_regular))

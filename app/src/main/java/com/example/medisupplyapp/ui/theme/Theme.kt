@@ -23,7 +23,10 @@ private val MediSupplyColorScheme = lightColorScheme(
     onSurface = Color.Black,
     error = Color(0xFFEB5757),
     inverseSurface = Color(0xB3757575),
-    inverseOnSurface = Color(0xB3FFFFFF)
+    inverseOnSurface = Color(0xB3FFFFFF),
+    onError = Color(0xFFFBE9E7),
+    onTertiary = Color(0xFFE6F4EA),
+    surfaceVariant = Color(0xFF09A794),
 )
 
 val LeagueSpartan = FontFamily(

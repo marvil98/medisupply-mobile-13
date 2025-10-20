@@ -216,7 +216,7 @@ fun CustomDropdown(
 
                     Icon(
                         painter = painterResource(id = R.drawable.ic_arrow_down),
-                        contentDescription = "Abrir o cerrar lista",
+                        contentDescription = stringResource(id = R.string.open_close),
                         modifier = Modifier
                             .size(20.dp)
                             .rotate(if (expanded) 180f else 0f)
@@ -268,7 +268,7 @@ fun CustomDropdown(
                         ) {
                             if (filteredOptions.isEmpty()) {
                                 Text(
-                                    text = "No hay resultados",
+                                    text = stringResource(id = R.string.no_results),
                                     modifier = Modifier
                                         .padding(12.dp)
                                         .align(Alignment.CenterStart),

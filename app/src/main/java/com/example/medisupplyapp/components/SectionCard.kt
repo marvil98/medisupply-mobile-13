@@ -55,7 +55,7 @@ fun SectionCard(
                         painter = painterResource(id = R.drawable.ic_arrow),
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(46.dp).padding(end = 16.dp),
-                        contentDescription = "Sección: $title"
+                        contentDescription = stringResource(R.string.section_description, title),
                     )
                 }
             } else {

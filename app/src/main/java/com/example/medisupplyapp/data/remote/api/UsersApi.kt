@@ -5,6 +5,6 @@ import retrofit2.Response
 import retrofit2.http.GET
 
 interface UsersApi {
-    @GET("api/users/clients")
+    @GET("users/clients")
     suspend fun getClients(): Response<ClientResponse>
 }

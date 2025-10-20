@@ -25,8 +25,8 @@ import java.util.Locale
 @Composable
 fun CreateOrderScreen(
     onBack: () -> Unit = {},
-    onOrderCreated: () -> Unit = {},
-    onNavigate: (String) -> Unit = {}
+    onNavigate: (String) -> Unit = {},
+    onNavigateDetail: (String) -> Unit,
 ) {
     val viewModel: CreateOrderViewModel = viewModel()
 
@@ -59,20 +59,10 @@ fun CreateOrderScreen(
             selectedQuantities = selectedQuantities,
             products = products,
             totalAmount = totalAmount,
-            onConfirm = {
-                viewModel.createOrder(
-                    onSuccess = { _, _ ->
-                        onOrderCreated()
-                        showConfirmation = false
-                    },
-                    onError = { error ->
-                        println("Error al crear orden: $error")
-                    }
-                )
-            },
             onCancel = {
                 showConfirmation = false
-            }
+            },
+            onNavigateDetail = onNavigateDetail
         )
     } else {
         MediSupplyTheme {

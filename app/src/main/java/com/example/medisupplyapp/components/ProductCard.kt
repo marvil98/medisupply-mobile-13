@@ -3,8 +3,6 @@ package com.example.medisupplyapp.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.*
-import androidx.compose.material.icons.*
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
@@ -36,7 +34,7 @@ fun ProductCard(
         ) {
             Image(
                 painter = painterResource(id = R.drawable.image),
-                contentDescription = "Foto",
+                contentDescription = stringResource(id = R.string.picture),
                 modifier = Modifier.size(50.dp)
             )
 
@@ -49,7 +47,7 @@ fun ProductCard(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = product.categoryName,
+                    text = product.name,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -70,7 +68,7 @@ fun ProductCard(
                         disabledContentColor = MaterialTheme.colorScheme.inverseSurface
                     )
                 ) {
-                    Icon(painter = painterResource(id = R.drawable.ic_decrease), contentDescription = "Decrease")
+                    Icon(painter = painterResource(id = R.drawable.ic_decrease), contentDescription = stringResource(id = R.string.decrease))
                 }
 
                 Text(
@@ -87,7 +85,7 @@ fun ProductCard(
                         disabledContentColor = MaterialTheme.colorScheme.inverseSurface
                     )
                 ) {
-                    Icon(painter = painterResource(id = R.drawable.ic_add), contentDescription = "Increase")
+                    Icon(painter = painterResource(id = R.drawable.ic_add), contentDescription = stringResource(id = R.string.increase))
                 }
             }
         }

@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.medisupplyapp.R
 
@@ -46,7 +47,7 @@ fun RoundedButton(
         )
         Icon(
             painter = painterResource(id = R.drawable.ic_arrow),
-            contentDescription = "Sección: $title",
+            contentDescription = stringResource(R.string.section_description, title),
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(24.dp)
         )
