@@ -9,3 +9,15 @@ data class Order(
     val estimatedReleaseDate: Date?,
     val lastUpdate: Date
 )
+
+data class CreateOrderRequest(
+    val client_id: Int,
+    val products: List<ProductRequest>,
+    val estimated_delivery_time: String,
+    val status_id: Int
+)
+
+data class CreateOrderResponse(
+    val order_id: Int,
+    val message: String
+)

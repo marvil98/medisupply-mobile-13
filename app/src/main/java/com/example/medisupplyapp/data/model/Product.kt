@@ -9,3 +9,8 @@ data class Product(
     @SerializedName("total_quantity") val totalQuantity: Int,
     @SerializedName("value") val value: Double
 )
+
+data class ProductRequest(
+    @SerializedName("product_id") val productId: Int,
+    @SerializedName("quantity") val quantity: Int
+)

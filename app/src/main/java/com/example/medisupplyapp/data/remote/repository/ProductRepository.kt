@@ -1,10 +1,11 @@
-package com.example.medisupplyapp.data.repository
+package com.example.medisupplyapp.data.remote.repository
 
 import com.example.medisupplyapp.data.model.Product
+import com.example.medisupplyapp.data.remote.api.ProductsApi
 
-class ProductRepository {
+class ProductRepository(var api: ProductsApi) {
     suspend fun fetchProducts(): List<Product> {
-        val response = RetrofitInstance.api.getProducts()
+        val response = api.getProducts()
         if (response.isSuccessful) {
             return response.body() ?: emptyList()
         } else {
@@ -12,4 +13,3 @@ class ProductRepository {
         }
     }
 }
-

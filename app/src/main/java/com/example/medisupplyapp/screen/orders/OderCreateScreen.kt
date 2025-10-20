@@ -34,7 +34,7 @@ fun CreateOrderScreen(
     val selectedClient = viewModel.selectedClient
     val clientError = viewModel.clientError
     val products = viewModel.products
-    var showConfirmation by remember { mutableStateOf(true) }
+    var showConfirmation by remember { mutableStateOf(false) }
 
     val selectedRoute = "orders/create"
     val productPriceMap = remember(products) {
@@ -60,8 +60,15 @@ fun CreateOrderScreen(
             products = products,
             totalAmount = totalAmount,
             onConfirm = {
-                viewModel.createOrder(onSuccess = onOrderCreated)
-                showConfirmation = false
+                viewModel.createOrder(
+                    onSuccess = { _, _ ->
+                        onOrderCreated()
+                        showConfirmation = false
+                    },
+                    onError = { error ->
+                        println("Error al crear orden: $error")
+                    }
+                )
             },
             onCancel = {
                 showConfirmation = false

@@ -36,6 +36,26 @@ fun ConfirmOrderScreen(
             .joinToString { "${it.categoryName} (${selectedQuantities[it.productId]})" }
     }
 
+    val viewModel = remember { CreateOrderViewModel() }
+
+    fun handleOrderConfirm() {
+        val selectedProducts = products.filter {
+            val qty = selectedQuantities[it.productId] ?: 0
+            qty > 0
+        }
+
+        viewModel.selectedClient = selectedClient
+        viewModel.selectedProducts = selectedProducts
+
+        viewModel.createOrder(
+            onSuccess = { orderId, message ->
+                onConfirm()
+            },
+            onError = { error ->
+            }
+        )
+    }
+
     MediSupplyTheme {
         Scaffold(
             topBar = {

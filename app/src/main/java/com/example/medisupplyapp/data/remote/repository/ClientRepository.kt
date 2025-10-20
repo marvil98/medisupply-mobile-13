@@ -1,9 +1,11 @@
-package com.example.medisupplyapp.data.repository
-import com.example.medisupplyapp.data.model.Client
+package com.example.medisupplyapp.data.remote.repository
 
-class ClientRepository {
+import com.example.medisupplyapp.data.model.Client
+import com.example.medisupplyapp.data.remote.api.UsersApi
+
+class ClientRepository(var api: UsersApi) {
     suspend fun fetchClients(): List<Client> {
-        val response = RetrofitInstance.api2.getClients()
+        val response = api.getClients()
         if (response.isSuccessful) {
             return response.body()?.users ?: emptyList()
         } else {
