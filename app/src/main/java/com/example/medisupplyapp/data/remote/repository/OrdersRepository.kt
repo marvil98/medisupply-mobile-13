@@ -1,5 +1,7 @@
 package com.example.medisupplyapp.data.remote.repository
 
+import com.example.medisupplyapp.data.model.CreateOrderRequest
+import com.example.medisupplyapp.data.model.CreateOrderResponse
 import com.example.medisupplyapp.data.model.Order
 import com.example.medisupplyapp.data.model.OrderStatus
 
@@ -34,6 +36,10 @@ class OrdersRepository(var api: OrdersApi) {
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    suspend fun createOrder(order: CreateOrderRequest): CreateOrderResponse {
+        return api.createOrder(order)
     }
 
     fun mapStatus(status: String): OrderStatus {

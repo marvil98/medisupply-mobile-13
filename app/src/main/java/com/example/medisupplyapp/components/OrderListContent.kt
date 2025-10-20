@@ -34,7 +34,7 @@ fun OrdersListContent(
         }
         item{
             RoundedButton(
-                title = stringResource(R.string.follow_order),
+                title = stringResource(R.string.create_order),
                 navigation = "create_order",
                 onOptionClick = { onNavigate(it) }
             )

@@ -42,4 +42,25 @@
     <string name="country_peru">Peru</string>
     <string name="country_ecuador">Ecuador</string>
     <string name="country_mexico">Mexico</string>
+    <string name="label_client">Client</string>
+    <string name="label_client_placeholder">Assigned client</string>
+    <string name="total">Total</string>
+    <string name="product_label">Product</string>
+    <string name="product_placeholder">Select the product</string>
+    <string name="observations_label">Observations</string>
+    <string name="observations_placeholder">Write your order comment here...</string>
+    <string name="confirm_order">Confirm order</string>
+    <string name="cancel">Cancel</string>
+    <string name="client_selected">Client selected</string>
+    <string name="product_selected">Selected products</string>
+    <string name="open_close">Open or close list</string>
+    <string name="no_results">No results</string>
+    <string name="picture">Photo</string>
+    <string name="decrease">Decrease</string>
+    <string name="increase">Increase</string>
+    <string name="no_results_to">No results for %1$s</string>
+    <string name="section_description">Section: %1$s</string>
+    <string name="client_not_selected">Client no selected</string>
+    <string name="order_success">Order created successfully.</string>
+    <string name="order_error">¡Ups! Unable to create the order. Please try again.</string>
 </resources>
