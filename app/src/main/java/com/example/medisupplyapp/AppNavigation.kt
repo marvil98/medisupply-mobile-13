@@ -6,8 +6,13 @@ import androidx.navigation.compose.*
 import com.example.medisupplyapp.screen.RegionalSettingsScreen
 import androidx.compose.ui.platform.LocalContext
 import com.example.medisupplyapp.data.CountryPreferencesRepository
+import com.example.medisupplyapp.screen.orders.CreateOrderScreen
 import com.example.medisupplyapp.utils.updateLocale
 import kotlinx.coroutines.launch
+import com.example.medisupplyapp.screen.orders.FollowOrderScreen
+import com.example.medisupplyapp.utils.updateLocale
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
 fun AppNavigation(userName: String) {
@@ -67,14 +72,29 @@ fun AppNavigation(userName: String) {
         }
 
         composable("orders") {
-            OrdersScreen()
+            FollowOrderScreen(
+                onNavigate = { route -> navController.navigate(route) },
+                selectedRoute = "orders",
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable("follow_orders") {
+            FollowOrderScreen(
+                onNavigate = { route -> navController.navigate(route) },
+                selectedRoute = "orders",
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable("create_order") {
+            CreateOrderScreen(
+                    onNavigate = { route -> navController.navigate(route) },
+                    onBack = { navController.popBackStack() },
+                    onNavigateDetail = { route -> navController.navigate("home") },
+            )
         }
     }
-}
-
-@Composable
-fun OrdersScreen() {
-    TODO("Not yet implemented")
 }
 
 @Composable

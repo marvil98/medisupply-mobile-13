@@ -24,6 +24,17 @@
     <string name="placeholder_default">Selecciona una opción</string>
     <string name="required_field">Campo obligatorio</string>
     <string name="save">Guardar</string>
+    <string name="pending_approval">Pendiente</string>
+    <string name="processing">Procesando</string>
+    <string name="in_transit">En camino</string>
+    <string name="delivered">Entregado</string>
+    <string name="cancelled">Cancelado</string>
+    <string name="delayed">Demorado</string>
+    <string name="last_update">Última actualización</string>
+    <string name="order">Pedido</string>
+    <string name="order_history">Historial de pedidos</string>
+    <string name="no_order_history">¡Ups! Aún no tienes pedidos registrados.</string>
+    <string name="error_order_history">¡Ups! No pudimos obtener los pedidos. Intenta nuevamente.</string>
     <string name="language_label">Idioma</string>
     <string name="language_spanish">Español (Colombia)</string>
     <string name="language_english">Inglés (Estados Unidos)</string>
@@ -32,4 +43,26 @@
     <string name="country_peru">Perú</string>
     <string name="country_ecuador">Ecuador</string>
     <string name="country_mexico">México</string>
+    <string name="label_client">Cliente</string>
+    <string name="label_client_placeholder">Cliente asignado</string>
+    <string name="total">Total</string>
+    <string name="total_label" translatable="false">%1$s</string>
+    <string name="product_label">Producto</string>
+    <string name="product_placeholder">Selecciona el producto</string>
+    <string name="observations_label">Observaciones</string>
+    <string name="observations_placeholder">Escribe aquí el comentario del pedido...</string>
+    <string name="confirm_order">Confirmar pedido</string>
+    <string name="cancel">Cancelar</string>
+    <string name="client_selected">Cliente seleccionado</string>
+    <string name="product_selected">Productos seleccionados</string>
+    <string name="open_close">Abrir o cerrar lista</string>
+    <string name="no_results">No hay resultados</string>
+    <string name="picture">Foto</string>
+    <string name="decrease">Disminuir</string>
+    <string name="increase">Aumentar</string>
+    <string name="no_results_to">No hay resultados para %1$s</string>
+    <string name="section_description">Sección: %1$s</string>
+    <string name="client_not_selected">Cliente no seleccionado</string>
+    <string name="order_success">Pedido creado exitosamente.</string>
+    <string name="order_error">¡Ups! No fue posible crear el pedido. Intenta nuevamente.</string>
 </resources>

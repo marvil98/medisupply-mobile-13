@@ -22,6 +22,11 @@ private val MediSupplyColorScheme = lightColorScheme(
     onBackground = Color.Black,
     onSurface = Color.Black,
     error = Color(0xFFEB5757),
+    inverseSurface = Color(0xB3757575),
+    inverseOnSurface = Color(0xB3FFFFFF),
+    onError = Color(0xFFFBE9E7),
+    onTertiary = Color(0xFFE6F4EA),
+    surfaceVariant = Color(0xFF09A794),
 )
 
 val LeagueSpartan = FontFamily(
@@ -42,7 +47,7 @@ private val MediSupplyTypography = Typography(
     bodySmall = TextStyle(fontSize = 14.sp,  fontFamily = LeagueSpartan),
     labelSmall = TextStyle(fontSize = 12.sp,  fontFamily = LeagueSpartan),
     labelMedium = TextStyle(fontSize = 14.sp,  fontFamily = LeagueSpartan),
-    labelLarge = TextStyle(fontSize = 16.sp,  fontFamily = LeagueSpartan),
+    labelLarge = TextStyle(fontSize = 22.sp,  fontFamily = LeagueSpartan),
     headlineLarge = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold, fontFamily = LeagueSpartan),
     headlineMedium = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, fontFamily = LeagueSpartan),
     headlineSmall = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold, fontFamily = LeagueSpartan),
