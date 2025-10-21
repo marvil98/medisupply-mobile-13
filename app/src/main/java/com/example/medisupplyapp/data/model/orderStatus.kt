@@ -11,3 +11,9 @@ enum class OrderStatus(val displayName: Int, val color: Color) {
     CANCELLED(R.string.cancelled, Color(0xFFEA4335)),
     DELAYED(R.string.delayed, Color(0xFFFF9800))
 }
+
+sealed class OrderState {
+    object Loading : OrderState()
+    data class Success(val data: CreateOrderResponse?) : OrderState()
+    data class Error(val error: Throwable?) : OrderState()
+}
