@@ -38,8 +38,13 @@ class OrdersRepository(var api: OrdersApi) {
         }
     }
 
-    suspend fun createOrder(order: CreateOrderRequest): CreateOrderResponse {
-        return api.createOrder(order)
+    suspend fun createOrder(order: CreateOrderRequest): Result<CreateOrderResponse> {
+        return try {
+            val response = api.createOrder(order)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     fun mapStatus(status: String): OrderStatus {
