@@ -12,6 +12,6 @@ data class Product(
 )
 
 data class ProductRequest(
-    @SerializedName("product_id") val productId: Int,
+    @SerializedName("product_id") val productId: String,
     @SerializedName("quantity") val quantity: Int
 )

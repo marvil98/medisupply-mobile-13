@@ -20,7 +20,7 @@ import com.example.medisupplyapp.components.ToastType
 
 @Composable
 fun ConfirmOrderScreen(
-    selectedClient: String,
+    selectedClient: String?,
     selectedQuantities: Map<String, Int>,
     products: List<Product>,
     totalAmount: Double,
@@ -46,7 +46,7 @@ fun ConfirmOrderScreen(
     }
 
     val successMessage = stringResource(R.string.order_success)
-    val errorMessage = stringResource(R.string.order_error)
+    val mssgError = stringResource(R.string.order_error)
 
     MediSupplyTheme {
         Scaffold(
@@ -146,14 +146,15 @@ fun ConfirmOrderScreen(
                         Button(
                             onClick = {
                                 viewModel.createOrder(
-                                    onSuccess = { _, _ ->
+                                    selectedQuantities,
+                                    onSuccess = { orderId, message ->
                                         toastMessage = successMessage
                                         toastType = ToastType.SUCCESS
                                         showToast = true
                                         orderSuccess = true
                                     },
-                                    onError = { error ->
-                                        toastMessage = errorMessage
+                                    onError = { errorMessage ->
+                                        toastMessage = mssgError
                                         toastType = ToastType.ERROR
                                         showToast = true
                                     }
