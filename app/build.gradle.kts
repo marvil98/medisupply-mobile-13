@@ -67,6 +67,16 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation("androidx.compose.ui:ui-text-google-fonts:1.9.0")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    testImplementation("androidx.compose.ui:ui-test-junit4")
+    // JUnit 4
+    testImplementation("junit:junit:4.13.2")
+
+    // Mocking framework (e.g., Mockito-Kotlin)
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.0.0")
+
+    // Robolectric (often necessary to resolve Android resources like R.string.* in JVM tests)
+    testImplementation("org.robolectric:robolectric:4.10.3")
 }
 
 // Versión de la herramienta JaCoCo
