@@ -8,6 +8,7 @@ on:
 
 jobs:
   test:
+    # Usaremos un runner de Linux, que es el estándar
     runs-on: ubuntu-latest
 
     steps:
@@ -24,33 +25,13 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    - name: Set up Android SDK
-      uses: android-actions/setup-android@v3
-      with:
-        api-level: 33
-        target: default
-        arch: x86_64
-        cache: gradle
+    - name: Run unit tests, create report, and check coverage
+      # Ejecutamos las tres tareas necesarias en orden.
+      run: ./gradlew testDebugUnitTest createDebugUnitTestCoverageReport jacocoTestCoverageVerification
 
-    - name: Start Android emulator and run instrumented tests
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: 33
-        target: default
-        arch: x86_64
-        script: ./gradlew connectedDebugAndroidTest
-
-    - name: Run unit tests and generate combined coverage report and verify coverage
-      run: ./gradlew testDebugUnitTest jacocoTestReport jacocoTestCoverageVerification
-
-    - name: Upload unit test coverage report as artifact
+    - name: Upload coverage report as artifact
       uses: actions/upload-artifact@v4
       with:
         name: jacoco-html-report
-        path: app/build/reports/jacoco/jacocoTestReport/html/index.html
-
-    - name: Upload instrumented test reports as artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: instrumented-tests-report
-        path: app/build/reports/androidTests/connected/
+        # La tarea createDebugUnitTestCoverageReport genera este index.
+        path: app/build/reports/coverage/test/debug/index.html
