@@ -28,7 +28,7 @@ android {
             )
         }
         debug {
-            // Habilitamos cobertura solo para pruebas unitarias (instrumentada no aquí, la combinamos aparte)
+            // Habilitamos cobertura solo para pruebas unitarias
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = false
         }
@@ -76,9 +76,9 @@ jacoco {
 
 // ------------------- CONFIGURACIÓN UNIFICADA Y CORRECTA -------------------
 
-// 1. Tarea para CREAR el reporte HTML/XML (combinando unit y androidTest)
+// 1. Tarea para CREAR el reporte HTML/XML (opcional, pero buena práctica)
 tasks.register<JacocoReport>("jacocoTestReport") {
-    dependsOn("testDebugUnitTest", "connectedDebugAndroidTest")
+    dependsOn("testDebugUnitTest")
 
     reports {
         xml.required.set(true)
@@ -95,19 +95,15 @@ tasks.register<JacocoReport>("jacocoTestReport") {
 
     sourceDirectories.setFrom(mainSrc)
     classDirectories.setFrom(files(javaTree, kotlinTree))
-    executionData.setFrom(
-        fileTree(buildDir) {
-            include(
-                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
-                "outputs/code_coverage/connected/*coverage.ec"
-            )
-        }
-    )
+    executionData.setFrom(fileTree(buildDir) {
+        include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+    })
 }
 
-// 2. Tarea para VERIFICAR el umbral de cobertura (combinado)
+// 2. Tarea para VERIFICAR el umbral de cobertura
 tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
-    dependsOn("testDebugUnitTest", "connectedDebugAndroidTest")
+    // Esta tarea depende de que las pruebas unitarias se hayan ejecutado
+    dependsOn("testDebugUnitTest")
 
     violationRules {
         rule {
@@ -115,7 +111,7 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
             limit {
                 counter = "LINE"
                 value = "COVEREDRATIO"
-                minimum = 0.70.toBigDecimal() // umbral 70%
+                minimum = 0.70.toBigDecimal() // <-- ¡Aquí está tu umbral del 70%!
             }
         }
     }
@@ -130,12 +126,8 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
 
     sourceDirectories.setFrom(mainSrc)
     classDirectories.setFrom(files(javaTree, kotlinTree))
-    executionData.setFrom(
-        fileTree(buildDir) {
-            include(
-                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
-                "outputs/code_coverage/connected/*coverage.ec"
-            )
-        }
-    )
+    executionData.setFrom(fileTree(buildDir) {
+        // MUY IMPORTANTE: Solo usa los datos de las pruebas unitarias
+        include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+    })
 }
