@@ -18,6 +18,8 @@ import com.example.medisupplyapp.data.remote.repository.ClientRepository
 import com.example.medisupplyapp.data.remote.repository.OrdersRepository
 import com.example.medisupplyapp.data.remote.repository.ProductRepository
 import kotlinx.coroutines.launch
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 
 class CreateOrderViewModel : ViewModel() {
     var selectedClient by mutableStateOf<Client?>(null)
@@ -56,7 +58,7 @@ class CreateOrderViewModel : ViewModel() {
 
     fun createOrder(
         selectedQuantities: Map<String, Int>,
-        onSuccess: (orderId: Int, message: String) -> Unit,
+        onSuccess: (orderId: String, message: String) -> Unit,
         onError: (String) -> Unit
     ) {
         viewModelScope.launch {
@@ -84,11 +86,13 @@ class CreateOrderViewModel : ViewModel() {
                     }
 
                 val orderRepo = OrdersRepository(api = ApiConnection.api)
+                val nowUtc = ZonedDateTime.now(ZoneOffset.UTC)
+                val futureUtc = nowUtc.plusDays(5)
 
                 val request = CreateOrderRequest(
-                    client_id = clientId,
+                    user_id = clientId.toString(),
                     products = productRequests,
-                    estimated_delivery_time = "2025-10-25T14:00:00",
+                    estimated_delivery_time = futureUtc.toString(),
                     status_id = 3
                 )
 
