@@ -112,21 +112,31 @@ tasks.register<JacocoReport>("jacocoTestReport") {
 
 // 2. Tarea para VERIFICAR el umbral de cobertura
 tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
-    // Esta tarea depende de que las pruebas unitarias se hayan ejecutado
     dependsOn("testDebugUnitTest")
 
     violationRules {
         rule {
             element = "CLASS"
+            // Excluir todas las clases generadas para composables (archivos *Kt* y lambdas)
+            excludes = listOf( // clases generadas de archivos Kotlin (incluye composables)
+                "**/ComposableSingletons$*.*"  // composables singleton generados
+            )
             limit {
                 counter = "LINE"
                 value = "COVEREDRATIO"
-                minimum = 0.70.toBigDecimal() // <-- ¡Aquí está tu umbral del 70%!
+                minimum = 0.70.toBigDecimal()
             }
         }
     }
 
-    val fileFilter = listOf("**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*", "**/*Test*.*")
+    val fileFilter = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*"
+    )
+
     val javaTree = fileTree("${buildDir}/intermediates/javac/debug/classes") { exclude(fileFilter) }
     val kotlinTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") { exclude(fileFilter) }
     val mainSrc = files(
@@ -137,7 +147,6 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
     sourceDirectories.setFrom(mainSrc)
     classDirectories.setFrom(files(javaTree, kotlinTree))
     executionData.setFrom(fileTree(buildDir) {
-        // MUY IMPORTANTE: Solo usa los datos de las pruebas unitarias
         include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
     })
 }
