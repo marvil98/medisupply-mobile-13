@@ -34,7 +34,7 @@ jobs:
           arch: arm64-v8a
           force-avd-creation: false
           ram-size: 4096M
-          emulator-options: "-accel auto -no-snapshot-save -no-window -gpu auto -noaudio -no-boot-anim -camera-back none"
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -accel off
           disable-animations: true
           script: ./gradlew connectedDebugAndroidTest jacocoAndroidTestReport
 
