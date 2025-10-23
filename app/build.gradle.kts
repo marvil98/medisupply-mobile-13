@@ -116,7 +116,17 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
     violationRules {
         rule {
             element = "CLASS"
-            excludes = listOf("**/ComposableSingletons$*.*")
+            excludes = listOf(
+                "**/R.class",
+                "**/R$*.class",
+                "**/BuildConfig.*",
+                "**/Manifest*.*",
+                "**/*Test*.*",
+                "**/*\$ComposableSingletons*.*",
+                "**/*_Factory.*",
+                "**/*_MembersInjector.*",
+                "**/*_Impl.*"
+            )
             limit {
                 counter = "LINE"
                 value = "COVEREDRATIO"
