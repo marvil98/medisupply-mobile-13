@@ -136,12 +136,14 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
         }
     }
 
-    val javaTree = fileTree("${buildDir}/intermediates/javac/debug/classes") {
+    val javaTree = fileTree(buildDir.resolve("intermediates/javac/debug/classes")) {
         exclude(jacocoExcludes)
     }
-    val kotlinTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") {
+
+    val kotlinTree = fileTree(buildDir.resolve("tmp/kotlin-classes/debug")) {
         exclude(jacocoExcludes)
     }
+
     val mainSrc = files(
         "${project.projectDir}/src/main/java",
         "${project.projectDir}/src/main/kotlin"
