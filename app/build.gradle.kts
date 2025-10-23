@@ -131,16 +131,16 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
             limit {
                 counter = "LINE"
                 value = "COVEREDRATIO"
-                minimum = 0.0
+                minimum = BigDecimal("0.0")
             }
         }
     }
 
-    val javaTree = fileTree(buildDir.resolve("intermediates/javac/debug/classes")) {
+    val javaTree = fileTree(layout.buildDirectory.dir("intermediates/javac/debug/classes").get().asFile) {
         exclude(jacocoExcludes)
     }
 
-    val kotlinTree = fileTree(buildDir.resolve("tmp/kotlin-classes/debug")) {
+    val kotlinTree = fileTree(layout.buildDirectory.dir("tmp/kotlin-classes/debug").get().asFile) {
         exclude(jacocoExcludes)
     }
 
@@ -151,7 +151,7 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
 
     sourceDirectories.setFrom(mainSrc)
     classDirectories.setFrom(files(javaTree, kotlinTree))
-    executionData.setFrom(fileTree(buildDir) {
+    executionData.setFrom(fileTree(layout.buildDirectory.get().asFile) {
         include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
     })
 }
