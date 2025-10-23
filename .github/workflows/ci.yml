@@ -8,30 +8,33 @@ on:
 
 jobs:
   test:
-    # Usaremos un runner de Linux, que es el estándar
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: gradle
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
-    - name: Run unit tests, create report, and check coverage
-      # Ejecutamos las tres tareas necesarias en orden.
-      run: ./gradlew testDebugUnitTest createDebugUnitTestCoverageReport jacocoTestCoverageVerification
+      - name: Run unit tests, create report, and check coverage
+        run: ./gradlew testDebugUnitTest jacocoTestReport jacocoTestCoverageVerification
 
-    - name: Upload coverage report as artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: jacoco-html-report
-        # La tarea createDebugUnitTestCoverageReport genera este index.
-        path: app/build/reports/coverage/test/debug/index.html
+      - name: Upload coverage report as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-html-report
+          path: app/build/reports/jacoco/jacocoTestReport/html
+
+      - name: Run SonarCloud analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Asegurate de tener configurado el token en GitHub Secrets
+        run: ./gradlew sonarqube
+

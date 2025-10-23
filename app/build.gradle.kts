@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("jacoco")
+    id("org.sonarqube") version "4.3.0.3225" // Plugin de SonarCloud
 }
 
 android {
@@ -75,7 +76,7 @@ dependencies {
     // Mocking framework (e.g., Mockito-Kotlin)
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.0.0")
 
-    // Robolectric (often necessary to resolve Android resources like R.string.* in JVM tests)
+    // Robolectric (para resolver recursos Android en pruebas JVM)
     testImplementation("org.robolectric:robolectric:4.10.3")
 }
 
@@ -84,9 +85,7 @@ jacoco {
     toolVersion = "0.8.8"
 }
 
-// ------------------- CONFIGURACIÓN UNIFICADA Y CORRECTA -------------------
-
-// 1. Tarea para CREAR el reporte HTML/XML (opcional, pero buena práctica)
+// Tarea para CREAR el reporte Jacoco HTML/XML
 tasks.register<JacocoReport>("jacocoTestReport") {
     dependsOn("testDebugUnitTest")
 
@@ -110,17 +109,14 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     })
 }
 
-// 2. Tarea para VERIFICAR el umbral de cobertura
+// Tarea para VERIFICAR el umbral mínimo de cobertura
 tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
     dependsOn("testDebugUnitTest")
 
     violationRules {
         rule {
             element = "CLASS"
-            // Excluir todas las clases generadas para composables (archivos *Kt* y lambdas)
-            excludes = listOf( // clases generadas de archivos Kotlin (incluye composables)
-                "**/ComposableSingletons$*.*"  // composables singleton generados
-            )
+            excludes = listOf("**/ComposableSingletons$*.*")
             limit {
                 counter = "LINE"
                 value = "COVEREDRATIO"
@@ -149,4 +145,15 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
     executionData.setFrom(fileTree(buildDir) {
         include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
     })
+}
+
+// Configuración para SonarQube/SonarCloud
+sonarqube {
+    properties {
+        property("sonar.projectKey", "margarita-villafane_medisupply-mobile-13")
+        property("sonar.organization", "margarita-villafane")
+        property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.login", System.getenv("SONAR_TOKEN"))  // Asumiendo que usas token en variable de entorno
+        property("sonar.coverage.jacoco.xmlReportPaths", "app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+    }
 }
