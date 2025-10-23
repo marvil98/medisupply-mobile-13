@@ -27,6 +27,7 @@ android {
             )
         }
         debug {
+            // Cobertura habilitada para pruebas unitarias e instrumentadas
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
         }
@@ -94,6 +95,7 @@ val jacocoExcludes = listOf(
     "**/*_ExternalSyntheticLambda.*",
 )
 
+// Tarea para reporte de cobertura de pruebas unitarias
 tasks.register<JacocoReport>("jacocoTestReport") {
     dependsOn("testDebugUnitTest")
 
@@ -108,10 +110,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     val kotlinTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") {
         exclude(jacocoExcludes)
     }
-    val mainSrc = files(
-        "${project.projectDir}/src/main/java",
-        "${project.projectDir}/src/main/kotlin"
-    )
+    val mainSrc = files("${project.projectDir}/src/main/java", "${project.projectDir}/src/main/kotlin")
 
     sourceDirectories.setFrom(mainSrc)
     classDirectories.setFrom(files(javaTree, kotlinTree))
@@ -120,6 +119,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     })
 }
 
+// Verificación de cobertura para pruebas unitarias
 tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
     dependsOn("testDebugUnitTest")
 
@@ -138,15 +138,10 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
     val javaTree = fileTree(layout.buildDirectory.dir("intermediates/javac/debug/classes").get().asFile) {
         exclude(jacocoExcludes)
     }
-
     val kotlinTree = fileTree(layout.buildDirectory.dir("tmp/kotlin-classes/debug").get().asFile) {
         exclude(jacocoExcludes)
     }
-
-    val mainSrc = files(
-        "${project.projectDir}/src/main/java",
-        "${project.projectDir}/src/main/kotlin"
-    )
+    val mainSrc = files("${project.projectDir}/src/main/java", "${project.projectDir}/src/main/kotlin")
 
     sourceDirectories.setFrom(mainSrc)
     classDirectories.setFrom(files(javaTree, kotlinTree))
@@ -155,9 +150,9 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
     })
 }
 
-// NUEVA tarea para cobertura de tests instrumentados (UI tests)
+// NUEVA tarea para reporte de cobertura de pruebas instrumentadas (androidTest)
 tasks.register<JacocoReport>("jacocoAndroidTestReport") {
-    dependsOn("connectedDebugAndroidTest") // corre los instrumented tests
+    dependsOn("connectedDebugAndroidTest")
 
     group = "verification"
     description = "Generates Jacoco coverage reports from androidTests."
@@ -167,20 +162,16 @@ tasks.register<JacocoReport>("jacocoAndroidTestReport") {
         html.required.set(true)
     }
 
-    val debugTree = fileTree("${buildDir}/intermediates/javac/debug/classes") {
+    val javaTree = fileTree("${buildDir}/intermediates/javac/debug/classes") {
         exclude(jacocoExcludes)
     }
-    val kotlinDebugTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") {
+    val kotlinTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") {
         exclude(jacocoExcludes)
     }
 
-    classDirectories.setFrom(files(debugTree, kotlinDebugTree))
-
-    sourceDirectories.setFrom(
-        files("${project.projectDir}/src/main/java", "${project.projectDir}/src/main/kotlin")
-    )
-
-    executionData.setFrom(fileTree(buildDir) {
-        include("outputs/code_coverage/connected/*coverage.ec")
+    sourceDirectories.setFrom(files("${project.projectDir}/src/main/java", "${project.projectDir}/src/main/kotlin"))
+    classDirectories.setFrom(files(javaTree, kotlinTree))
+    executionData.setFrom(fileTree("${buildDir}/outputs/code_coverage/connected") {
+        include("*.ec")
     })
 }
