@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
@@ -24,17 +24,11 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Run unit tests, create report, and check coverage
+      - name: Run unit tests and generate coverage reports
         run: ./gradlew testDebugUnitTest jacocoTestReport jacocoTestCoverageVerification
 
-      - name: Upload coverage report as artifact
+      - name: Upload coverage report artifact
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-html-report
           path: app/build/reports/jacoco/jacocoTestReport/html
-
-      - name: Run SonarCloud analysis
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Asegurate de tener configurado el token en GitHub Secrets
-        run: ./gradlew sonarqube
-

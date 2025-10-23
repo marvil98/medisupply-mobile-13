@@ -1,10 +1,8 @@
 plugins {
-    // Tus plugins existentes
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("jacoco")
-    id("org.sonarqube") version "4.3.0.3225" // Plugin de SonarCloud
 }
 
 android {
@@ -48,7 +46,6 @@ android {
 }
 
 dependencies {
-    // ... tus dependencias ...
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -93,7 +90,7 @@ val jacocoExcludes = listOf(
     "**/*_Impl.*",
     "**/*\$Lambda\$*.*",
     "**/*_Delegate.*", // para delegados de Kotlin
-    "**/*\$inlined\$*.*", // funciones inlminimumine generadas
+    "**/*\$inlined\$*.*", // funciones inline generadas
     "**/*_ExternalSyntheticLambda.*", // lambdas externas generadas
 )
 
@@ -156,14 +153,4 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
     executionData.setFrom(fileTree(layout.buildDirectory.get().asFile) {
         include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
     })
-}
-
-sonarqube {
-    properties {
-        property("sonar.projectKey", "margarita-villafane_medisupply-mobile-13")
-        property("sonar.organization", "margarita-villafane")
-        property("sonar.host.url", "https://sonarcloud.io")
-        property("sonar.login", System.getenv("SONAR_TOKEN"))  // Token en variable de entorno
-        property("sonar.coverage.jacoco.xmlReportPaths", "app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
-    }
 }
