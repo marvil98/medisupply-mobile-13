@@ -7,7 +7,8 @@ on:
     branches: [ "main", "feature/**" ]
 
 jobs:
-  test:
+  unit-tests:
+    name: Run Unit Tests & Generate Coverage
     runs-on: ubuntu-latest
 
     steps:
@@ -27,8 +28,43 @@ jobs:
       - name: Run unit tests and generate coverage reports
         run: ./gradlew testDebugUnitTest jacocoTestReport jacocoTestCoverageVerification
 
-      - name: Upload coverage report artifact
+      - name: Upload unit test coverage report
         uses: actions/upload-artifact@v4
         with:
-          name: jacoco-html-report
+          name: jacoco-html-report-unit-tests
           path: app/build/reports/jacoco/jacocoTestReport/html
+
+  instrumented-tests:
+    name: Run Instrumented Tests & Generate Coverage
+    runs-on: macos-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Start Android Emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: true
+          emulator-options: "-no-window -no-audio"
+          script: ./gradlew connectedDebugAndroidTest jacocoAndroidTestReport
+
+      - name: Upload instrumented test coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-html-report-instrumented-tests
+          path: app/build/reports/jacoco/jacocoAndroidTestReport/html

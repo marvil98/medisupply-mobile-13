@@ -27,8 +27,8 @@ android {
             )
         }
         debug {
-            // Habilitamos cobertura solo para pruebas unitarias
-            isTestCoverageEnabled = true
+            enableUnitTestCoverage = true
+            enableAndroidTestCoverage = true
         }
     }
 
@@ -71,9 +71,7 @@ dependencies {
     testImplementation("org.robolectric:robolectric:4.10.3")
     androidTestImplementation("org.mockito:mockito-android:5.1.1")
     androidTestImplementation("org.mockito.kotlin:mockito-kotlin:5.0.0")
-    testImplementation("org.mockito:mockito-core:5.1.1")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.0.0")
-    testImplementation("org.mockito:mockito-inline:5.1.1")
+    testImplementation(kotlin("test"))
 }
 
 jacoco {
@@ -154,5 +152,35 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
     classDirectories.setFrom(files(javaTree, kotlinTree))
     executionData.setFrom(fileTree(layout.buildDirectory.get().asFile) {
         include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+    })
+}
+
+// NUEVA tarea para cobertura de tests instrumentados (UI tests)
+tasks.register<JacocoReport>("jacocoAndroidTestReport") {
+    dependsOn("connectedDebugAndroidTest") // corre los instrumented tests
+
+    group = "verification"
+    description = "Generates Jacoco coverage reports from androidTests."
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    val debugTree = fileTree("${buildDir}/intermediates/javac/debug/classes") {
+        exclude(jacocoExcludes)
+    }
+    val kotlinDebugTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") {
+        exclude(jacocoExcludes)
+    }
+
+    classDirectories.setFrom(files(debugTree, kotlinDebugTree))
+
+    sourceDirectories.setFrom(
+        files("${project.projectDir}/src/main/java", "${project.projectDir}/src/main/kotlin")
+    )
+
+    executionData.setFrom(fileTree(buildDir) {
+        include("outputs/code_coverage/connected/*coverage.ec")
     })
 }

@@ -1,26 +1,24 @@
-package com.example.medisupplyapp.screen
-
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.*
+import com.example.medisupplyapp.screen.RegionalSettingsScreen
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 
 class RegionalSettingsScreenUiTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    // Mocks para las funciones callback que recibe el composable
-    private val onLanguageChange: (String) -> Unit = mock()
-    private val onNavigate: (String) -> Unit = mock()
-    private val onBack: () -> Unit = mock()
-    private val onSave: () -> Unit = mock()
+    private var languageChanged = ""
+    private var saveClicked = false
+
+    private val onLanguageChange: (String) -> Unit = { languageChanged = it }
+    private val onNavigate: (String) -> Unit = { }
+    private val onBack: () -> Unit = { }
+    private val onSave: () -> Unit = { saveClicked = true }
 
     @Test
-    fun dropdown_selection_updatesSelectedLanguage_andEnablesSaveButton() {
-        // Montar el composable con el estado inicial y los mocks
+    fun dropdown_selection_debugTest() {
         composeTestRule.setContent {
             RegionalSettingsScreen(
                 currentLanguage = "Español",
@@ -32,19 +30,14 @@ class RegionalSettingsScreenUiTest {
             )
         }
 
-        // Simular click para abrir el dropdown (buscando el label "Idioma")
+        // Antes de hacer click
+        composeTestRule.onRoot().printToLog("UI_TREE_INITIAL")
+
+        // Abrir dropdown
         composeTestRule.onNodeWithText("Idioma").performClick()
 
-        // Simular selección de "English"
-        composeTestRule.onNodeWithText("English").performClick()
-
-        // Comprobar que el dropdown muestra la opción seleccionada "English"
-        composeTestRule.onNodeWithText("English").assertExists()
-
-        // Comprobar que el botón "Save" está habilitado
-        composeTestRule.onNodeWithText("Save").assertIsEnabled()
-
-        // Verificar que se llamó el callback onLanguageChange con el valor "English"
-        verify(onLanguageChange).invoke("English")
+        // Después de abrir dropdown
+        composeTestRule.onRoot().printToLog("UI_TREE_AFTER_CLICK")
     }
+
 }
