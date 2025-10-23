@@ -70,22 +70,28 @@ dependencies {
     implementation("androidx.compose.ui:ui-text-google-fonts:1.9.0")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     testImplementation("androidx.compose.ui:ui-test-junit4")
-    // JUnit 4
     testImplementation("junit:junit:4.13.2")
-
-    // Mocking framework (e.g., Mockito-Kotlin)
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.0.0")
-
-    // Robolectric (para resolver recursos Android en pruebas JVM)
     testImplementation("org.robolectric:robolectric:4.10.3")
 }
 
-// Versión de la herramienta JaCoCo
 jacoco {
     toolVersion = "0.8.8"
 }
 
-// Tarea para CREAR el reporte Jacoco HTML/XML
+val jacocoExcludes = listOf(
+    "**/R.class",
+    "**/R$*.class",
+    "**/BuildConfig.*",
+    "**/Manifest*.*",
+    "**/*Test*.*",
+    "**/*\$ComposableSingletons*.*",
+    "**/*_Factory.*",
+    "**/*_MembersInjector.*",
+    "**/*_Impl.*",
+    "**/*\$Lambda\$*.*"
+)
+
 tasks.register<JacocoReport>("jacocoTestReport") {
     dependsOn("testDebugUnitTest")
 
@@ -94,9 +100,12 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         html.required.set(true)
     }
 
-    val fileFilter = listOf("**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*", "**/*Test*.*")
-    val javaTree = fileTree("${buildDir}/intermediates/javac/debug/classes") { exclude(fileFilter) }
-    val kotlinTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") { exclude(fileFilter) }
+    val javaTree = fileTree("${buildDir}/intermediates/javac/debug/classes") {
+        exclude(jacocoExcludes)
+    }
+    val kotlinTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") {
+        exclude(jacocoExcludes)
+    }
     val mainSrc = files(
         "${project.projectDir}/src/main/java",
         "${project.projectDir}/src/main/kotlin"
@@ -109,24 +118,13 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     })
 }
 
-// Tarea para VERIFICAR el umbral mínimo de cobertura
 tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
     dependsOn("testDebugUnitTest")
 
     violationRules {
         rule {
             element = "CLASS"
-            excludes = listOf(
-                "**/R.class",
-                "**/R$*.class",
-                "**/BuildConfig.*",
-                "**/Manifest*.*",
-                "**/*Test*.*",
-                "**/*\$ComposableSingletons*.*",
-                "**/*_Factory.*",
-                "**/*_MembersInjector.*",
-                "**/*_Impl.*"
-            )
+            excludes = jacocoExcludes
             limit {
                 counter = "LINE"
                 value = "COVEREDRATIO"
@@ -135,16 +133,12 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
         }
     }
 
-    val fileFilter = listOf(
-        "**/R.class",
-        "**/R$*.class",
-        "**/BuildConfig.*",
-        "**/Manifest*.*",
-        "**/*Test*.*"
-    )
-
-    val javaTree = fileTree("${buildDir}/intermediates/javac/debug/classes") { exclude(fileFilter) }
-    val kotlinTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") { exclude(fileFilter) }
+    val javaTree = fileTree("${buildDir}/intermediates/javac/debug/classes") {
+        exclude(jacocoExcludes)
+    }
+    val kotlinTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") {
+        exclude(jacocoExcludes)
+    }
     val mainSrc = files(
         "${project.projectDir}/src/main/java",
         "${project.projectDir}/src/main/kotlin"
@@ -157,13 +151,12 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
     })
 }
 
-// Configuración para SonarQube/SonarCloud
 sonarqube {
     properties {
         property("sonar.projectKey", "margarita-villafane_medisupply-mobile-13")
         property("sonar.organization", "margarita-villafane")
         property("sonar.host.url", "https://sonarcloud.io")
-        property("sonar.login", System.getenv("SONAR_TOKEN"))  // Asumiendo que usas token en variable de entorno
+        property("sonar.login", System.getenv("SONAR_TOKEN"))  // Token en variable de entorno
         property("sonar.coverage.jacoco.xmlReportPaths", "app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
     }
 }
