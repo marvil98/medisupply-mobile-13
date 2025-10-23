@@ -15,7 +15,7 @@ import com.tuempresa.medisupply.ui.theme.MediSupplyTheme
 
 @Composable
 fun RegionalSettingsScreen(
-    currentLanguage: String,
+    currentLanguage: String?,
     onLanguageChange: (String) -> Unit,
     onNavigate: (String) -> Unit,
     selectedRoute: String,

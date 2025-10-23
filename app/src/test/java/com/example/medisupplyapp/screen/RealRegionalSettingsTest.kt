@@ -2,195 +2,85 @@ package com.example.medisupplyapp.screen
 
 import org.junit.Test
 import org.junit.Assert.*
-import java.util.*
 
 class RealRegionalSettingsTest {
 
+    private val languageOptions = listOf("Español", "English")
+
     @Test
-    fun regionalSettingsLogic_works() {
-        // Test the actual logic from RegionalSettingsScreen.kt
-        
-        // Arrange
-        val currentLanguage = "Español"
-        var selectedLanguage = currentLanguage
-        val languageOptions = listOf("Español", "English")
-        
-        // Act - Test the logic from RegionalSettingsScreen
+    fun regionalSettingsLogic_initialSpanish_isValid() {
+        val selectedLanguage = "Español"
+
         val hasError = selectedLanguage == null
         val isEnabled = selectedLanguage != null
-        
-        // Assert
+
         assertFalse(hasError)
         assertTrue(isEnabled)
         assertTrue(languageOptions.contains(selectedLanguage))
     }
 
     @Test
-    fun regionalSettingsLogic_works_english() {
-        // Test the actual logic from RegionalSettingsScreen.kt
-        
-        // Arrange
-        val currentLanguage = "English"
-        var selectedLanguage = currentLanguage
-        val languageOptions = listOf("Español", "English")
-        
-        // Act - Test the logic from RegionalSettingsScreen
+    fun regionalSettingsLogic_initialEnglish_isValid() {
+        val selectedLanguage = "English"
+
         val hasError = selectedLanguage == null
         val isEnabled = selectedLanguage != null
-        
-        // Assert
+
         assertFalse(hasError)
         assertTrue(isEnabled)
         assertTrue(languageOptions.contains(selectedLanguage))
     }
 
     @Test
-    fun regionalSettingsLogic_works_null() {
-        // Test the actual logic from RegionalSettingsScreen.kt
-        
-        // Arrange
-        val currentLanguage: String? = null
-        var selectedLanguage = currentLanguage
-        val languageOptions = listOf("Español", "English")
-        
-        // Act - Test the logic from RegionalSettingsScreen
+    fun regionalSettingsLogic_nullLanguage_hasErrorAndDisabled() {
+        val selectedLanguage: String? = null
+
         val hasError = selectedLanguage == null
         val isEnabled = selectedLanguage != null
-        
-        // Assert
+
         assertTrue(hasError)
         assertFalse(isEnabled)
     }
 
     @Test
-    fun regionalSettingsLogic_works_empty() {
-        // Test the actual logic from RegionalSettingsScreen.kt
-        
-        // Arrange
-        val currentLanguage = ""
-        var selectedLanguage = currentLanguage
-        val languageOptions = listOf("Español", "English")
-        
-        // Act - Test the logic from RegionalSettingsScreen
+    fun regionalSettingsLogic_emptyString_isValidButMayNotBeDesired() {
+        val selectedLanguage = ""
+
         val hasError = selectedLanguage == null
         val isEnabled = selectedLanguage != null
-        
-        // Assert
+
         assertFalse(hasError)
         assertTrue(isEnabled)
+
+        // Empty string is not in languageOptions, so this might be an edge case
+        assertFalse(languageOptions.contains(selectedLanguage))
     }
 
     @Test
-    fun regionalSettingsLogic_works_spanish() {
-        // Test the actual logic from RegionalSettingsScreen.kt
-        
-        // Arrange
-        val currentLanguage = "Español"
-        var selectedLanguage = currentLanguage
-        val languageOptions = listOf("Español", "English")
-        
-        // Act - Test the logic from RegionalSettingsScreen
-        val hasError = selectedLanguage == null
-        val isEnabled = selectedLanguage != null
-        
-        // Assert
-        assertFalse(hasError)
-        assertTrue(isEnabled)
-        assertTrue(languageOptions.contains(selectedLanguage))
-    }
-
-    @Test
-    fun regionalSettingsLogic_works_english_selection() {
-        // Test the actual logic from RegionalSettingsScreen.kt
-        
-        // Arrange
-        val currentLanguage = "Español"
-        var selectedLanguage = "English"
-        val languageOptions = listOf("Español", "English")
-        
-        // Act - Test the logic from RegionalSettingsScreen
-        val hasError = selectedLanguage == null
-        val isEnabled = selectedLanguage != null
-        
-        // Assert
-        assertFalse(hasError)
-        assertTrue(isEnabled)
-        assertTrue(languageOptions.contains(selectedLanguage))
-    }
-
-    @Test
-    fun regionalSettingsLogic_works_spanish_selection() {
-        // Test the actual logic from RegionalSettingsScreen.kt
-        
-        // Arrange
-        val currentLanguage = "English"
+    fun regionalSettingsLogic_changeLanguageToEnglish_isValid() {
         var selectedLanguage = "Español"
-        val languageOptions = listOf("Español", "English")
-        
-        // Act - Test the logic from RegionalSettingsScreen
-        val hasError = selectedLanguage == null
-        val isEnabled = selectedLanguage != null
-        
-        // Assert
-        assertFalse(hasError)
-        assertTrue(isEnabled)
-        assertTrue(languageOptions.contains(selectedLanguage))
-    }
 
-    @Test
-    fun regionalSettingsLogic_works_language_change() {
-        // Test the actual logic from RegionalSettingsScreen.kt
-        
-        // Arrange
-        val currentLanguage = "Español"
-        var selectedLanguage = currentLanguage
-        val languageOptions = listOf("Español", "English")
-        
-        // Act - Test the language change logic
+        // Simulate user changes language to English
         selectedLanguage = "English"
+
         val hasError = selectedLanguage == null
         val isEnabled = selectedLanguage != null
-        
-        // Assert
+
         assertFalse(hasError)
         assertTrue(isEnabled)
         assertTrue(languageOptions.contains(selectedLanguage))
     }
 
     @Test
-    fun regionalSettingsLogic_works_language_change_back() {
-        // Test the actual logic from RegionalSettingsScreen.kt
-        
-        // Arrange
-        val currentLanguage = "English"
-        var selectedLanguage = currentLanguage
-        val languageOptions = listOf("Español", "English")
-        
-        // Act - Test the language change logic
+    fun regionalSettingsLogic_changeLanguageToSpanish_isValid() {
+        var selectedLanguage = "English"
+
+        // Simulate user changes language to Español
         selectedLanguage = "Español"
-        val hasError = selectedLanguage == null
-        val isEnabled = selectedLanguage != null
-        
-        // Assert
-        assertFalse(hasError)
-        assertTrue(isEnabled)
-        assertTrue(languageOptions.contains(selectedLanguage))
-    }
 
-    @Test
-    fun regionalSettingsLogic_works_save_button() {
-        // Test the actual logic from RegionalSettingsScreen.kt
-        
-        // Arrange
-        val currentLanguage = "Español"
-        var selectedLanguage = currentLanguage
-        val languageOptions = listOf("Español", "English")
-        
-        // Act - Test the save button logic
         val hasError = selectedLanguage == null
         val isEnabled = selectedLanguage != null
-        
-        // Assert
+
         assertFalse(hasError)
         assertTrue(isEnabled)
         assertTrue(languageOptions.contains(selectedLanguage))
