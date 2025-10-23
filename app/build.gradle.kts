@@ -89,7 +89,10 @@ val jacocoExcludes = listOf(
     "**/*_Factory.*",
     "**/*_MembersInjector.*",
     "**/*_Impl.*",
-    "**/*\$Lambda\$*.*"
+    "**/*\$Lambda\$*.*",
+    "**/*_Delegate.*", // para delegados de Kotlin
+    "**/*\$inlined\$*.*", // funciones inline generadas
+    "**/*_ExternalSyntheticLambda.*", // lambdas externas generadas
 )
 
 tasks.register<JacocoReport>("jacocoTestReport") {
