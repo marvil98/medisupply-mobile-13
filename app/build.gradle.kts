@@ -28,8 +28,7 @@ android {
         }
         debug {
             // Habilitamos cobertura solo para pruebas unitarias
-            enableUnitTestCoverage = true
-            enableAndroidTestCoverage = false
+            isTestCoverageEnabled = true
         }
     }
 
@@ -72,6 +71,9 @@ dependencies {
     testImplementation("org.robolectric:robolectric:4.10.3")
     androidTestImplementation("org.mockito:mockito-android:5.1.1")
     androidTestImplementation("org.mockito.kotlin:mockito-kotlin:5.0.0")
+    testImplementation("org.mockito:mockito-core:5.1.1")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.0.0")
+    testImplementation("org.mockito:mockito-inline:5.1.1")
 }
 
 jacoco {
@@ -89,9 +91,9 @@ val jacocoExcludes = listOf(
     "**/*_MembersInjector.*",
     "**/*_Impl.*",
     "**/*\$Lambda\$*.*",
-    "**/*_Delegate.*", // para delegados de Kotlin
-    "**/*\$inlined\$*.*", // funciones inline generadas
-    "**/*_ExternalSyntheticLambda.*", // lambdas externas generadas
+    "**/*_Delegate.*",
+    "**/*\$inlined\$*.*",
+    "**/*_ExternalSyntheticLambda.*",
 )
 
 tasks.register<JacocoReport>("jacocoTestReport") {
