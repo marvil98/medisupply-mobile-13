@@ -73,6 +73,8 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.0.0")
     testImplementation("org.robolectric:robolectric:4.10.3")
+    androidTestImplementation("org.mockito:mockito-android:5.1.1")
+    androidTestImplementation("org.mockito.kotlin:mockito-kotlin:5.0.0")
 }
 
 jacoco {
