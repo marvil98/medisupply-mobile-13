@@ -10,6 +10,7 @@ import com.example.medisupplyapp.screen.orders.CreateOrderScreen
 import com.example.medisupplyapp.utils.updateLocale
 import kotlinx.coroutines.launch
 import com.example.medisupplyapp.screen.orders.FollowOrderScreen
+import com.example.medisupplyapp.screen.visits.RegisterVisitScreen
 import com.example.medisupplyapp.utils.updateLocale
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -68,7 +69,19 @@ fun AppNavigation(userName: String) {
         }
 
         composable("visits") {
-            VisitsScreen()
+            RegisterVisitScreen(
+                onNavigate = { route -> navController.navigate(route) },
+                onBack = { navController.popBackStack() },
+                onNavigateDetail = { route -> navController.navigate("home") },
+            )
+        }
+
+        composable("register_visit") {
+            RegisterVisitScreen(
+                onNavigate = { route -> navController.navigate(route) },
+                onBack = { navController.popBackStack() },
+                onNavigateDetail = { route -> navController.navigate("home") },
+            )
         }
 
         composable("orders") {
@@ -95,11 +108,6 @@ fun AppNavigation(userName: String) {
             )
         }
     }
-}
-
-@Composable
-fun VisitsScreen() {
-    TODO("Not yet implemented")
 }
 
 @Composable
