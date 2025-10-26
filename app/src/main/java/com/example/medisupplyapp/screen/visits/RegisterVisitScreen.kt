@@ -3,6 +3,7 @@ package com.example.medisupplyapp.screen.visits
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
@@ -22,11 +23,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medisupplyapp.R
 import com.example.medisupplyapp.components.CustomDropdown
 import com.example.medisupplyapp.components.CustomTextArea
-import com.example.medisupplyapp.components.ProductSelector
+import com.example.medisupplyapp.components.FloatingToast
 import com.example.medisupplyapp.components.SimpleTopBar
+import com.example.medisupplyapp.components.ToastType
 import com.tuempresa.medisupply.ui.components.FooterNavigation
 import com.tuempresa.medisupply.ui.theme.MediSupplyTheme
-import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -43,16 +44,31 @@ fun RegisterVisitScreen(
     val clientOptions = viewModel.clients
     val selectedClient = viewModel.selectedClient
     val selectedDate = viewModel.selectedDate
+    val findings = viewModel.findings
     val clientError = viewModel.clientError
     val dateError = viewModel.dateError
+    val dateErrorMessage = viewModel.errorMessage
 
+    var toastMessage by remember { mutableStateOf("") }
+    var showToast by remember { mutableStateOf(false) }
+    var toastType by remember { mutableStateOf(ToastType.SUCCESS) }
+
+    val successMessage = stringResource(R.string.visit_success)
+    val mssgError = stringResource(R.string.visit_error)
 
     var isDatePickerVisible by remember { mutableStateOf(false) }
-    var showConfirmation by remember { mutableStateOf(false) }
 
     val selectedRoute = "visits"
-    var comment by remember { mutableStateOf("") }
 
+    var visitSuccess by remember { mutableStateOf(false) }
+
+    if (visitSuccess) {
+        LaunchedEffect(Unit) {
+            val delaySeconds = 2.0f
+            kotlinx.coroutines.delay((delaySeconds * 1000).toLong())
+            onNavigateDetail("dashboard")
+        }
+    }
 
     MediSupplyTheme {
         Scaffold(
@@ -70,14 +86,31 @@ fun RegisterVisitScreen(
                 ) {
                     Spacer(modifier = Modifier.height(16.dp))
 
-
+                    FloatingToast(
+                        message = toastMessage,
+                        type = toastType,
+                        visible = showToast,
+                        onDismiss = { showToast = false }
+                    )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Button(
                         onClick = {
                             if (viewModel.isFormValid()) {
-                                showConfirmation = true
+                                viewModel.registerVisit(
+                                    onSuccess = { orderId, message ->
+                                        toastMessage = successMessage
+                                        toastType = ToastType.SUCCESS
+                                        showToast = true
+                                        visitSuccess = true
+                                    },
+                                    onError = { errorMessage ->
+                                        toastMessage = mssgError
+                                        toastType = ToastType.ERROR
+                                        showToast = true
+                                    }
+                                )
                             }
                         },
                         enabled = viewModel.isFormValid(),
@@ -109,10 +142,10 @@ fun RegisterVisitScreen(
             ) {
                 CustomDropdown(
                     label = stringResource(R.string.label_client),
-                    options = clientOptions.map { it.fullName },
-                    selected = selectedClient?.fullName ?: "",
-                    onSelect = { fullName ->
-                        val client = clientOptions.find { it.fullName == fullName }
+                    options = clientOptions.map { it.name },
+                    selected = selectedClient?.name ?: "",
+                    onSelect = { name ->
+                        val client = clientOptions.find { it.name == name }
                         viewModel.selectedClient = client
                         viewModel.clientError = false
                     },
@@ -133,9 +166,9 @@ fun RegisterVisitScreen(
                     isError = dateError,
                     onClicked = { isDatePickerVisible = true }
                 )
-                if (dateError) {
+                if (dateError && dateErrorMessage != "") {
                     Text(
-                        text = "Campo obligatorio",
+                        text = dateErrorMessage,
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.labelSmall,
                         modifier = Modifier.padding(start = 16.dp, top = 4.dp)
@@ -147,8 +180,8 @@ fun RegisterVisitScreen(
                 CustomTextArea(
                     label = stringResource(R.string.observations_label),
                     placeholder = stringResource(R.string.observations_placeholder),
-                    value = comment,
-                    onValueChange = { comment = it },
+                    value = findings,
+                    onValueChange = { viewModel.updateFindings(it) },
                 )
             }
         }
@@ -173,7 +206,9 @@ fun DateSelector(
 ) {
     // Usamos la fecha seleccionada del estado si existe
     val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-    val dateText = selectedDate?.let { dateFormat.format(it) } ?: "Seleccionar Fecha"
+    val dateText = selectedDate?.let { "" } ?: "Seleccionar Fecha"
+    // Usamos InteractionSource para capturar el clic sobre el TextField completo
+    val interactionSource = remember { MutableInteractionSource() }
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = label,
@@ -181,48 +216,61 @@ fun DateSelector(
             modifier = Modifier.padding(bottom = 8.dp)
         )
         Spacer(modifier = Modifier.height(4.dp))
-        OutlinedTextField(
-            value = dateText,
-            onValueChange = { /* Solo lectura */ },
-            label = { Text("Fecha") },
-            readOnly = true,
-            trailingIcon = {
-                Icon(
-                    Icons.Default.CalendarToday,
-                    contentDescription = "Seleccionar fecha",
-                    modifier = Modifier.clickable(onClick = onClicked),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            },
-            isError = isError,
+        Box(
             modifier = Modifier
-                .clickable(onClick = onClicked)
                 .fillMaxWidth()
                 .height(56.dp)
+                // Aplicamos el clic al Box, que abarca toda el área del TextField.
+                // Esto garantiza que el toque se detecte ANTES de la lógica interna del TextField.
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onClicked
+                )
                 .clip(RoundedCornerShape(16.dp))
                 .background(MaterialTheme.colorScheme.secondary)
                 .border(
                     width = 0.dp,
                     color = Color.Transparent,
                     shape = RoundedCornerShape(16.dp)
+                )
+        ) {
+            OutlinedTextField(
+                // --- Usar la fecha formateada o el placeholder ---
+                value = dateText,
+                onValueChange = { /* Solo lectura */ },
+                readOnly = true, // Es fundamental mantener esto para evitar el teclado
+                enabled = false, // Deshabilitar evita que capture eventos de foco/teclado
+                label = { Text("Fecha") },
+                trailingIcon = {
+                    Icon(
+                        Icons.Default.CalendarToday,
+                        contentDescription = "Seleccionar fecha",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                },
+                isError = isError,
+                // El Modifier del TextField ahora solo necesita rellenar el Box padre
+                modifier = Modifier.fillMaxSize(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent, // Fondo transparente ya que el Box lo maneja
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                    cursorColor = MaterialTheme.colorScheme.primary,
+                    focusedBorderColor = Color.Transparent,
+                    disabledBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent,
+                    // Usamos el color de texto para el estado 'disabled'
+                    disabledTextColor = MaterialTheme.colorScheme.primary,
+                    disabledLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                    errorSupportingTextColor = MaterialTheme.colorScheme.error
                 ),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.secondary,
-                unfocusedContainerColor = MaterialTheme.colorScheme.secondary,
-                disabledContainerColor = MaterialTheme.colorScheme.secondary,
-                cursorColor = MaterialTheme.colorScheme.primary,
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent,
-                focusedTextColor = MaterialTheme.colorScheme.primary,
-                unfocusedTextColor = MaterialTheme.colorScheme.primary,
-                disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-            ),
-            shape = RoundedCornerShape(16.dp),
-            textStyle = MaterialTheme.typography.bodyLarge.copy(
-                color = MaterialTheme.colorScheme.primary,
-            ),
-
-        )
+                shape = RoundedCornerShape(16.dp),
+                textStyle = MaterialTheme.typography.bodyLarge.copy(
+                    color = MaterialTheme.colorScheme.primary,
+                ),
+            )
+        }
     }
 }
 
@@ -233,9 +281,7 @@ fun RealDatePickerDialog(
     onDateSelected: (Date) -> Unit
 ) {
     // 1. Crear el estado del DatePicker
-    val datePickerState = rememberDatePickerState(
-         System.currentTimeMillis()
-    )
+    val datePickerState = rememberDatePickerState()
 
     // 2. Crear el DatePickerDialog
     DatePickerDialog(
