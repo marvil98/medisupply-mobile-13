@@ -100,7 +100,7 @@ class RegisterVisitViewModel : ViewModel() {
     }
 
     fun registerVisit(
-        onSuccess: (orderId: String, message: String) -> Unit,
+        onSuccess: (visitID: String, message: String) -> Unit,
         onError: (String) -> Unit
     ) {
         viewModelScope.launch {

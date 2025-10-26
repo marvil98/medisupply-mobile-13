@@ -22,7 +22,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medisupplyapp.R
 import com.example.medisupplyapp.components.CustomDropdown
+import com.example.medisupplyapp.components.CustomPickerDialog
 import com.example.medisupplyapp.components.CustomTextArea
+import com.example.medisupplyapp.components.DateSelector
 import com.example.medisupplyapp.components.FloatingToast
 import com.example.medisupplyapp.components.SimpleTopBar
 import com.example.medisupplyapp.components.ToastType
@@ -99,13 +101,13 @@ fun RegisterVisitScreen(
                         onClick = {
                             if (viewModel.isFormValid()) {
                                 viewModel.registerVisit(
-                                    onSuccess = { orderId, message ->
+                                    onSuccess = { _, message ->
                                         toastMessage = successMessage
                                         toastType = ToastType.SUCCESS
                                         showToast = true
                                         visitSuccess = true
                                     },
-                                    onError = { errorMessage ->
+                                    onError = { _ ->
                                         toastMessage = mssgError
                                         toastType = ToastType.ERROR
                                         showToast = true
@@ -187,7 +189,7 @@ fun RegisterVisitScreen(
         }
     }
     if (isDatePickerVisible) {
-        RealDatePickerDialog(
+        CustomPickerDialog (
             onDismiss = { isDatePickerVisible = false },
             onDateSelected = { date ->
                 viewModel.onDateSelected(date) // Llama al ViewModel con la fecha
@@ -197,132 +199,3 @@ fun RegisterVisitScreen(
     }
 }
 
-@Composable
-fun DateSelector(
-    label: String,
-    selectedDate: Date?,
-    isError: Boolean,
-    onClicked: () -> Unit
-) {
-    // Usamos la fecha seleccionada del estado si existe
-    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-    val dateText = selectedDate?.let { "" } ?: "Seleccionar Fecha"
-    // Usamos InteractionSource para capturar el clic sobre el TextField completo
-    val interactionSource = remember { MutableInteractionSource() }
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                // Aplicamos el clic al Box, que abarca toda el área del TextField.
-                // Esto garantiza que el toque se detecte ANTES de la lógica interna del TextField.
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onClicked
-                )
-                .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.secondary)
-                .border(
-                    width = 0.dp,
-                    color = Color.Transparent,
-                    shape = RoundedCornerShape(16.dp)
-                )
-        ) {
-            OutlinedTextField(
-                // --- Usar la fecha formateada o el placeholder ---
-                value = dateText,
-                onValueChange = { /* Solo lectura */ },
-                readOnly = true, // Es fundamental mantener esto para evitar el teclado
-                enabled = false, // Deshabilitar evita que capture eventos de foco/teclado
-                label = { Text("Fecha") },
-                trailingIcon = {
-                    Icon(
-                        Icons.Default.CalendarToday,
-                        contentDescription = "Seleccionar fecha",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                },
-                isError = isError,
-                // El Modifier del TextField ahora solo necesita rellenar el Box padre
-                modifier = Modifier.fillMaxSize(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent, // Fondo transparente ya que el Box lo maneja
-                    unfocusedContainerColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent,
-                    cursorColor = MaterialTheme.colorScheme.primary,
-                    focusedBorderColor = Color.Transparent,
-                    disabledBorderColor = Color.Transparent,
-                    unfocusedBorderColor = Color.Transparent,
-                    // Usamos el color de texto para el estado 'disabled'
-                    disabledTextColor = MaterialTheme.colorScheme.primary,
-                    disabledLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                    errorSupportingTextColor = MaterialTheme.colorScheme.error
-                ),
-                shape = RoundedCornerShape(16.dp),
-                textStyle = MaterialTheme.typography.bodyLarge.copy(
-                    color = MaterialTheme.colorScheme.primary,
-                ),
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun RealDatePickerDialog(
-    onDismiss: () -> Unit,
-    onDateSelected: (Date) -> Unit
-) {
-    // 1. Crear el estado del DatePicker
-    val datePickerState = rememberDatePickerState()
-
-    // 2. Crear el DatePickerDialog
-    DatePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    datePickerState.selectedDateMillis?.let { millis ->
-                        // Convertir milisegundos a objeto Date y pasarlo al callback
-                        onDateSelected(Date(millis))
-                    }
-                    onDismiss()
-                },
-                // Habilitar el botón si hay una fecha seleccionada
-                enabled = datePickerState.selectedDateMillis != null
-            ) {
-                Text("OK", color = MaterialTheme.colorScheme.primary)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancelar", color = MaterialTheme.colorScheme.primary)
-            }
-        },
-        colors = DatePickerDefaults.colors(
-            containerColor = Color.White,
-            // Aquí puedes personalizar los colores para que coincidan exactamente con la imagen
-        )
-    ) {
-        // 3. Colocar el DatePicker dentro del Dialog
-        DatePicker(
-            state = datePickerState,
-            // Personalización visual para que se parezca más a la imagen
-            colors = DatePickerDefaults.colors(
-                todayContentColor = MaterialTheme.colorScheme.primary,
-                todayDateBorderColor = MaterialTheme.colorScheme.primary,
-                selectedDayContentColor = Color.White,
-                selectedDayContainerColor = MaterialTheme.colorScheme.primary,
-                currentYearContentColor = MaterialTheme.colorScheme.primary,
-                dayContentColor = Color.Black
-            )
-        )
-    }
-}
