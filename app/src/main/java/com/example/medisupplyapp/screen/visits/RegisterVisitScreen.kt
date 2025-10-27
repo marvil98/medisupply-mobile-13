@@ -9,6 +9,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,16 +18,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medisupplyapp.R
 import com.example.medisupplyapp.components.CustomDropdown
 import com.example.medisupplyapp.components.CustomTextArea
-import com.example.medisupplyapp.components.ProductSelector
 import com.example.medisupplyapp.components.SimpleTopBar
 import com.tuempresa.medisupply.ui.components.FooterNavigation
 import com.tuempresa.medisupply.ui.theme.MediSupplyTheme
-import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -52,7 +52,7 @@ fun RegisterVisitScreen(
 
     val selectedRoute = "visits"
     var comment by remember { mutableStateOf("") }
-
+    var visitaId = "1"
 
     MediSupplyTheme {
         Scaffold(
@@ -79,8 +79,9 @@ fun RegisterVisitScreen(
                             if (viewModel.isFormValid()) {
                                 showConfirmation = true
                             }
+                            showConfirmation = true
                         },
-                        enabled = viewModel.isFormValid(),
+                        enabled = true,
                         modifier = Modifier
                             .height(48.dp),
                         colors = ButtonDefaults.buttonColors(
@@ -150,17 +151,79 @@ fun RegisterVisitScreen(
                     value = comment,
                     onValueChange = { comment = it },
                 )
+
+                if (isDatePickerVisible) {
+                    RealDatePickerDialog(
+                        onDismiss = { isDatePickerVisible = false },
+                        onDateSelected = { date ->
+                            viewModel.onDateSelected(date) // Llama al ViewModel con la fecha
+                            isDatePickerVisible = false
+                        }
+                    )
+                }
+                if (showConfirmation) {
+                    AlertDialog(
+                        onDismissRequest = { showConfirmation = false },
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        shape = RoundedCornerShape(8.dp),
+                        title = {
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.End
+                                ) {
+                                    IconButton(onClick = { showConfirmation = false }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Close,
+                                            contentDescription = "Cerrar",
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
+                                Text(
+                                    text = "¿Desea agregar evidencias (fotos o videos) a esta visita ahora?",
+                                    style = MaterialTheme.typography.headlineLarge,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center,
+                                )
+                            }
+                        },
+                        confirmButton = {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Button(
+                                    onClick = { showConfirmation = false },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.surface
+                                    )
+                                ) {
+                                    Text("No", color = MaterialTheme.colorScheme.primary)
+                                }
+                                Spacer(modifier = Modifier.width(8.dp))
+                                // Luego el botón "Sí"
+                                Button(
+                                    onClick = {
+                                        showConfirmation = false
+                                        onNavigate("evidencias/${visitaId}")
+                                        // Acción para agregar evidencia
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.primary
+                                    )
+                                ) {
+                                    Text("Sí", color = Color.White)
+                                }
+                            }
+                        },
+                        dismissButton = {} // Ya está integrado en confirmButton
+                    )
+                }
             }
         }
-    }
-    if (isDatePickerVisible) {
-        RealDatePickerDialog(
-            onDismiss = { isDatePickerVisible = false },
-            onDateSelected = { date ->
-                viewModel.onDateSelected(date) // Llama al ViewModel con la fecha
-                isDatePickerVisible = false
-            }
-        )
     }
 }
 
@@ -261,7 +324,7 @@ fun RealDatePickerDialog(
             }
         },
         colors = DatePickerDefaults.colors(
-            containerColor = Color.White,
+            containerColor =  MaterialTheme.colorScheme.secondary,
             // Aquí puedes personalizar los colores para que coincidan exactamente con la imagen
         )
     ) {
@@ -275,7 +338,11 @@ fun RealDatePickerDialog(
                 selectedDayContentColor = Color.White,
                 selectedDayContainerColor = MaterialTheme.colorScheme.primary,
                 currentYearContentColor = MaterialTheme.colorScheme.primary,
-                dayContentColor = Color.Black
+                dayContentColor = Color.Black,
+                containerColor = MaterialTheme.colorScheme.secondary,
+                titleContentColor = MaterialTheme.colorScheme.primary,
+                headlineContentColor = MaterialTheme.colorScheme.primary,
+                subheadContentColor = MaterialTheme.colorScheme.primary,
             )
         )
     }
