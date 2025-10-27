@@ -13,6 +13,7 @@ import com.example.medisupplyapp.data.model.CreateOrderRequest
 import com.example.medisupplyapp.data.model.OrderState
 import com.example.medisupplyapp.data.model.Product
 import com.example.medisupplyapp.data.model.ProductRequest
+import com.example.medisupplyapp.data.model.RegisterVisitRequest
 import com.example.medisupplyapp.data.remote.ApiConnection
 import com.example.medisupplyapp.data.remote.repository.ClientRepository
 import com.example.medisupplyapp.data.remote.repository.OrdersRepository
@@ -20,6 +21,7 @@ import com.example.medisupplyapp.data.remote.repository.ProductRepository
 import kotlinx.coroutines.launch
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
+import java.util.Calendar
 import java.util.Date
 
 class RegisterVisitViewModel : ViewModel() {
@@ -28,16 +30,20 @@ class RegisterVisitViewModel : ViewModel() {
 
     var clientError by mutableStateOf(false)
     var dateError by mutableStateOf(false)
+    var errorMessage: String by mutableStateOf("")
+
     var clients by mutableStateOf<List<Client>>(emptyList())
 
+    var findings: String by mutableStateOf("")
+
+
     private val _registerState = MutableLiveData<OrderState>()
-    val registerState: LiveData<OrderState> = _registerState
 
     init {
         viewModelScope.launch {
             try {
                 val repo = ClientRepository(api = ApiConnection.api_users)
-                val result = repo.fetchClients()
+                val result = repo.fecthClientsBySellerID(1)
                 clients = result
             } catch (e: Exception) {
             }
@@ -49,17 +55,52 @@ class RegisterVisitViewModel : ViewModel() {
     }
 
     fun isFormValid(): Boolean {
-        return selectedClient != null && !clientError
+        return selectedClient != null && !clientError && selectedDate != null && !dateError
     }
 
+    fun updateFindings(newText: String) {
+        findings = newText
+    }
 
     fun onDateSelected(date: Date) {
+        val now = Date()
+        val calendar = Calendar.getInstance()
+
+        // 1. Validación de Fecha Futura
+        // Se resetea la hora de 'now' a 00:00:00 del día actual para una comparación pura de día.
+        val todayCalendar = Calendar.getInstance().apply {
+            time = now
+            set(Calendar.HOUR_OF_DAY, 23) // Establecer a casi final del día para comparación
+            set(Calendar.MINUTE, 59)
+            set(Calendar.SECOND, 59)
+            set(Calendar.MILLISECOND, 999)
+        }
+        val todayLimit = todayCalendar.time
+
+        if (date.after(todayLimit)) {
+            dateError = true
+            return
+        }
+
+        // 2. Validación de Últimos 30 Días
+        calendar.time = now
+        calendar.add(Calendar.DAY_OF_YEAR, -30)
+        val thirtyDaysAgo = calendar.time
+
+        if (date.before(thirtyDaysAgo)) {
+            errorMessage = "La fecha de la visita no puede ser anterior a 30 días."
+            dateError = true
+            return
+        }
+
+        // Si la validación es exitosa
         selectedDate = date
         dateError = false
+        errorMessage = ""
     }
-    fun createOrder(
-        selectedQuantities: Map<String, Int>,
-        onSuccess: (orderId: String, message: String) -> Unit,
+
+    fun registerVisit(
+        onSuccess: (visitID: String, message: String) -> Unit,
         onError: (String) -> Unit
     ) {
         viewModelScope.launch {
@@ -70,21 +111,22 @@ class RegisterVisitViewModel : ViewModel() {
                     onError("Cliente inválido")
                     return@launch
                 }
+                val clientRepo = ClientRepository(api = ApiConnection.api_users)
+
+                val request = RegisterVisitRequest(
+                    client_id = clientId,
+                    seller_id = 1,
+                    date =selectedDate,
+                    findings = findings
+                )
 
 
-                val orderRepo = OrdersRepository(api = ApiConnection.api)
-                val nowUtc = ZonedDateTime.now(ZoneOffset.UTC)
-                val futureUtc = nowUtc.plusDays(5)
-
-
-/***
-                val response = orderRepo.createOrder(request)
+                val response = clientRepo.registerVisit(request)
 
                 if (response.isSuccess) {
-                    val orderResponse = response.getOrNull()
-                    if (orderResponse != null) {
-                        _registerState.value = OrderState.Success(orderResponse)
-                        onSuccess(orderResponse.order_id, "Orden creada con éxito")
+                    val visitResponse = response.getOrNull()
+                    if (visitResponse != null) {
+                        onSuccess(visitResponse.visit.visit_id.toString(), "Orden creada con éxito")
                     } else {
                         onError("Respuesta vacía del servidor")
                     }
@@ -92,7 +134,7 @@ class RegisterVisitViewModel : ViewModel() {
                     val exception = response.exceptionOrNull()
                     _registerState.value = OrderState.Error(exception)
                     onError(exception?.message ?: "Error desconocido")
-                }***/
+                }
             } catch (e: Exception) {
                 onError("Error al crear orden: ${e.message}")
             }

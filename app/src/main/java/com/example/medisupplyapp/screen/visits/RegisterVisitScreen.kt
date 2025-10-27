@@ -1,35 +1,27 @@
 package com.example.medisupplyapp.screen.visits
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medisupplyapp.R
 import com.example.medisupplyapp.components.CustomDropdown
+import com.example.medisupplyapp.components.CustomPickerDialog
 import com.example.medisupplyapp.components.CustomTextArea
-import com.example.medisupplyapp.components.ProductSelector
+import com.example.medisupplyapp.components.DateSelector
+import com.example.medisupplyapp.components.FloatingToast
 import com.example.medisupplyapp.components.SimpleTopBar
+import com.example.medisupplyapp.components.ToastType
 import com.tuempresa.medisupply.ui.components.FooterNavigation
 import com.tuempresa.medisupply.ui.theme.MediSupplyTheme
-import java.text.NumberFormat
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 
 @Composable
@@ -43,16 +35,31 @@ fun RegisterVisitScreen(
     val clientOptions = viewModel.clients
     val selectedClient = viewModel.selectedClient
     val selectedDate = viewModel.selectedDate
+    val findings = viewModel.findings
     val clientError = viewModel.clientError
     val dateError = viewModel.dateError
+    val dateErrorMessage = viewModel.errorMessage
 
+    var toastMessage by remember { mutableStateOf("") }
+    var showToast by remember { mutableStateOf(false) }
+    var toastType by remember { mutableStateOf(ToastType.SUCCESS) }
+
+    val successMessage = stringResource(R.string.visit_success)
+    val mssgError = stringResource(R.string.visit_error)
 
     var isDatePickerVisible by remember { mutableStateOf(false) }
-    var showConfirmation by remember { mutableStateOf(false) }
 
     val selectedRoute = "visits"
-    var comment by remember { mutableStateOf("") }
 
+    var visitSuccess by remember { mutableStateOf(false) }
+
+    if (visitSuccess) {
+        LaunchedEffect(Unit) {
+            val delaySeconds = 2.0f
+            kotlinx.coroutines.delay((delaySeconds * 1000).toLong())
+            onNavigateDetail("dashboard")
+        }
+    }
 
     MediSupplyTheme {
         Scaffold(
@@ -70,14 +77,31 @@ fun RegisterVisitScreen(
                 ) {
                     Spacer(modifier = Modifier.height(16.dp))
 
-
+                    FloatingToast(
+                        message = toastMessage,
+                        type = toastType,
+                        visible = showToast,
+                        onDismiss = { showToast = false }
+                    )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Button(
                         onClick = {
                             if (viewModel.isFormValid()) {
-                                showConfirmation = true
+                                viewModel.registerVisit(
+                                    onSuccess = { _, _ ->
+                                        toastMessage = successMessage
+                                        toastType = ToastType.SUCCESS
+                                        showToast = true
+                                        visitSuccess = true
+                                    },
+                                    onError = { _ ->
+                                        toastMessage = mssgError
+                                        toastType = ToastType.ERROR
+                                        showToast = true
+                                    }
+                                )
                             }
                         },
                         enabled = viewModel.isFormValid(),
@@ -109,10 +133,10 @@ fun RegisterVisitScreen(
             ) {
                 CustomDropdown(
                     label = stringResource(R.string.label_client),
-                    options = clientOptions.map { it.fullName },
-                    selected = selectedClient?.fullName ?: "",
-                    onSelect = { fullName ->
-                        val client = clientOptions.find { it.fullName == fullName }
+                    options = clientOptions.map { it.name },
+                    selected = selectedClient?.name ?: "",
+                    onSelect = { name ->
+                        val client = clientOptions.find { it.name == name }
                         viewModel.selectedClient = client
                         viewModel.clientError = false
                     },
@@ -133,9 +157,9 @@ fun RegisterVisitScreen(
                     isError = dateError,
                     onClicked = { isDatePickerVisible = true }
                 )
-                if (dateError) {
+                if (dateError && dateErrorMessage != "") {
                     Text(
-                        text = "Campo obligatorio",
+                        text = dateErrorMessage,
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.labelSmall,
                         modifier = Modifier.padding(start = 16.dp, top = 4.dp)
@@ -147,14 +171,14 @@ fun RegisterVisitScreen(
                 CustomTextArea(
                     label = stringResource(R.string.observations_label),
                     placeholder = stringResource(R.string.observations_placeholder),
-                    value = comment,
-                    onValueChange = { comment = it },
+                    value = findings,
+                    onValueChange = { viewModel.updateFindings(it) },
                 )
             }
         }
     }
     if (isDatePickerVisible) {
-        RealDatePickerDialog(
+        CustomPickerDialog (
             onDismiss = { isDatePickerVisible = false },
             onDateSelected = { date ->
                 viewModel.onDateSelected(date) // Llama al ViewModel con la fecha
@@ -164,119 +188,3 @@ fun RegisterVisitScreen(
     }
 }
 
-@Composable
-fun DateSelector(
-    label: String,
-    selectedDate: Date?,
-    isError: Boolean,
-    onClicked: () -> Unit
-) {
-    // Usamos la fecha seleccionada del estado si existe
-    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-    val dateText = selectedDate?.let { dateFormat.format(it) } ?: "Seleccionar Fecha"
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        OutlinedTextField(
-            value = dateText,
-            onValueChange = { /* Solo lectura */ },
-            label = { Text("Fecha") },
-            readOnly = true,
-            trailingIcon = {
-                Icon(
-                    Icons.Default.CalendarToday,
-                    contentDescription = "Seleccionar fecha",
-                    modifier = Modifier.clickable(onClick = onClicked),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            },
-            isError = isError,
-            modifier = Modifier
-                .clickable(onClick = onClicked)
-                .fillMaxWidth()
-                .height(56.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.secondary)
-                .border(
-                    width = 0.dp,
-                    color = Color.Transparent,
-                    shape = RoundedCornerShape(16.dp)
-                ),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.secondary,
-                unfocusedContainerColor = MaterialTheme.colorScheme.secondary,
-                disabledContainerColor = MaterialTheme.colorScheme.secondary,
-                cursorColor = MaterialTheme.colorScheme.primary,
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent,
-                focusedTextColor = MaterialTheme.colorScheme.primary,
-                unfocusedTextColor = MaterialTheme.colorScheme.primary,
-                disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-            ),
-            shape = RoundedCornerShape(16.dp),
-            textStyle = MaterialTheme.typography.bodyLarge.copy(
-                color = MaterialTheme.colorScheme.primary,
-            ),
-
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun RealDatePickerDialog(
-    onDismiss: () -> Unit,
-    onDateSelected: (Date) -> Unit
-) {
-    // 1. Crear el estado del DatePicker
-    val datePickerState = rememberDatePickerState(
-         System.currentTimeMillis()
-    )
-
-    // 2. Crear el DatePickerDialog
-    DatePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    datePickerState.selectedDateMillis?.let { millis ->
-                        // Convertir milisegundos a objeto Date y pasarlo al callback
-                        onDateSelected(Date(millis))
-                    }
-                    onDismiss()
-                },
-                // Habilitar el botón si hay una fecha seleccionada
-                enabled = datePickerState.selectedDateMillis != null
-            ) {
-                Text("OK", color = MaterialTheme.colorScheme.primary)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancelar", color = MaterialTheme.colorScheme.primary)
-            }
-        },
-        colors = DatePickerDefaults.colors(
-            containerColor = Color.White,
-            // Aquí puedes personalizar los colores para que coincidan exactamente con la imagen
-        )
-    ) {
-        // 3. Colocar el DatePicker dentro del Dialog
-        DatePicker(
-            state = datePickerState,
-            // Personalización visual para que se parezca más a la imagen
-            colors = DatePickerDefaults.colors(
-                todayContentColor = MaterialTheme.colorScheme.primary,
-                todayDateBorderColor = MaterialTheme.colorScheme.primary,
-                selectedDayContentColor = Color.White,
-                selectedDayContainerColor = MaterialTheme.colorScheme.primary,
-                currentYearContentColor = MaterialTheme.colorScheme.primary,
-                dayContentColor = Color.Black
-            )
-        )
-    }
-}
