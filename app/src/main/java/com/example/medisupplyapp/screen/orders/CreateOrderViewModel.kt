@@ -35,7 +35,7 @@ class CreateOrderViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val repo = ClientRepository(api = ApiConnection.api_users)
-                val result = repo.fetchClients()
+                val result = repo.fecthClientsBySellerID(1)
                 clients = result
             } catch (e: Exception) {
             }

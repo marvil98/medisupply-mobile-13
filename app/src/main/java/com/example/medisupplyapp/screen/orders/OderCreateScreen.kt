@@ -55,7 +55,7 @@ fun CreateOrderScreen(
 
     if (showConfirmation) {
         ConfirmOrderScreen(
-            selectedClient = selectedClient?.fullName,
+            selectedClient = selectedClient?.name,
             selectedQuantities = selectedQuantities,
             products = products,
             totalAmount = totalAmount,
@@ -140,10 +140,10 @@ fun CreateOrderScreen(
                 ) {
                     CustomDropdown(
                         label = stringResource(R.string.label_client),
-                        options = clientOptions.map { it.fullName },
-                        selected = selectedClient?.fullName ?: "",
-                        onSelect = { fullName ->
-                            val client = clientOptions.find { it.fullName == fullName }
+                        options = clientOptions.map { it.name },
+                        selected = selectedClient?.name ?: "",
+                        onSelect = { name ->
+                            val client = clientOptions.find { it.name == name }
                             viewModel.selectedClient = client
                             viewModel.clientError = false
                         },

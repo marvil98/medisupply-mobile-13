@@ -1,19 +1,39 @@
 package com.example.medisupplyapp.data.model
 
+import android.R
 import com.google.gson.annotations.SerializedName
+import java.util.Date
 
 data class Client(
-    @SerializedName("user_id") val userId: Int,
+    @SerializedName("client_id") val userId: Int,
     @SerializedName("name") val name: String,
-    @SerializedName("last_name") val lastName: String,
-    @SerializedName("identification") val identification: String,
+    @SerializedName("nit") val nit: String,
+    @SerializedName("latitude") val latitude: String,
     @SerializedName("phone") val phone: String,
-    @SerializedName("rol") val rol: String,
-    @SerializedName("password") val password: String
+    @SerializedName("longitude") val longitude: String,
 ) {
-    val fullName: String get() = "$name $lastName"
 }
 
 data class ClientResponse(
-    @SerializedName("users") val users: List<Client>
+    @SerializedName("clients") val clients: List<Client>
+)
+
+data class RegisterVisitRequest(
+    val client_id: Int,
+    val seller_id: Int,
+    val date: Date?,
+    val findings: String
+)
+
+data class RegisterVisitResponse(
+    val visit: VisitResponse,
+    val message: String
+)
+
+data class VisitResponse(
+    val client_id: Int,
+    val seller_id: Int,
+    val visit_id: Int,
+    val date: String,
+    val findings: String
 )
