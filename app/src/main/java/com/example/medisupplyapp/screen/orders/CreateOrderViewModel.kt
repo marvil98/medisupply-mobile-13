@@ -1,10 +1,10 @@
 package com.example.medisupplyapp.screen.orders
 
-import androidx.compose.runtime.Composable
-import androidx.lifecycle.ViewModel
+import android.app.Application
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
-class CreateOrderViewModel : ViewModel() {
+class CreateOrderViewModel(application: Application) : AndroidViewModel(application) {
     var selectedClient by mutableStateOf<Client?>(null)
     var clientError by mutableStateOf(false)
     var clients by mutableStateOf<List<Client>>(emptyList())

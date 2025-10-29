@@ -1,26 +1,21 @@
 package com.example.medisupplyapp.screen.visits
 
-import androidx.compose.runtime.Composable
-import androidx.lifecycle.ViewModel
+import android.app.Application
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
 import com.example.medisupplyapp.data.model.Client
-import com.example.medisupplyapp.data.model.CreateOrderRequest
 import com.example.medisupplyapp.data.model.OrderState
-import com.example.medisupplyapp.data.model.Product
-import com.example.medisupplyapp.data.model.ProductRequest
+
 import com.example.medisupplyapp.data.model.RegisterVisitRequest
 import com.example.medisupplyapp.data.remote.ApiConnection
 import com.example.medisupplyapp.data.remote.repository.ClientRepository
-import com.example.medisupplyapp.data.remote.repository.OrdersRepository
-import com.example.medisupplyapp.data.remote.repository.ProductRepository
 import kotlinx.coroutines.launch
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
 import java.util.Calendar
 import java.util.Date
 

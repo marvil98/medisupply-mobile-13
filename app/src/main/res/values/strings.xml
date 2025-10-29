@@ -13,7 +13,7 @@
     <string name="settings">Configuración</string>
     <string name="visits_done">visitas realizadas</string>
     <string name="routes_title">Mis rutas</string>
-    <string name="routes_subtitle">3/7 visitas realizadas</string>
+    <string name="routes_subtitle">visitas realizadas</string>
     <string name="register_visit">Registrar visita</string>
     <string name="suggest_product">Sugerir producto</string>
     <string name="create_order">Crear pedido</string>

@@ -12,7 +12,7 @@
     <string name="settings">Configuration</string>
     <string name="visits_done">visits completed</string>
     <string name="routes_title">My routes</string>
-    <string name="routes_subtitle">3/7 visits made</string>
+    <string name="routes_subtitle">visits made</string>
     <string name="register_visit">Register visit</string>
     <string name="suggest_product">Suggest product</string>
     <string name="create_order">Create order</string>
