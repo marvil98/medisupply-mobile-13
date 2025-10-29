@@ -24,9 +24,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.medisupplyapp.R
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
 @Composable
 fun DateSelector(
@@ -35,8 +39,13 @@ fun DateSelector(
     isError: Boolean,
     onClicked: () -> Unit
 ) {
-    // Usamos la fecha seleccionada del estado si existe
-    val dateText = selectedDate?.let { "" } ?: "Seleccionar Fecha"
+
+    val dateText = selectedDate?.let {
+        // Define el formato deseado (dd/MM/yyyy) y usa la localización adecuada
+        val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        // Formatea la fecha seleccionada
+        formatter.format(it)
+    } ?: "Seleccionar Fecha"
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -70,7 +79,11 @@ fun DateSelector(
                 onValueChange = { /* Solo lectura */ },
                 readOnly = true, // Es fundamental mantener esto para evitar el teclado
                 enabled = false, // Deshabilitar evita que capture eventos de foco/teclado
-                label = { Text("Fecha") },
+                label = {
+                    Text(
+                        text = label,
+                        color = if (dateText.isBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.inverseSurface,
+                    )},
                 trailingIcon = {
                     Icon(
                         Icons.Default.CalendarToday,
@@ -99,6 +112,8 @@ fun DateSelector(
                     color = MaterialTheme.colorScheme.primary,
                 ),
             )
+
+
         }
     }
 }

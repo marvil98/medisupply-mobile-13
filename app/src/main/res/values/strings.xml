@@ -13,7 +13,7 @@
     <string name="settings">Configuración</string>
     <string name="visits_done">visitas realizadas</string>
     <string name="routes_title">Mis rutas</string>
-    <string name="routes_subtitle">3/7 visitas realizadas</string>
+    <string name="routes_subtitle">visitas realizadas</string>
     <string name="register_visit">Registrar visita</string>
     <string name="suggest_product">Sugerir producto</string>
     <string name="create_order">Crear pedido</string>
@@ -66,6 +66,8 @@
     <string name="order_success">Pedido creado exitosamente.</string>
     <string name="order_error">¡Ups! No fue posible crear el pedido. Intenta nuevamente.</string>
     <string name="date_of_visit">Fecha de visita</string>
+    <string name="select_date">Seleccionar fecha</string>
+    <string name="date">Fecha</string>
     <string name="visit_success">Visita registrada exitosamente</string>
     <string name="visit_error">!Ups! Ya aparece un registro de tu visita para este cliente en la fecha seleccionada.</string>
     <string name="close_label">Cerrar</string>

@@ -157,7 +157,7 @@ fun RegisterVisitScreen(
 
 
                 DateSelector(
-                    label = stringResource(R.string.date_of_visit),
+                    label = stringResource(R.string.date),
                     selectedDate = selectedDate,
                     isError = dateError,
                     onClicked = { isDatePickerVisible = true }
