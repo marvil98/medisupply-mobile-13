@@ -68,4 +68,14 @@
     <string name="date_of_visit">Fecha de visita</string>
     <string name="visit_success">Visita registrada exitosamente</string>
     <string name="visit_error">!Ups! Ya aparece un registro de tu visita para este cliente en la fecha seleccionada.</string>
+    <string name="close_label">Cerrar</string>
+    <string name="message_new_evidence">¿Desea agregar evidencias (fotos o videos) a esta visita ahora?</string>
+    <string name="message_no">No</string>
+    <string name="message_yes">Sí</string>
+    <string name="evidences">Agregar Evidencias</string>
+    <string name="evidences_empty">Aún no has agregado evidencias.</string>
+    <string name="evidences_option">Agregar Evidencia</string>
+    <string name="photo_option">Tomar foto</string>
+    <string name="video_option">Grabar video</string>
+    <string name="gallery_option">Seleccionar de galería</string>
 </resources>

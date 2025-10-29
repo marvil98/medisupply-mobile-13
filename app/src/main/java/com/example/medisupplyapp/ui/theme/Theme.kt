@@ -44,7 +44,7 @@ private val MediSupplyTypography = Typography(
     titleLarge = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Bold, fontFamily = LeagueSpartan),
     titleMedium = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.SemiBold, fontFamily = LeagueSpartan),
     bodyMedium = TextStyle(fontSize = 16.sp, fontFamily = LeagueSpartan),
-    bodySmall = TextStyle(fontSize = 14.sp,  fontFamily = LeagueSpartan),
+    bodySmall = TextStyle(fontSize = 24.sp,  fontFamily = LeagueSpartan, fontWeight = FontWeight.Medium),
     labelSmall = TextStyle(fontSize = 12.sp,  fontFamily = LeagueSpartan),
     labelMedium = TextStyle(fontSize = 14.sp,  fontFamily = LeagueSpartan),
     labelLarge = TextStyle(fontSize = 22.sp,  fontFamily = LeagueSpartan),
