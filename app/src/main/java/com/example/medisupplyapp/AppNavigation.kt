@@ -10,6 +10,7 @@ import com.example.medisupplyapp.screen.orders.CreateOrderScreen
 import com.example.medisupplyapp.utils.updateLocale
 import kotlinx.coroutines.launch
 import com.example.medisupplyapp.screen.orders.FollowOrderScreen
+import com.example.medisupplyapp.screen.visits.RegisterEvidenceScreen
 import com.example.medisupplyapp.screen.visits.RegisterVisitScreen
 import com.example.medisupplyapp.utils.updateLocale
 import java.text.SimpleDateFormat
@@ -105,6 +106,15 @@ fun AppNavigation(userName: String) {
                     onNavigate = { route -> navController.navigate(route) },
                     onBack = { navController.popBackStack() },
                     onNavigateDetail = { route -> navController.navigate("home") },
+            )
+        }
+
+        composable("evidencias/{visitaId}") { backStackEntry ->
+            val visitaId = backStackEntry.arguments?.getString("visitaId")
+            RegisterEvidenceScreen(
+                onNavigate = { route -> navController.navigate(route) },
+                onBack = { navController.popBackStack() },
+                selectedRoute = "visits",
             )
         }
     }

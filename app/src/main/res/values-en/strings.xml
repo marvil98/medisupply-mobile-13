@@ -68,4 +68,14 @@
     <string name="date">Date</string>
     <string name="visit_success">Successfully registered visit</string>
     <string name="visit_error">Oops! A record of your visit already appears for this customer on the selected date.</string>
+    <string name="close_label">Close</string>
+    <string name="message_new_evidence">Would you like to add evidence (photos or videos) to this visit now?</string>
+    <string name="message_no">No</string>
+    <string name="message_yes">Yes</string>
+    <string name="evidences">Add Evidences</string>
+    <string name="evidences_empty">You have not yet added evidence.</string>
+    <string name="evidences_option">Add Evidence</string>
+    <string name="photo_option">Take photo</string>
+    <string name="video_option">Record video</string>
+    <string name="gallery_option">Select from gallery</string>
 </resources>

@@ -41,6 +41,7 @@ class RegisterVisitViewModel : ViewModel() {
                 val result = repo.fecthClientsBySellerID(1)
                 clients = result
             } catch (e: Exception) {
+                print(e)
             }
         }
     }
