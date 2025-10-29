@@ -4,12 +4,17 @@ package com.example.medisupplyapp.screen.visits
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medisupplyapp.R
@@ -52,12 +57,12 @@ fun RegisterVisitScreen(
     val selectedRoute = "visits"
 
     var visitSuccess by remember { mutableStateOf(false) }
-
+    var showConfirmation by remember { mutableStateOf(false) }
     if (visitSuccess) {
         LaunchedEffect(Unit) {
             val delaySeconds = 2.0f
             kotlinx.coroutines.delay((delaySeconds * 1000).toLong())
-            onNavigateDetail("dashboard")
+            showConfirmation = true
         }
     }
 
@@ -174,17 +179,77 @@ fun RegisterVisitScreen(
                     value = findings,
                     onValueChange = { viewModel.updateFindings(it) },
                 )
+
+                if (isDatePickerVisible) {
+                    CustomPickerDialog (
+                        onDismiss = { isDatePickerVisible = false },
+                        onDateSelected = { date ->
+                            viewModel.onDateSelected(date)
+                            isDatePickerVisible = false
+                        }
+                    )
+                }
+
+                if (showConfirmation) {
+                    AlertDialog(
+                        onDismissRequest = { showConfirmation = false },
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        shape = RoundedCornerShape(8.dp),
+                        title = {
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.End
+                                ) {
+                                    IconButton(onClick = { showConfirmation = false }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Close,
+                                            contentDescription = stringResource(R.string.close_label),
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
+                                Text(
+                                    text = stringResource(R.string.message_new_evidence),
+                                    style = MaterialTheme.typography.headlineLarge,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center,
+                                )
+                            }
+                        },
+                        confirmButton = {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Button(
+                                    onClick = { showConfirmation = false },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.surface
+                                    )
+                                ) {
+                                    Text(stringResource(R.string.message_no), color = MaterialTheme.colorScheme.primary)
+                                }
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Button(
+                                    onClick = {
+                                        showConfirmation = false
+                                        onNavigate("evidencias/1")
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.primary
+                                    )
+                                ) {
+                                    Text(stringResource(R.string.message_yes), color = Color.White)
+                                }
+                            }
+                        },
+                        dismissButton = {}
+                    )
+                }
             }
         }
     }
-    if (isDatePickerVisible) {
-        CustomPickerDialog (
-            onDismiss = { isDatePickerVisible = false },
-            onDateSelected = { date ->
-                viewModel.onDateSelected(date) // Llama al ViewModel con la fecha
-                isDatePickerVisible = false
-            }
-        )
-    }
 }
-

@@ -1,6 +1,7 @@
 package com.example.medisupplyapp.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -24,14 +25,21 @@ import com.example.medisupplyapp.R
 fun RoundedButton(
     onOptionClick: ((String) -> Unit)? = null,
     navigation: String,
-    title: String
-){
+    title: String,
+    withBorder: Boolean = false,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 6.dp)
-            .clickable {
-                onOptionClick?.invoke(navigation) }
+            .clickable { onOptionClick?.invoke(navigation) }
+            .then(
+                if (withBorder) Modifier.border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.primary,
+                    shape = RoundedCornerShape(percent = 50)
+                ) else Modifier
+            )
             .background(
                 color = Color.White,
                 shape = RoundedCornerShape(percent = 50)
@@ -43,7 +51,7 @@ fun RoundedButton(
         Text(
             text = title,
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface
+            color = if (withBorder) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
         )
         Icon(
             painter = painterResource(id = R.drawable.ic_arrow),
