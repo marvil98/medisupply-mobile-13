@@ -152,7 +152,7 @@ fun RegisterVisitScreen(
 
 
                 DateSelector(
-                    label = stringResource(R.string.date_of_visit),
+                    label = stringResource(R.string.date),
                     selectedDate = selectedDate,
                     isError = dateError,
                     onClicked = { isDatePickerVisible = true }
@@ -181,7 +181,8 @@ fun RegisterVisitScreen(
         CustomPickerDialog (
             onDismiss = { isDatePickerVisible = false },
             onDateSelected = { date ->
-                viewModel.onDateSelected(date) // Llama al ViewModel con la fecha
+                viewModel.onDateSelected(date)
+                viewModel.selectedDate = date
                 isDatePickerVisible = false
             }
         )

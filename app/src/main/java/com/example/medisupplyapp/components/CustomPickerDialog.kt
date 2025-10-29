@@ -10,6 +10,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import com.example.medisupplyapp.R
 import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,7 +43,7 @@ fun CustomPickerDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar", color = MaterialTheme.colorScheme.primary)
+                Text(stringResource(R.string.cancel), color = MaterialTheme.colorScheme.primary)
             }
         },
         colors = DatePickerDefaults.colors(

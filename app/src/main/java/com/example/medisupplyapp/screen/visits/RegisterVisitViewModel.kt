@@ -26,7 +26,7 @@ import java.util.Date
 
 class RegisterVisitViewModel : ViewModel() {
     var selectedClient by mutableStateOf<Client?>(null)
-    var selectedDate by mutableStateOf<Date?>(Date())
+    var selectedDate by mutableStateOf<Date?>(null)
 
     var clientError by mutableStateOf(false)
     var dateError by mutableStateOf(false)
