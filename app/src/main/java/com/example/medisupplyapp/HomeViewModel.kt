@@ -26,10 +26,6 @@ class HomeViewModel : ViewModel() {
     private val _dailyRoute = MutableStateFlow<DailyRoute>( DailyRoute(0, emptyList()))
     val dailyRoute: StateFlow<DailyRoute> = _dailyRoute
 
-
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "api_cache")
-    private val VISITS_MADE_CACHE_KEY = stringPreferencesKey("visits_made")
-
     init {
         // Se llama automáticamente al crear el ViewModel
         loadInitialData()

@@ -46,7 +46,7 @@ fun Home(userName: String, selectedRoute: String, onNavigate: (String) -> Unit) 
                     title = stringResource(R.string.routes_title),
                     subtitle = "0/${dailyRoute.numberVisits} ${stringResource(R.string.routes_subtitle)}",
                     centered = true,
-                    onClick = { onNavigate("rutas") }
+                    onClick = { onNavigate("routes") }
                 )
 
                 SectionCard(

@@ -10,6 +10,7 @@ import com.example.medisupplyapp.screen.orders.CreateOrderScreen
 import com.example.medisupplyapp.utils.updateLocale
 import kotlinx.coroutines.launch
 import com.example.medisupplyapp.screen.orders.FollowOrderScreen
+import com.example.medisupplyapp.screen.visits.DailyRouteScreen
 import com.example.medisupplyapp.screen.visits.RegisterEvidenceScreen
 import com.example.medisupplyapp.screen.visits.RegisterVisitScreen
 import com.example.medisupplyapp.utils.updateLocale
@@ -36,8 +37,12 @@ fun AppNavigation(userName: String) {
             )
         }
 
-        composable("rutas") {
-            RutasScreen()
+        composable("routes") {
+            DailyRouteScreen (
+                onNavigate = { route -> navController.navigate(route) },
+                selectedRoute = "routes",
+                onBack = { navController.popBackStack() }
+            )
         }
 
         composable("clientes") {

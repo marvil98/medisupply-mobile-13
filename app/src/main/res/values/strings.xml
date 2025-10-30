@@ -80,4 +80,5 @@
     <string name="photo_option">Tomar foto</string>
     <string name="video_option">Grabar video</string>
     <string name="gallery_option">Seleccionar de galería</string>
+    <string name="no_daily_routes">No tienes rutas asignadas para hoy.</string>
 </resources>
