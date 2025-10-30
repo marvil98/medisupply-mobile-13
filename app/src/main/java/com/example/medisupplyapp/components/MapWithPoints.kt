@@ -29,8 +29,8 @@ fun BoxScope.MapWithPoints(visitPoints: List<RoutePoint>) {
     var puntoSeleccionado by remember { mutableStateOf<RoutePoint?>(null) }
 
     // Calcular el centro del mapa basado en todos los puntos
-    val centerLat = visitPoints.map { it.latitud }.average()
-    val centerLng = visitPoints.map { it.longitud }.average()
+    val centerLat = visitPoints.map { it.latitude }.average()
+    val centerLng = visitPoints.map { it.longitude }.average()
 
     val camaraPosicion = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(centerLat, centerLng), 12f)
@@ -41,7 +41,7 @@ fun BoxScope.MapWithPoints(visitPoints: List<RoutePoint>) {
         if (visitPoints.size > 1) {
             val boundsBuilder = LatLngBounds.builder()
             visitPoints.forEach { point ->
-                boundsBuilder.include(LatLng(point.latitud, point.longitud))
+                boundsBuilder.include(LatLng(point.latitude, point.longitude))
             }
             val bounds = boundsBuilder.build()
             camaraPosicion.move(
@@ -64,7 +64,7 @@ fun BoxScope.MapWithPoints(visitPoints: List<RoutePoint>) {
     ) {
         // Dibujar la ruta (polyline) entre todos los puntos
         if (visitPoints.size > 1) {
-            val routePoints = visitPoints.map { LatLng(it.latitud, it.longitud) }
+            val routePoints = visitPoints.map { LatLng(it.latitude, it.longitude) }
             Polyline(
                 points = routePoints,
                 color = MaterialTheme.colorScheme.primary,
@@ -76,7 +76,7 @@ fun BoxScope.MapWithPoints(visitPoints: List<RoutePoint>) {
         // Marcadores en cada punto
         visitPoints.forEachIndexed { index, punto ->
             Marker(
-                state = MarkerState(position = LatLng(punto.latitud, punto.longitud)),
+                state = MarkerState(position = LatLng(punto.latitude, punto.longitude)),
                 title = "${index + 1}. ${punto.name}",
                 snippet = punto.address,
                 onClick = { marker ->

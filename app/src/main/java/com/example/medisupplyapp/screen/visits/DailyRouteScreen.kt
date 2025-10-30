@@ -9,18 +9,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medisupplyapp.R
 import com.example.medisupplyapp.components.MapWithPoints
 import com.example.medisupplyapp.components.SimpleTopBar
+import com.example.medisupplyapp.screen.LoadingScreen
 import com.tuempresa.medisupply.ui.components.FooterNavigation
 import com.tuempresa.medisupply.ui.theme.MediSupplyTheme
 
 @Composable
 fun DailyRouteScreen(
-    viewModel: DailyRouteVireModel = viewModel(),
+    viewModel: DailyRouteViewModel = viewModel(),
     onNavigate: (String) -> Unit,
     selectedRoute: String,
     onBack: () -> Unit,
 ) {
-    val numberVisits = viewModel.dailyRoute.collectAsState().value.numberVisits
-    val visitPoints = viewModel.dailyRoute.collectAsState().value.visits
+    val uiState by viewModel.uiState.collectAsState()
 
     MediSupplyTheme {
         Scaffold(
@@ -33,23 +33,36 @@ fun DailyRouteScreen(
             bottomBar = { FooterNavigation(selectedRoute, onNavigate) },
             containerColor = MaterialTheme.colorScheme.surface
         ) { paddingValues ->
-            if (numberVisits > 0) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                ) {
-                    MapWithPoints(visitPoints = visitPoints)
+
+            when (val state = uiState) {
+                is DailyRouteUiState.Loading -> {
+                    LoadingScreen()
                 }
-            } else {
-                NoDailyRouteScreen(
-                    paddingValues = paddingValues,
-                    stringResource(R.string.no_daily_routes)
-                )
+
+                is DailyRouteUiState.Success -> {
+                    if (state.dailyRoute.numberVisits > 0) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(paddingValues)
+                        ) {
+                            MapWithPoints(visitPoints = state.dailyRoute.visits)
+                        }
+                    } else {
+                        NoDailyRouteScreen(
+                            paddingValues = paddingValues,
+                            stringResource(R.string.no_daily_routes)
+                        )
+                    }
+                }
+
+                is DailyRouteUiState.Error -> {
+                    NoDailyRouteScreen(
+                        paddingValues = paddingValues,
+                        stringResource(R.string.no_daily_routes)
+                    )
+                }
             }
         }
     }
 }
-
-
-

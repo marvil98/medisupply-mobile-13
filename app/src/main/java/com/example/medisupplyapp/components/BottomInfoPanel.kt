@@ -29,7 +29,7 @@ import com.example.medisupplyapp.R
 import com.example.medisupplyapp.data.model.RoutePoint
 
 @Composable
-fun BoxScope.BottomInfoPanel(
+fun BoxScope.   BottomInfoPanel(
     point: RoutePoint,
     onDismiss: () -> Unit
 ) {

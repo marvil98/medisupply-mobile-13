@@ -23,6 +23,7 @@ fun Home(userName: String, selectedRoute: String, onNavigate: (String) -> Unit) 
     val viewModel: HomeViewModel = viewModel()
 
     val dailyRoute by viewModel.dailyRoute.collectAsState()
+    val visitsMade by viewModel.visitsMade.collectAsState()
     MediSupplyTheme {
         Scaffold(
             topBar = { Header(userName, onNavigate) },
@@ -44,7 +45,7 @@ fun Home(userName: String, selectedRoute: String, onNavigate: (String) -> Unit) 
                 Spacer(modifier = Modifier.height(28.dp))
                 SectionCard(
                     title = stringResource(R.string.routes_title),
-                    subtitle = "0/${dailyRoute.numberVisits} ${stringResource(R.string.routes_subtitle)}",
+                    subtitle = "${visitsMade}/${dailyRoute.numberVisits} ${stringResource(R.string.routes_subtitle)}",
                     centered = true,
                     onClick = { onNavigate("routes") }
                 )
