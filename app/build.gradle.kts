@@ -89,4 +89,7 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    // Reemplaza X.Y.Z con la última versión
+    implementation("com.google.maps.android:maps-compose:4.3.0")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
 }

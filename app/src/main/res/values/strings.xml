@@ -81,4 +81,6 @@
     <string name="video_option">Grabar video</string>
     <string name="gallery_option">Seleccionar de galería</string>
     <string name="no_daily_routes">No tienes rutas asignadas para hoy.</string>
+    <string name="capital_address">DIRECCIÓN</string>
+    <string name="capital_client">CLIENTE</string>
 </resources>

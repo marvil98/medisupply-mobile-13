@@ -12,10 +12,11 @@ data class DailyRoute(
 
 @Serializable
 data class RoutePoint(
-    @SerializedName("direccion") val address: String,
+    @SerializedName("address") val address: String,
     @SerializedName("id") val id: Int,
-    @SerializedName("latitud") val latitud: String,
-    @SerializedName("nombre") val name: String,
-    @SerializedName("longitud") val longitud: String,
+    @SerializedName("latitude") val latitud: Double,
+    @SerializedName("name") val name: String,
+    @SerializedName("client") val client: String,
+    @SerializedName("longitude") val longitud: Double,
 
-){}
+    ){}
