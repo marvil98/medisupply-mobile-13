@@ -16,6 +16,6 @@ interface UsersApi {
     @GET("users/clients/{sellerId}")
     suspend fun getClientsBySellerID(@Path("sellerId") sellerId: Int): Response<ClientResponse>
 
-    @POST("/users/visit")
+    @POST("/offers/visit")
     suspend fun registerVisit(@Body visit: RegisterVisitRequest): RegisterVisitResponse
 }
