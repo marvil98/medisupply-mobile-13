@@ -1,12 +1,15 @@
 package com.example.medisupplyapp.screen.visits
 
+import DailyRouteSerializer
 import android.app.Application
+import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.datastore.core.DataStore
+import androidx.datastore.dataStore
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
 import com.example.medisupplyapp.data.model.Client
@@ -15,11 +18,19 @@ import com.example.medisupplyapp.data.model.OrderState
 import com.example.medisupplyapp.data.model.RegisterVisitRequest
 import com.example.medisupplyapp.data.remote.ApiConnection
 import com.example.medisupplyapp.data.remote.repository.ClientRepository
+import com.example.medisupplyapp.data.remote.repository.RoutesRepository
+import com.example.medisupplyapp.datastore.RouteCacheProto
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
 
-class RegisterVisitViewModel : ViewModel() {
+
+import com.example.medisupplyapp.data.provider.routeCacheDataStore
+
+
+class RegisterVisitViewModel(application: Application) : AndroidViewModel(application) {
+
     var selectedClient by mutableStateOf<Client?>(null)
     var selectedDate by mutableStateOf<Date?>(null)
 
@@ -51,7 +62,9 @@ class RegisterVisitViewModel : ViewModel() {
     }
 
     fun isFormValid(): Boolean {
-        return selectedClient != null && !clientError && selectedDate != null && !dateError
+        return selectedClient != null &&
+                !clientError && selectedDate != null &&
+                !dateError && findings != ""
     }
 
     fun updateFindings(newText: String) {
@@ -108,6 +121,11 @@ class RegisterVisitViewModel : ViewModel() {
                     return@launch
                 }
                 val clientRepo = ClientRepository(api = ApiConnection.api_users)
+                val routesRepo = RoutesRepository(
+                    api = ApiConnection.api_routes,
+                    routeCacheDataStore = application.routeCacheDataStore
+                )
+
 
                 val request = RegisterVisitRequest(
                     client_id = clientId,
@@ -120,8 +138,12 @@ class RegisterVisitViewModel : ViewModel() {
                 val response = clientRepo.registerVisit(request)
 
                 if (response.isSuccess) {
+
                     val visitResponse = response.getOrNull()
                     if (visitResponse != null) {
+                        val visitsMade = routesRepo.visitsMadeFlow.first()
+
+                        routesRepo.updateVisitsMade(visitsMade+1)
                         onSuccess(visitResponse.visit.visit_id.toString(), "Orden creada con éxito")
                     } else {
                         onError("Respuesta vacía del servidor")
@@ -134,6 +156,7 @@ class RegisterVisitViewModel : ViewModel() {
             } catch (e: Exception) {
                 onError("Error al crear orden: ${e.message}")
             }
+
         }
     }
 }

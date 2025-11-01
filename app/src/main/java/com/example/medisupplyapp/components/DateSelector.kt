@@ -45,7 +45,7 @@ fun DateSelector(
         val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         // Formatea la fecha seleccionada
         formatter.format(it)
-    } ?: "Seleccionar Fecha"
+    } ?:  stringResource(R.string.select_date)
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -79,11 +79,6 @@ fun DateSelector(
                 onValueChange = { /* Solo lectura */ },
                 readOnly = true, // Es fundamental mantener esto para evitar el teclado
                 enabled = false, // Deshabilitar evita que capture eventos de foco/teclado
-                label = {
-                    Text(
-                        text = label,
-                        color = if (dateText.isBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.inverseSurface,
-                    )},
                 trailingIcon = {
                     Icon(
                         Icons.Default.CalendarToday,
@@ -109,7 +104,7 @@ fun DateSelector(
                 ),
                 shape = RoundedCornerShape(16.dp),
                 textStyle = MaterialTheme.typography.bodyLarge.copy(
-                    color = MaterialTheme.colorScheme.primary,
+                    color = if (dateText == stringResource(R.string.select_date)) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.primary,
                 ),
             )
 

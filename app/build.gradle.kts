@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.protobuf")
 }
 
 android {
@@ -86,7 +87,39 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("androidx.compose.material:material-icons-extended")
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    // Reemplaza X.Y.Z con la última versión
+    implementation("com.google.maps.android:maps-compose:4.3.0")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.protobuf:protobuf-kotlin-lite:3.25.1") // Última versión
+    implementation("com.google.protobuf:protobuf-javalite:3.25.1")
+
+    implementation("com.google.protobuf:protobuf-kotlin-lite:4.33.0") // Última versión
+    implementation("com.google.protobuf:protobuf-javalite:4.33.0")
+
+    // Dependencia de Proto DataStore
+    implementation("androidx.datastore:datastore:1.1.7")
+
+
+}
+
+protobuf {
+    protoc {
+        // Usa la misma versión de protoc que en las dependencias
+        artifact = "com.google.protobuf:protoc:4.33.0"
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                // Generar código Kotlin (y Java Lite)
+                create("kotlin") {
+                    option("lite")
+                }
+                create("java") {
+                    option("lite")
+                }
+            }
+        }
+    }
 }

@@ -1,35 +1,45 @@
 package com.example.medisupplyapp
 
+import DailyRouteSerializer
+import android.app.Application
 import android.content.Context
-import androidx.lifecycle.ViewModel
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
-import androidx.lifecycle.application
+import androidx.datastore.dataStore
+import androidx.lifecycle.AndroidViewModel
+
 import androidx.lifecycle.viewModelScope
 import com.example.medisupplyapp.data.model.DailyRoute
 import com.example.medisupplyapp.data.remote.ApiConnection
 import com.example.medisupplyapp.data.remote.repository.RoutesRepository
+import com.example.medisupplyapp.datastore.RouteCacheProto
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 
-class HomeViewModel : ViewModel() {
 
-    private val repository = RoutesRepository(api = ApiConnection.api_routes)
+import com.example.medisupplyapp.data.provider.routeCacheDataStore
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+
+
+class HomeViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val repository = RoutesRepository(
+        api = ApiConnection.api_routes,
+        routeCacheDataStore = application.routeCacheDataStore
+    )
 
     // Estado observable para la UI (opcional)
-    private val _dailyRoute = MutableStateFlow<DailyRoute>( DailyRoute(0, emptyList()))
+    private val _dailyRoute = MutableStateFlow<DailyRoute>( DailyRoute(0,visits = emptyList()))
     val dailyRoute: StateFlow<DailyRoute> = _dailyRoute
 
-
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "api_cache")
-    private val VISITS_MADE_CACHE_KEY = stringPreferencesKey("visits_made")
-
+    val visitsMade: StateFlow<Int> = repository.visitsMadeFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = 0 // El valor inicial que quieres mostrar
+        )
     init {
         // Se llama automáticamente al crear el ViewModel
         loadInitialData()

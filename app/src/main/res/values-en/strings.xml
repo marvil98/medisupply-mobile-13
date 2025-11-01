@@ -78,4 +78,7 @@
     <string name="photo_option">Take photo</string>
     <string name="video_option">Record video</string>
     <string name="gallery_option">Select from gallery</string>
+    <string name="no_daily_routes">You do not have any routes assigned for today.</string>
+    <string name="capital_address">ADDRESS</string>
+    <string name="capital_client">CLIENT</string>
 </resources>
