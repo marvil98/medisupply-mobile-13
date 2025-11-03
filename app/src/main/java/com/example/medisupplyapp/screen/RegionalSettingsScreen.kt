@@ -1,5 +1,6 @@
 package com.example.medisupplyapp.screen
 
+import android.content.pm.PackageManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -16,6 +17,8 @@ import com.example.medisupplyapp.components.CustomDropdown
 import com.example.medisupplyapp.components.SimpleTopBar
 import com.tuempresa.medisupply.ui.components.FooterNavigation
 import com.tuempresa.medisupply.ui.theme.MediSupplyTheme
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 @Composable
@@ -25,6 +28,32 @@ fun getDefaultLanguage(): String {
         "es" -> context.getString(R.string.language_spanish)
         "en" -> context.getString(R.string.language_english)
         else -> context.getString(R.string.language_english)
+    }
+}
+
+@Composable
+fun getAppVersionInfo(): Pair<String, String> {
+    val context = LocalContext.current
+    val packageName = context.packageName
+
+    // Simulación de la fecha de la última compilación o versión
+    // En una app real, esta fecha vendría de BuildConfig (generada en Gradle)
+    val compileDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+
+    return try {
+        val packageInfo = context.packageManager.getPackageInfo(packageName, 0)
+        // Usamos el nombre de la versión y el código de versión (longVersionCode para API 28+)
+        val versionName = packageInfo.versionName
+        val versionCode = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            packageInfo.longVersionCode.toString()
+        } else {
+            @Suppress("DEPRECATION")
+            packageInfo.versionCode.toString()
+        }
+
+        Pair("v$versionName ($versionCode)", compileDate)
+    } catch (e: PackageManager.NameNotFoundException) {
+        Pair(stringResource(R.string.visits), compileDate)
     }
 }
 
@@ -53,7 +82,7 @@ fun RegionalSettingsScreen(
     )
 
     var selectedCountry by remember { mutableStateOf(countryOptions.first()) }
-
+    val (versionText, dateText) = getAppVersionInfo()
     MediSupplyTheme {
         Scaffold(
             topBar = {
@@ -62,7 +91,32 @@ fun RegionalSettingsScreen(
                     onBack = onBack
                 )
             },
-            bottomBar = { FooterNavigation(selectedRoute, onNavigate) },
+            bottomBar = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally // Para centrar los Text
+                ) {
+                    // --- SECCIÓN DE VERSIÓN Y FECHA ---
+                    Spacer(modifier = Modifier.height(8.dp)) // Pequeño espacio superior
+
+                    Text(
+                        text = stringResource(R.string.version_label, "2.0.0"),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = stringResource(R.string.date_label, "02/11/2025"),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    // Espacio entre la versión y la navegación
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // --- NAVEGACIÓN PRINCIPAL ---
+                    FooterNavigation(selectedRoute, onNavigate)
+                }
+                        },
         ) { innerPadding ->
             val scrollState = rememberScrollState()
 

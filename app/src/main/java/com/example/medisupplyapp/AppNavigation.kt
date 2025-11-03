@@ -5,6 +5,8 @@ import androidx.compose.runtime.*
 import androidx.navigation.compose.*
 import com.example.medisupplyapp.screen.RegionalSettingsScreen
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.example.medisupplyapp.data.CountryPreferencesRepository
 import com.example.medisupplyapp.screen.orders.CreateOrderScreen
 import com.example.medisupplyapp.utils.updateLocale
@@ -78,7 +80,6 @@ fun AppNavigation(userName: String) {
             RegisterVisitScreen(
                 onNavigate = { route -> navController.navigate(route) },
                 onBack = { navController.popBackStack() },
-                onNavigateDetail = { route -> navController.navigate("home") },
             )
         }
 
@@ -86,7 +87,6 @@ fun AppNavigation(userName: String) {
             RegisterVisitScreen(
                 onNavigate = { route -> navController.navigate(route) },
                 onBack = { navController.popBackStack() },
-                onNavigateDetail = { route -> navController.navigate("home") },
             )
         }
 
@@ -114,12 +114,22 @@ fun AppNavigation(userName: String) {
             )
         }
 
-        composable("evidencias/{visitaId}") { backStackEntry ->
-            val visitaId = backStackEntry.arguments?.getString("visitaId")
+        composable(
+            route = "evidencias/{visitId}?clientId={clientId}",
+            arguments = listOf(
+                navArgument("visitId") { type = NavType.IntType },
+                navArgument("clientId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val visitId = backStackEntry.arguments?.getInt("visitId") ?: -1
+            val clientId = backStackEntry.arguments?.getInt("clientId") ?: -1
+
             RegisterEvidenceScreen(
                 onNavigate = { route -> navController.navigate(route) },
                 onBack = { navController.popBackStack() },
                 selectedRoute = "visits",
+                visitId = visitId,
+                clientId = clientId
             )
         }
     }

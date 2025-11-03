@@ -22,6 +22,8 @@ import androidx.compose.ui.res.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
 import androidx.core.content.FileProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medisupplyapp.R
 import com.example.medisupplyapp.components.*
 import com.example.medisupplyapp.data.model.*
@@ -35,10 +37,16 @@ import kotlinx.coroutines.*
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun RegisterEvidenceScreen(
+    visitId: Int,
     onNavigate: (String) -> Unit,
     onBack: () -> Unit,
     selectedRoute: String,
+    clientId: Int,
 ) {
+    val viewModel: RegisterEvidenceViewModel = viewModel()
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     var optionsVisibles by remember { mutableStateOf(false) }
     val evidences = remember { mutableStateListOf<Evidence>() }
     val photoUri = remember { mutableStateOf<Uri?>(null) }
@@ -47,13 +55,81 @@ fun RegisterEvidenceScreen(
     var showToast by remember { mutableStateOf(false) }
     var toastMessage by remember { mutableStateOf("") }
     var toastType by remember { mutableStateOf(ToastType.SUCCESS) }
+    var recommendationsData by remember { mutableStateOf<List<Recommendation>?>(null) }
+
+    val successMessage = stringResource(R.string.upload_success_message)
+    val noEvidencesToUpload = stringResource(R.string.no_evidences_to_upload)
+    val uploadingEvidencesMessage = stringResource(R.string.uploading_evidences_message)
+    val processingVisitMessage = stringResource(R.string.processing_visit_message)
 
     val allEvidencesReady by derivedStateOf {
-        val hasCompleted = evidences.any { it.statusUpdate == StatusUpdate.COMPLETADO }
-        val hasPendingOrUploading = evidences.any {
-            it.statusUpdate == StatusUpdate.PENDIENTE || it.statusUpdate == StatusUpdate.SUBIENDO
+        val hasReadyOrError = evidences.any {
+            it.statusUpdate == StatusUpdate.PENDIENTE || it.statusUpdate == StatusUpdate.ERROR
         }
-        hasCompleted && !hasPendingOrUploading
+        val isActivelyUploading = uiState is UploadState.SubiendoEvidencias || uiState is UploadState.ProcesandoVisita
+
+        hasReadyOrError && !isActivelyUploading
+    }
+
+    val isBlockingLoad by remember(uiState) {
+        derivedStateOf {
+            uiState is UploadState.SubiendoEvidencias || uiState is UploadState.ProcesandoVisita
+        }
+    }
+
+    LaunchedEffect(uiState) {
+        when (val state = uiState) {
+            is UploadState.Error -> {
+                toastMessage = state.message
+                toastType = ToastType.ERROR
+                showToast = true
+
+                evidences.replaceAll {
+                    if (it.statusUpdate == StatusUpdate.SUBIENDO)
+                        it.copy(statusUpdate = StatusUpdate.ERROR, progress = 0f)
+                    else
+                        it
+                }
+            }
+            is UploadState.Success -> {
+                toastMessage = successMessage
+                toastType = ToastType.SUCCESS
+                showToast = true
+
+                evidences.replaceAll {
+                    if (it.statusUpdate != StatusUpdate.COMPLETADO)
+                        it.copy(statusUpdate = StatusUpdate.COMPLETADO, progress = 1f)
+                    else
+                        it
+                }
+
+                delay(1000)
+                onBack()
+            }
+            else -> {  }
+        }
+    }
+
+    LaunchedEffect(uiState) {
+        when (val state = uiState) {
+            is UploadState.Error -> {
+            }
+            is UploadState.SuccessWithData -> {
+                recommendationsData = state.recommendations
+            }
+            else -> { }
+        }
+    }
+
+    if (recommendationsData != null) {
+        RecommendationsScreen(
+            recommendations = recommendationsData!!,
+            onBackToHome = {
+                recommendationsData = null
+                onNavigate("home")
+            }
+        )
+        return
     }
 
     fun handleEvidenceCopy(tempEvidence: Evidence, originalUri: Uri) {
@@ -73,7 +149,9 @@ fun RegisterEvidenceScreen(
                 toastType = ToastType.ERROR
             }
 
-            if (successful) {
+            val index = evidences.indexOfFirst { it.id == tempEvidence.id }
+
+            if (successful && index != -1) {
                 val finalFileName = if (tempEvidence.type == EvidenceType.GALERIA) {
                     tempEvidence.nameFile.replaceAfterLast('.', cacheUri!!.lastPathSegment?.substringAfterLast('.') ?: "jpg")
                 } else {
@@ -85,14 +163,14 @@ fun RegisterEvidenceScreen(
                     else -> generateImageThumbnail(context, cacheUri!!)
                 }
 
-                val index = evidences.indexOfFirst { it.id == tempEvidence.id }
-                if (index != -1) {
-                    evidences[index] = evidences[index].copy(
-                        uri = cacheUri!!,
-                        nameFile = finalFileName,
-                        thumbnail = finalThumbnail
-                    )
-                }
+                evidences[index] = evidences[index].copy(
+                    uri = cacheUri!!,
+                    nameFile = finalFileName,
+                    thumbnail = finalThumbnail,
+                    statusUpdate = StatusUpdate.PENDIENTE
+                )
+            } else if (!successful && index != -1) {
+                evidences[index] = evidences[index].copy(statusUpdate = StatusUpdate.ERROR)
             }
         }
     }
@@ -179,32 +257,62 @@ fun RegisterEvidenceScreen(
     MediSupplyTheme {
         Scaffold(
             topBar = {
-                SimpleTopBar(
-                    title = stringResource(R.string.visits),
-                    onBack = onBack
-                )
+                if (!isBlockingLoad) {
+                    SimpleTopBar(
+                        title = stringResource(R.string.visits),
+                        onBack = onBack,
+                        showBackIcon = false
+                    )
+                }
             },
             bottomBar = {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Button(
-                        onClick = {
-                            val evidencesToSend = evidences.filter { it.statusUpdate == StatusUpdate.COMPLETADO }
-                        },
-                        enabled = allEvidencesReady,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary,
-                            disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
-                            disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface
-                        )
+                if (!isBlockingLoad) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(stringResource(R.string.finish_evidences_button))
+                        Button(
+                            onClick = {
+                                val filesToSend = evidences
+                                    .filter { it.statusUpdate == StatusUpdate.PENDIENTE || it.statusUpdate == StatusUpdate.ERROR }
+                                    .mapNotNull { evidence ->
+                                        val fileName = evidence.nameFile
+                                        val file = File(context.cacheDir, fileName)
+                                        if (file.exists()) file else null
+                                    }
+
+                                if (filesToSend.isNotEmpty()) {
+                                    evidences.filter { it.statusUpdate == StatusUpdate.PENDIENTE || it.statusUpdate == StatusUpdate.ERROR }.forEach { evidence ->
+                                        val index = evidences.indexOf(evidence)
+                                        if (index != -1) {
+                                            evidences[index] = evidence.copy(statusUpdate = StatusUpdate.SUBIENDO)
+                                        }
+                                    }
+
+                                    viewModel.uploadEvidences(
+                                        visitId = visitId,
+                                        files = filesToSend,
+                                        clientId = clientId
+                                    )
+                                } else {
+                                    toastMessage = noEvidencesToUpload
+                                    toastType = ToastType.ERROR
+                                    showToast = true
+                                }
+                            },
+                            enabled = allEvidencesReady,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary,
+                                disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
+                                disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface
+                            )
+                        ) {
+                            Text(stringResource(R.string.finish_evidences_button))
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        FooterNavigation(selectedRoute, onNavigate)
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    FooterNavigation(selectedRoute, onNavigate)
                 }
             },
             containerColor = MaterialTheme.colorScheme.surface
@@ -294,7 +402,8 @@ fun RegisterEvidenceScreen(
                                                                 if (updatedIndex != -1) {
                                                                     evidences[updatedIndex] = evidences[updatedIndex].copy(
                                                                         uri = cacheUri,
-                                                                        thumbnail = finalThumbnail
+                                                                        thumbnail = finalThumbnail,
+                                                                        statusUpdate = StatusUpdate.PENDIENTE
                                                                     )
                                                                 }
                                                             }
@@ -304,7 +413,7 @@ fun RegisterEvidenceScreen(
                                                 onDelete = { evidenciaToDelete ->
                                                     scope.launch {
                                                         try {
-                                                            val file = File(context.cacheDir, evidenciaToDelete.uri.lastPathSegment ?: "")
+                                                            val file = File(context.cacheDir, evidenciaToDelete.nameFile)
                                                             if (file.exists()) {
                                                                 file.delete()
                                                             }
@@ -377,6 +486,16 @@ fun RegisterEvidenceScreen(
                     visible = showToast,
                     onDismiss = { showToast = false }
                 )
+
+                when (uiState) {
+                    UploadState.SubiendoEvidencias -> {
+                        ProccessedEvidence(message = uploadingEvidencesMessage)
+                    }
+                    UploadState.ProcesandoVisita -> {
+                        ProccessedEvidence(message = processingVisitMessage)
+                    }
+                    else -> Unit
+                }
             }
         }
     }

@@ -2,9 +2,15 @@ package com.example.medisupplyapp.data.remote.repository
 
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.medisupplyapp.data.model.Client
+import com.example.medisupplyapp.data.model.RecommendationResponse
 import com.example.medisupplyapp.data.model.RegisterVisitRequest
 import com.example.medisupplyapp.data.model.RegisterVisitResponse
+import com.example.medisupplyapp.data.model.UploadEvidenceResponse
 import com.example.medisupplyapp.data.remote.api.UsersApi
+import okhttp3.MultipartBody
+import com.example.medisupplyapp.data.model.RecommendationRequest
+import retrofit2.HttpException
+import java.io.IOException
 
 
 class ClientRepository(var api: UsersApi) {
@@ -32,6 +38,57 @@ class ClientRepository(var api: UsersApi) {
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    suspend fun uploadVisitEvidences(visitId: Int, files: List<MultipartBody.Part>): Result<UploadEvidenceResponse> {
+        return try {
+            val response = api.uploadEvidences(visitId, files)
+
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null) {
+                    Result.success(body)
+                } else {
+                    Result.failure(Exception("Respuesta vacía del servidor."))
+                }
+            } else {
+                val errorBody = response.errorBody()?.string() ?: "Error desconocido"
+                Result.failure(Exception("Error al subir evidencias: ${response.code()}. Detalle: $errorBody"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getRecommendations(
+        clientId: Int,
+        regionalSetting: String
+    ): Result<RecommendationResponse> {
+        return try {
+            val request = RecommendationRequest(
+                client_id = clientId,
+                regional_setting = regionalSetting
+            )
+
+            // Realizar la llamada a la API
+            val response = api.getRecommendations(request)
+
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null) {
+                    Result.success(body)
+                } else {
+                    Result.failure(Exception("Respuesta de recomendaciones vacía o mal formada."))
+                }
+            } else {
+                val errorBody = response.errorBody()?.string() ?: "Error desconocido"
+                Result.failure(HttpException(response))
+            }
+        } catch (e: IOException) {
+            Result.failure(Exception("Fallo de red: Verifique su conexión a Internet.", e))
+        } catch (e: Exception) {
+            Result.failure(Exception("Error inesperado al obtener recomendaciones.", e))
         }
     }
 }

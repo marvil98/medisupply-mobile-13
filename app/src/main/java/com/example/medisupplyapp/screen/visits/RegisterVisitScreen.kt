@@ -33,7 +33,6 @@ import com.tuempresa.medisupply.ui.theme.MediSupplyTheme
 fun RegisterVisitScreen(
     onBack: () -> Unit = {},
     onNavigate: (String) -> Unit = {},
-    onNavigateDetail: (String) -> Unit,
 ) {
     val viewModel: RegisterVisitViewModel = viewModel()
 
@@ -51,13 +50,14 @@ fun RegisterVisitScreen(
 
     val successMessage = stringResource(R.string.visit_success)
     val mssgError = stringResource(R.string.visit_error)
+    var generatedVisitId by remember { mutableStateOf<Int?>(null) }
 
     var isDatePickerVisible by remember { mutableStateOf(false) }
 
     val selectedRoute = "visits"
 
     var visitSuccess by remember { mutableStateOf(false) }
-    var showConfirmation by remember { mutableStateOf(true) }
+    var showConfirmation by remember { mutableStateOf(false) }
     if (visitSuccess) {
         LaunchedEffect(Unit) {
             val delaySeconds = 2.0f
@@ -82,20 +82,12 @@ fun RegisterVisitScreen(
                 ) {
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    FloatingToast(
-                        message = toastMessage,
-                        type = toastType,
-                        visible = showToast,
-                        onDismiss = { showToast = false }
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
                     Button(
                         onClick = {
                             if (viewModel.isFormValid()) {
                                 viewModel.registerVisit(
-                                    onSuccess = { _, _ ->
+                                    onSuccess = { id, _ ->
+                                        generatedVisitId = id.toInt()
                                         toastMessage = successMessage
                                         toastType = ToastType.SUCCESS
                                         showToast = true
@@ -136,6 +128,13 @@ fun RegisterVisitScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp)
             ) {
+                FloatingToast(
+                    message = toastMessage,
+                    type = toastType,
+                    visible = showToast,
+                    onDismiss = { showToast = false }
+                )
+
                 CustomDropdown(
                     label = stringResource(R.string.label_client),
                     options = clientOptions.map { it.name },
@@ -192,7 +191,10 @@ fun RegisterVisitScreen(
 
                 if (showConfirmation) {
                     AlertDialog(
-                        onDismissRequest = { showConfirmation = false },
+                        onDismissRequest = {
+                            showConfirmation = false
+                            onNavigate("home")
+                        },
                         containerColor = MaterialTheme.colorScheme.surface,
                         shape = RoundedCornerShape(8.dp),
                         title = {
@@ -201,7 +203,12 @@ fun RegisterVisitScreen(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.End
                                 ) {
-                                    IconButton(onClick = { showConfirmation = false }) {
+                                    IconButton(
+                                        onClick = {
+                                            showConfirmation = false
+                                            onNavigate("home")
+                                        }
+                                    ) {
                                         Icon(
                                             imageVector = Icons.Default.Close,
                                             contentDescription = stringResource(R.string.close_label),
@@ -225,7 +232,10 @@ fun RegisterVisitScreen(
                                 horizontalArrangement = Arrangement.Center
                             ) {
                                 Button(
-                                    onClick = { showConfirmation = false },
+                                    onClick = {
+                                        showConfirmation = false
+                                        onNavigate("home")
+                                    },
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = MaterialTheme.colorScheme.surface
                                     )
@@ -235,8 +245,11 @@ fun RegisterVisitScreen(
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Button(
                                     onClick = {
+                                        val clientId = selectedClient?.userId
                                         showConfirmation = false
-                                        onNavigate("evidencias/1")
+                                        generatedVisitId?.let { id ->
+                                            onNavigate("evidencias/$id?clientId=${clientId}")
+                                        }
                                     },
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = MaterialTheme.colorScheme.primary
@@ -245,8 +258,7 @@ fun RegisterVisitScreen(
                                     Text(stringResource(R.string.message_yes), color = Color.White)
                                 }
                             }
-                        },
-                        dismissButton = {}
+                        }
                     )
                 }
             }

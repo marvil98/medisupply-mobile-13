@@ -35,16 +35,13 @@ import java.util.Locale
 @Composable
 fun DateSelector(
     label: String,
-    selectedDate: Date?,
+    selectedDate: Long?,
     isError: Boolean,
     onClicked: () -> Unit
 ) {
-
-    val dateText = selectedDate?.let {
-        // Define el formato deseado (dd/MM/yyyy) y usa la localización adecuada
+    val dateText = selectedDate?.let { milliseconds ->
         val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        // Formatea la fecha seleccionada
-        formatter.format(it)
+        formatter.format(Date(milliseconds))
     } ?:  stringResource(R.string.select_date)
 
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -58,8 +55,6 @@ fun DateSelector(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp)
-                // Aplicamos el clic al Box, que abarca toda el área del TextField.
-                // Esto garantiza que el toque se detecte ANTES de la lógica interna del TextField.
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
@@ -74,30 +69,27 @@ fun DateSelector(
                 )
         ) {
             OutlinedTextField(
-                // --- Usar la fecha formateada o el placeholder ---
                 value = dateText,
                 onValueChange = { /* Solo lectura */ },
-                readOnly = true, // Es fundamental mantener esto para evitar el teclado
-                enabled = false, // Deshabilitar evita que capture eventos de foco/teclado
+                readOnly = true,
+                enabled = false,
                 trailingIcon = {
                     Icon(
                         Icons.Default.CalendarToday,
-                        contentDescription = "Seleccionar fecha",
+                        contentDescription = stringResource(R.string.select_date),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 },
                 isError = isError,
-                // El Modifier del TextField ahora solo necesita rellenar el Box padre
                 modifier = Modifier.fillMaxSize(),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent, // Fondo transparente ya que el Box lo maneja
+                    focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
                     disabledContainerColor = Color.Transparent,
                     cursorColor = MaterialTheme.colorScheme.primary,
                     focusedBorderColor = Color.Transparent,
                     disabledBorderColor = Color.Transparent,
                     unfocusedBorderColor = Color.Transparent,
-                    // Usamos el color de texto para el estado 'disabled'
                     disabledTextColor = MaterialTheme.colorScheme.primary,
                     disabledLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                     errorSupportingTextColor = MaterialTheme.colorScheme.error
@@ -107,8 +99,6 @@ fun DateSelector(
                     color = if (dateText == stringResource(R.string.select_date)) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.primary,
                 ),
             )
-
-
         }
     }
 }

@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.medisupplyapp.R
 import com.example.medisupplyapp.data.model.Evidence
@@ -48,7 +49,10 @@ fun EvidenceCard(
             .fillMaxWidth()
             .padding(vertical = 4.dp),
         shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        )
     ) {
         Row(
             modifier = Modifier
@@ -97,7 +101,10 @@ fun EvidenceCard(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Subiendo... ${(evidence.progress * 100).toInt()}%",
+                            text = stringResource(
+                                R.string.uploading_progress_format,
+                                (evidence.progress * 100).toInt()
+                            ),
                             style = MaterialTheme.typography.labelSmall,
                             color = primaryColor
                         )
@@ -114,7 +121,7 @@ fun EvidenceCard(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Error al subir. Intenta nuevamente.",
+                            text = stringResource(R.string.upload_error_message),
                             color = errorColor,
                             style = MaterialTheme.typography.labelSmall,
                         )
@@ -131,10 +138,14 @@ fun EvidenceCard(
                         )
                     }
                     StatusUpdate.PENDIENTE -> {
-                        Text(
-                            text = "Lista para subir (${evidence.type})",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Color.Gray
+                        LinearProgressIndicator(
+                            progress = 1f,
+                            color = primaryColor,
+                            trackColor = primaryColor.copy(alpha = 0.3f),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(6.dp)
+                                .clip(RoundedCornerShape(4.dp))
                         )
                     }
                 }

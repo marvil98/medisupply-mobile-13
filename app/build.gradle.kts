@@ -101,7 +101,9 @@ dependencies {
     // Dependencia de Proto DataStore
     implementation("androidx.datastore:datastore:1.1.7")
 
-
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
 }
 
 protobuf {

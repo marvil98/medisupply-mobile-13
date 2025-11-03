@@ -27,12 +27,16 @@ import java.util.Date
 
 
 import com.example.medisupplyapp.data.provider.routeCacheDataStore
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 
 class RegisterVisitViewModel(application: Application) : AndroidViewModel(application) {
 
     var selectedClient by mutableStateOf<Client?>(null)
-    var selectedDate by mutableStateOf<Date?>(null)
+    var selectedDate: Long? by mutableStateOf(null)
 
     var clientError by mutableStateOf(false)
     var dateError by mutableStateOf(false)
@@ -73,28 +77,32 @@ class RegisterVisitViewModel(application: Application) : AndroidViewModel(applic
 
     fun onDateSelected(date: Date) {
         val now = Date()
-        val calendar = Calendar.getInstance()
 
-        // 1. Validación de Fecha Futura
-        // Se resetea la hora de 'now' a 00:00:00 del día actual para una comparación pura de día.
-        val todayCalendar = Calendar.getInstance().apply {
+        val todayLimitCalendar = Calendar.getInstance().apply {
             time = now
-            set(Calendar.HOUR_OF_DAY, 23) // Establecer a casi final del día para comparación
-            set(Calendar.MINUTE, 59)
-            set(Calendar.SECOND, 59)
-            set(Calendar.MILLISECOND, 999)
+            add(Calendar.DAY_OF_YEAR, 1)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
         }
-        val todayLimit = todayCalendar.time
+        val todayLimit = todayLimitCalendar.time
 
-        if (date.after(todayLimit)) {
+        if (date.after(todayLimit) || date == todayLimit) {
+            errorMessage = "La fecha de la visita no puede ser posterior a la fecha actual."
             dateError = true
             return
         }
 
-        // 2. Validación de Últimos 30 Días
-        calendar.time = now
-        calendar.add(Calendar.DAY_OF_YEAR, -30)
-        val thirtyDaysAgo = calendar.time
+        val thirtyDaysAgoCalendar = Calendar.getInstance().apply {
+            time = now
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+            add(Calendar.DAY_OF_YEAR, -30)
+        }
+        val thirtyDaysAgo = thirtyDaysAgoCalendar.time
 
         if (date.before(thirtyDaysAgo)) {
             errorMessage = "La fecha de la visita no puede ser anterior a 30 días."
@@ -102,8 +110,7 @@ class RegisterVisitViewModel(application: Application) : AndroidViewModel(applic
             return
         }
 
-        // Si la validación es exitosa
-        selectedDate = date
+        selectedDate = date.time
         dateError = false
         errorMessage = ""
     }
@@ -115,22 +122,38 @@ class RegisterVisitViewModel(application: Application) : AndroidViewModel(applic
         viewModelScope.launch {
             try {
                 val clientId = selectedClient?.userId
-                if (clientId == null) {
+                val dateMillis = selectedDate
+
+                if (clientId == null || dateMillis == null) {
                     clientError = true
-                    onError("Cliente inválido")
+                    onError("Cliente o fecha inválidos")
                     return@launch
                 }
+
+                val instant = Instant.ofEpochMilli(dateMillis)
+                val utcZone = ZoneId.of("UTC")
+                val zonedDateTime = instant
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate()
+                    .atStartOfDay()
+                    .plusHours(12)
+                    .atZone(utcZone)
+
+                val iso8601Formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+                    .withZone(utcZone)
+
+                val formattedDateString = zonedDateTime.format(iso8601Formatter)
+
                 val clientRepo = ClientRepository(api = ApiConnection.api_users)
                 val routesRepo = RoutesRepository(
                     api = ApiConnection.api_routes,
                     routeCacheDataStore = application.routeCacheDataStore
                 )
 
-
                 val request = RegisterVisitRequest(
                     client_id = clientId,
                     seller_id = 1,
-                    date =selectedDate,
+                    date = formattedDateString,
                     findings = findings
                 )
 

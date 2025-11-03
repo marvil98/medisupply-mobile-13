@@ -86,4 +86,20 @@
     <string name="success_evidence">Evidencia agregada exitosamente</string>
     <string name="error_evidence">¡Ups! No fue posible agregar la evidencia. Intenta nuevamente.</string>
     <string name="finish_evidences_button">Finalizar evidencias</string>
+    <string name="error_upload_evidence">¡Ups! Error al subir evidencias. Intenta de nuevo.</string>
+    <string name="recomendations">Recomendaciones</string>
+    <string name="no_recomendations">No hay recomendaciones disponibles.</string>
+    <string name="product_name_unavailable">Nombre de producto no disponible</string>
+    <string name="score_label">Puntuación: %1$.2f</string>
+    <string name="no_available">No disponible</string>
+    <string name="reasoning_label">Razonamiento</string>
+    <string name="recommend">Recomendar</string>
+    <string name="version_label">Versión</string>
+    <string name="date_label">Fecha de actualización</string>
+    <string name="upload_success_message">Evidencias cargadas con éxito.</string>
+    <string name="no_evidences_to_upload">No hay evidencias pendientes para subir.</string>
+    <string name="uploading_evidences_message">Subiendo evidencias, por favor espere...</string>
+    <string name="processing_visit_message">Procesando visita y generando recomendaciones...</string>
+    <string name="uploading_progress_format">Subiendo... %1$d%%</string>
+    <string name="upload_error_message">Error al subir. Intenta nuevamente.</string>
 </resources>
