@@ -12,7 +12,7 @@
     <string name="settings">Configuration</string>
     <string name="visits_done">visits completed</string>
     <string name="routes_title">My routes</string>
-    <string name="routes_subtitle">3/7 visits made</string>
+    <string name="routes_subtitle">visits made</string>
     <string name="register_visit">Register visit</string>
     <string name="suggest_product">Suggest product</string>
     <string name="create_order">Create order</string>
@@ -64,6 +64,8 @@
     <string name="order_success">Order created successfully.</string>
     <string name="order_error">¡Ups! Unable to create the order. Please try again.</string>
     <string name="date_of_visit">Date of visit</string>
+    <string name="select_date">Select date</string>
+    <string name="date">Date</string>
     <string name="visit_success">Successfully registered visit</string>
     <string name="visit_error">Oops! A record of your visit already appears for this customer on the selected date.</string>
     <string name="close_label">Close</string>
@@ -76,4 +78,26 @@
     <string name="photo_option">Take photo</string>
     <string name="video_option">Record video</string>
     <string name="gallery_option">Select from gallery</string>
+    <string name="no_daily_routes">You do not have any routes assigned for today.</string>
+    <string name="capital_address">ADDRESS</string>
+    <string name="capital_client">CLIENT</string>
+    <string name="success_evidence">Evidence successfully added</string>
+    <string name="error_evidence">Oops! We were unable to add the evidence. Please try again.</string>
+    <string name="finish_evidences_button">Finish evidences</string>
+    <string name="error_upload_evidence">Oops! Error uploading evidence. Please try again.</string>
+    <string name="recomendations">Recommendations</string>
+    <string name="no_recomendations">No recommendations available.</string>
+    <string name="product_name_unavailable">Product name not available</string>
+    <string name="score_label">Score: %1$.2f</string>
+    <string name="no_available">Not available</string>
+    <string name="reasoning_label">Reasoning</string>
+    <string name="recommend">Recommend</string>
+    <string name="version_label">Version</string>
+    <string name="date_label">Update Date</string>
+    <string name="upload_success_message">Evidence uploaded successfully.</string>
+    <string name="no_evidences_to_upload">No evidence pending upload.</string>
+    <string name="uploading_evidences_message">Uploading evidence, please wait...</string>
+    <string name="processing_visit_message">Processing visit and generating recommendations...</string>
+    <string name="uploading_progress_format">Uploading... %1$d%%</string>
+    <string name="upload_error_message">Upload error. Try again.</string>
 </resources>

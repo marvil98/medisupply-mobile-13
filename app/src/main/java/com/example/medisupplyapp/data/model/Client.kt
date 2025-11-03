@@ -21,7 +21,7 @@ data class ClientResponse(
 data class RegisterVisitRequest(
     val client_id: Int,
     val seller_id: Int,
-    val date: Date?,
+    val date: String,
     val findings: String
 )
 

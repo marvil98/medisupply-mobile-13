@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+option java_package = "com.example.medisupplyapp.datastore";
+option java_multiple_files = true;
+
+message RouteCacheProto {
+  int64 timestamp = 1; // Marca de tiempo de guardado (en milisegundos)
+  DailyRouteProto route = 2;
+}
+// ----------------------------------------------------
+
+// Los mensajes RoutePointProto y DailyRouteProto se mantienen iguales
+message RoutePointProto {
+  string address = 1;
+  int32 visit_id = 2;
+  double latitude = 3;
+  string name = 4;
+  string client = 5;
+  double longitude = 6;
+}
+
+message DailyRouteProto {
+  int32 number_visits = 1;
+  int32 visits_made = 2;
+  repeated RoutePointProto visits = 3;
+}

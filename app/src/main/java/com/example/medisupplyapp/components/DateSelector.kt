@@ -24,19 +24,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.medisupplyapp.R
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
 @Composable
 fun DateSelector(
     label: String,
-    selectedDate: Date?,
+    selectedDate: Long?,
     isError: Boolean,
     onClicked: () -> Unit
 ) {
-    // Usamos la fecha seleccionada del estado si existe
-    val dateText = selectedDate?.let { "" } ?: "Seleccionar Fecha"
+    val dateText = selectedDate?.let { milliseconds ->
+        val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        formatter.format(Date(milliseconds))
+    } ?:  stringResource(R.string.select_date)
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -49,8 +55,6 @@ fun DateSelector(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp)
-                // Aplicamos el clic al Box, que abarca toda el área del TextField.
-                // Esto garantiza que el toque se detecte ANTES de la lógica interna del TextField.
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
@@ -65,38 +69,34 @@ fun DateSelector(
                 )
         ) {
             OutlinedTextField(
-                // --- Usar la fecha formateada o el placeholder ---
                 value = dateText,
                 onValueChange = { /* Solo lectura */ },
-                readOnly = true, // Es fundamental mantener esto para evitar el teclado
-                enabled = false, // Deshabilitar evita que capture eventos de foco/teclado
-                label = { Text("Fecha") },
+                readOnly = true,
+                enabled = false,
                 trailingIcon = {
                     Icon(
                         Icons.Default.CalendarToday,
-                        contentDescription = "Seleccionar fecha",
+                        contentDescription = stringResource(R.string.select_date),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 },
                 isError = isError,
-                // El Modifier del TextField ahora solo necesita rellenar el Box padre
                 modifier = Modifier.fillMaxSize(),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent, // Fondo transparente ya que el Box lo maneja
+                    focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
                     disabledContainerColor = Color.Transparent,
                     cursorColor = MaterialTheme.colorScheme.primary,
                     focusedBorderColor = Color.Transparent,
                     disabledBorderColor = Color.Transparent,
                     unfocusedBorderColor = Color.Transparent,
-                    // Usamos el color de texto para el estado 'disabled'
                     disabledTextColor = MaterialTheme.colorScheme.primary,
                     disabledLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                     errorSupportingTextColor = MaterialTheme.colorScheme.error
                 ),
                 shape = RoundedCornerShape(16.dp),
                 textStyle = MaterialTheme.typography.bodyLarge.copy(
-                    color = MaterialTheme.colorScheme.primary,
+                    color = if (dateText == stringResource(R.string.select_date)) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.primary,
                 ),
             )
         }

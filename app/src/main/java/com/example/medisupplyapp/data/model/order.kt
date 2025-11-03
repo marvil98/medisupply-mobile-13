@@ -3,7 +3,7 @@ package com.example.medisupplyapp.data.model
 import java.util.Date
 
 data class Order(
-    val id: String,
+    val id: Int,
     val status: OrderStatus,
     val creationDate: Date,
     val estimatedReleaseDate: Date?,

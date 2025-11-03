@@ -1,5 +1,6 @@
 package com.example.medisupplyapp
 
+import android.content.Context
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.*
 import androidx.compose.material3.*
@@ -7,6 +8,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medisupplyapp.components.SectionCard
 import com.tuempresa.medisupply.ui.components.FooterNavigation
 import com.tuempresa.medisupply.ui.components.Header
@@ -14,6 +20,10 @@ import com.tuempresa.medisupply.ui.theme.MediSupplyTheme
 
 @Composable
 fun Home(userName: String, selectedRoute: String, onNavigate: (String) -> Unit) {
+    val viewModel: HomeViewModel = viewModel()
+
+    val dailyRoute by viewModel.dailyRoute.collectAsState()
+    val visitsMade by viewModel.visitsMade.collectAsState()
     MediSupplyTheme {
         Scaffold(
             topBar = { Header(userName, onNavigate) },
@@ -35,9 +45,9 @@ fun Home(userName: String, selectedRoute: String, onNavigate: (String) -> Unit) 
                 Spacer(modifier = Modifier.height(28.dp))
                 SectionCard(
                     title = stringResource(R.string.routes_title),
-                    subtitle = stringResource(R.string.routes_subtitle),
+                    subtitle = "${visitsMade}/${dailyRoute.numberVisits} ${stringResource(R.string.routes_subtitle)}",
                     centered = true,
-                    onClick = { onNavigate("rutas") }
+                    onClick = { onNavigate("routes") }
                 )
 
                 SectionCard(

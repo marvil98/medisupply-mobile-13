@@ -1,32 +1,42 @@
 package com.example.medisupplyapp.screen.visits
 
-import androidx.compose.runtime.Composable
-import androidx.lifecycle.ViewModel
+import DailyRouteSerializer
+import android.app.Application
+import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.LiveData
+import androidx.datastore.core.DataStore
+import androidx.datastore.dataStore
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
 import com.example.medisupplyapp.data.model.Client
-import com.example.medisupplyapp.data.model.CreateOrderRequest
 import com.example.medisupplyapp.data.model.OrderState
-import com.example.medisupplyapp.data.model.Product
-import com.example.medisupplyapp.data.model.ProductRequest
+
 import com.example.medisupplyapp.data.model.RegisterVisitRequest
 import com.example.medisupplyapp.data.remote.ApiConnection
 import com.example.medisupplyapp.data.remote.repository.ClientRepository
-import com.example.medisupplyapp.data.remote.repository.OrdersRepository
-import com.example.medisupplyapp.data.remote.repository.ProductRepository
+import com.example.medisupplyapp.data.remote.repository.RoutesRepository
+import com.example.medisupplyapp.datastore.RouteCacheProto
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
 import java.util.Calendar
 import java.util.Date
 
-class RegisterVisitViewModel : ViewModel() {
+
+import com.example.medisupplyapp.data.provider.routeCacheDataStore
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+
+
+class RegisterVisitViewModel(application: Application) : AndroidViewModel(application) {
+
     var selectedClient by mutableStateOf<Client?>(null)
-    var selectedDate by mutableStateOf<Date?>(Date())
+    var selectedDate: Long? by mutableStateOf(null)
 
     var clientError by mutableStateOf(false)
     var dateError by mutableStateOf(false)
@@ -56,7 +66,9 @@ class RegisterVisitViewModel : ViewModel() {
     }
 
     fun isFormValid(): Boolean {
-        return selectedClient != null && !clientError && selectedDate != null && !dateError
+        return selectedClient != null &&
+                !clientError && selectedDate != null &&
+                !dateError && findings != ""
     }
 
     fun updateFindings(newText: String) {
@@ -65,28 +77,32 @@ class RegisterVisitViewModel : ViewModel() {
 
     fun onDateSelected(date: Date) {
         val now = Date()
-        val calendar = Calendar.getInstance()
 
-        // 1. Validación de Fecha Futura
-        // Se resetea la hora de 'now' a 00:00:00 del día actual para una comparación pura de día.
-        val todayCalendar = Calendar.getInstance().apply {
+        val todayLimitCalendar = Calendar.getInstance().apply {
             time = now
-            set(Calendar.HOUR_OF_DAY, 23) // Establecer a casi final del día para comparación
-            set(Calendar.MINUTE, 59)
-            set(Calendar.SECOND, 59)
-            set(Calendar.MILLISECOND, 999)
+            add(Calendar.DAY_OF_YEAR, 1)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
         }
-        val todayLimit = todayCalendar.time
+        val todayLimit = todayLimitCalendar.time
 
-        if (date.after(todayLimit)) {
+        if (date.after(todayLimit) || date == todayLimit) {
+            errorMessage = "La fecha de la visita no puede ser posterior a la fecha actual."
             dateError = true
             return
         }
 
-        // 2. Validación de Últimos 30 Días
-        calendar.time = now
-        calendar.add(Calendar.DAY_OF_YEAR, -30)
-        val thirtyDaysAgo = calendar.time
+        val thirtyDaysAgoCalendar = Calendar.getInstance().apply {
+            time = now
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+            add(Calendar.DAY_OF_YEAR, -30)
+        }
+        val thirtyDaysAgo = thirtyDaysAgoCalendar.time
 
         if (date.before(thirtyDaysAgo)) {
             errorMessage = "La fecha de la visita no puede ser anterior a 30 días."
@@ -94,8 +110,7 @@ class RegisterVisitViewModel : ViewModel() {
             return
         }
 
-        // Si la validación es exitosa
-        selectedDate = date
+        selectedDate = date.time
         dateError = false
         errorMessage = ""
     }
@@ -107,17 +122,38 @@ class RegisterVisitViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val clientId = selectedClient?.userId
-                if (clientId == null) {
+                val dateMillis = selectedDate
+
+                if (clientId == null || dateMillis == null) {
                     clientError = true
-                    onError("Cliente inválido")
+                    onError("Cliente o fecha inválidos")
                     return@launch
                 }
+
+                val instant = Instant.ofEpochMilli(dateMillis)
+                val utcZone = ZoneId.of("UTC")
+                val zonedDateTime = instant
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate()
+                    .atStartOfDay()
+                    .plusHours(12)
+                    .atZone(utcZone)
+
+                val iso8601Formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+                    .withZone(utcZone)
+
+                val formattedDateString = zonedDateTime.format(iso8601Formatter)
+
                 val clientRepo = ClientRepository(api = ApiConnection.api_users)
+                val routesRepo = RoutesRepository(
+                    api = ApiConnection.api_routes,
+                    routeCacheDataStore = application.routeCacheDataStore
+                )
 
                 val request = RegisterVisitRequest(
                     client_id = clientId,
                     seller_id = 1,
-                    date =selectedDate,
+                    date = formattedDateString,
                     findings = findings
                 )
 
@@ -125,8 +161,12 @@ class RegisterVisitViewModel : ViewModel() {
                 val response = clientRepo.registerVisit(request)
 
                 if (response.isSuccess) {
+
                     val visitResponse = response.getOrNull()
                     if (visitResponse != null) {
+                        val visitsMade = routesRepo.visitsMadeFlow.first()
+
+                        routesRepo.updateVisitsMade(visitsMade+1)
                         onSuccess(visitResponse.visit.visit_id.toString(), "Orden creada con éxito")
                     } else {
                         onError("Respuesta vacía del servidor")
@@ -139,6 +179,7 @@ class RegisterVisitViewModel : ViewModel() {
             } catch (e: Exception) {
                 onError("Error al crear orden: ${e.message}")
             }
+
         }
     }
 }

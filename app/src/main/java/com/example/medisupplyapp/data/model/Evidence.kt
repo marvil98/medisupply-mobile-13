@@ -23,3 +23,32 @@ data class Evidence(
     val progress: Float = 0f,
     val statusUpdate: StatusUpdate = StatusUpdate.PENDIENTE
 )
+
+data class EvidenceDTO(
+    val evidence_id: Int,
+    val type: String,
+    val url: String,
+    val visit_id: Int
+)
+
+data class UploadEvidenceResponse(
+    val evidences: List<EvidenceDTO>,
+    val message: String
+)
+
+data class RecommendationResponse(
+    val recommendations: List<Recommendation>,
+    val status: String
+)
+
+data class Recommendation(
+    val product_name: String?,
+    val product_sku: String?,
+    val reasoning: String?,
+    val score: Double?
+)
+
+data class RecommendationRequest(
+    val client_id: Int,
+    val regional_setting: String
+)

@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.example.medisupplyapp.data.remote.api.OrdersApi
 import com.example.medisupplyapp.data.remote.api.ProductsApi
+import com.example.medisupplyapp.data.remote.api.RoutesApi
 import com.example.medisupplyapp.data.remote.api.UsersApi
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -48,5 +49,15 @@ object ApiConnection {
             .addConverterFactory(GsonConverterFactory.create(customGson))
             .build()
             .create(UsersApi::class.java)
+    }
+
+    val api_routes: RoutesApi by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            // 🚀 CRÍTICO: Añadir el cliente OkHttpClient configurado con el logger
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create(customGson))
+            .build()
+            .create(RoutesApi::class.java)
     }
 }

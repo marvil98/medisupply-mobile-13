@@ -13,7 +13,7 @@
     <string name="settings">Configuración</string>
     <string name="visits_done">visitas realizadas</string>
     <string name="routes_title">Mis rutas</string>
-    <string name="routes_subtitle">3/7 visitas realizadas</string>
+    <string name="routes_subtitle">visitas realizadas</string>
     <string name="register_visit">Registrar visita</string>
     <string name="suggest_product">Sugerir producto</string>
     <string name="create_order">Crear pedido</string>
@@ -66,6 +66,8 @@
     <string name="order_success">Pedido creado exitosamente.</string>
     <string name="order_error">¡Ups! No fue posible crear el pedido. Intenta nuevamente.</string>
     <string name="date_of_visit">Fecha de visita</string>
+    <string name="select_date">Seleccionar fecha</string>
+    <string name="date">Fecha</string>
     <string name="visit_success">Visita registrada exitosamente</string>
     <string name="visit_error">!Ups! Ya aparece un registro de tu visita para este cliente en la fecha seleccionada.</string>
     <string name="close_label">Cerrar</string>
@@ -78,4 +80,26 @@
     <string name="photo_option">Tomar foto</string>
     <string name="video_option">Grabar video</string>
     <string name="gallery_option">Seleccionar de galería</string>
+    <string name="no_daily_routes">No tienes rutas asignadas para hoy.</string>
+    <string name="capital_address">DIRECCIÓN</string>
+    <string name="capital_client">CLIENTE</string>
+    <string name="success_evidence">Evidencia agregada exitosamente</string>
+    <string name="error_evidence">¡Ups! No fue posible agregar la evidencia. Intenta nuevamente.</string>
+    <string name="finish_evidences_button">Finalizar evidencias</string>
+    <string name="error_upload_evidence">¡Ups! Error al subir evidencias. Intenta de nuevo.</string>
+    <string name="recomendations">Recomendaciones</string>
+    <string name="no_recomendations">No hay recomendaciones disponibles.</string>
+    <string name="product_name_unavailable">Nombre de producto no disponible</string>
+    <string name="score_label">Puntuación: %1$.2f</string>
+    <string name="no_available">No disponible</string>
+    <string name="reasoning_label">Razonamiento</string>
+    <string name="recommend">Recomendar</string>
+    <string name="version_label">Versión</string>
+    <string name="date_label">Fecha de actualización</string>
+    <string name="upload_success_message">Evidencias cargadas con éxito.</string>
+    <string name="no_evidences_to_upload">No hay evidencias pendientes para subir.</string>
+    <string name="uploading_evidences_message">Subiendo evidencias, por favor espere...</string>
+    <string name="processing_visit_message">Procesando visita y generando recomendaciones...</string>
+    <string name="uploading_progress_format">Subiendo... %1$d%%</string>
+    <string name="upload_error_message">Error al subir. Intenta nuevamente.</string>
 </resources>
