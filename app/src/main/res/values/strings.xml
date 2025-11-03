@@ -83,4 +83,7 @@
     <string name="no_daily_routes">No tienes rutas asignadas para hoy.</string>
     <string name="capital_address">DIRECCIÓN</string>
     <string name="capital_client">CLIENTE</string>
+    <string name="success_evidence">Evidencia agregada exitosamente</string>
+    <string name="error_evidence">¡Ups! No fue posible agregar la evidencia. Intenta nuevamente.</string>
+    <string name="finish_evidences_button">Finalizar evidencias</string>
 </resources>

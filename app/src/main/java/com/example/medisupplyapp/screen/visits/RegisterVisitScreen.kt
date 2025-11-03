@@ -57,7 +57,7 @@ fun RegisterVisitScreen(
     val selectedRoute = "visits"
 
     var visitSuccess by remember { mutableStateOf(false) }
-    var showConfirmation by remember { mutableStateOf(false) }
+    var showConfirmation by remember { mutableStateOf(true) }
     if (visitSuccess) {
         LaunchedEffect(Unit) {
             val delaySeconds = 2.0f

@@ -4,9 +4,9 @@ import com.example.medisupplyapp.data.model.OrderStatus
 import java.util.Date
 
 data class OrderResponse(
-    val numero_pedido: String,
-    val estado_nombre: String,
-    val fecha_creacion: Date,
-    val fecha_entrega_estimada: Date?,
-    val fecha_ultima_actualizacion: Date
+    val order_id: Int,
+    val status: String,
+    val creation_date: Date,
+    val estimated_delivery_time: Date?,
+    val last_updated_date: Date
 )

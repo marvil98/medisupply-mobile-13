@@ -18,11 +18,11 @@ class OrdersRepository(var api: OrdersApi) {
             } else {
                 val orders = response.map { orderResponse ->
                     Order(
-                        id = orderResponse.numero_pedido,
-                        creationDate = orderResponse.fecha_creacion,
-                        estimatedReleaseDate = orderResponse.fecha_entrega_estimada,
-                        lastUpdate =  orderResponse.fecha_ultima_actualizacion,
-                        status = mapStatus(orderResponse.estado_nombre)
+                        id = orderResponse.order_id,
+                        creationDate = orderResponse.creation_date,
+                        estimatedReleaseDate = orderResponse.estimated_delivery_time,
+                        lastUpdate =  orderResponse.last_updated_date,
+                        status = mapStatus(orderResponse.status)
                     )
                 }
                 Result.success(orders)

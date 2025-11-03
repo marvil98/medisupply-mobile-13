@@ -81,4 +81,7 @@
     <string name="no_daily_routes">You do not have any routes assigned for today.</string>
     <string name="capital_address">ADDRESS</string>
     <string name="capital_client">CLIENT</string>
+    <string name="success_evidence">Evidence successfully added</string>
+    <string name="error_evidence">Oops! We were unable to add the evidence. Please try again.</string>
+    <string name="finish_evidences_button">Finish evidences</string>
 </resources>
