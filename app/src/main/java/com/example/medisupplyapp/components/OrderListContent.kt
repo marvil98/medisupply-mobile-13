@@ -32,13 +32,15 @@ fun OrdersListContent(
         item {
             Spacer(modifier = Modifier.height(5.dp))
         }
-        item{
+
+        item {
             RoundedButton(
                 title = stringResource(R.string.create_order),
                 navigation = "create_order",
                 onOptionClick = { onNavigate(it) }
             )
         }
+
         item {
             Text(
                 text = stringResource(R.string.order_history),
@@ -51,10 +53,13 @@ fun OrdersListContent(
             Spacer(modifier = Modifier.height(4.dp))
         }
 
-        // Lista de pedidos
+        // Lista de pedidos con click handler
         items(orders.size) { i ->
             OrderCard(
                 order = orders[i],
+                onClick = {
+                    onNavigate("order_detail/${orders[i].id}")
+                }
             )
         }
     }

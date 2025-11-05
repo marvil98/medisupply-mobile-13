@@ -35,12 +35,14 @@ import java.util.Locale
 @Composable
 fun OrderCard(
     order: Order,
+    onClick: () -> Unit  // ⭐ NUEVO: Callback para el click
 ) {
     val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
     Card(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable(onClick = onClick),  // ⭐ NUEVO: Hacer clickeable toda la tarjeta
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         ),
@@ -86,7 +88,7 @@ fun OrderCard(
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.width( 75.dp )
+                    modifier = Modifier.width(75.dp)
                 )
             }
         }

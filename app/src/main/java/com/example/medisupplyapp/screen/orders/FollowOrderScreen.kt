@@ -22,13 +22,15 @@ fun FollowOrderScreen(
     onBack: () -> Unit,
 ) {
     val uiState = viewModel.ordersState
+
     MediSupplyTheme {
         Scaffold(
             topBar = {
                 SimpleTopBar(
                     title = stringResource(R.string.orders),
                     onBack = onBack
-                ) },
+                )
+            },
             bottomBar = { FooterNavigation(selectedRoute, onNavigate) },
             containerColor = MaterialTheme.colorScheme.surface
         ) { paddingValues ->
@@ -36,7 +38,6 @@ fun FollowOrderScreen(
                 is OrdersUiState.Loading -> {
                     LoadingScreen()
                 }
-
                 is OrdersUiState.Success -> {
                     OrdersListContent(
                         orders = uiState.orders,
@@ -44,13 +45,17 @@ fun FollowOrderScreen(
                         onNavigate = onNavigate
                     )
                 }
-
                 is OrdersUiState.Empty -> {
-                    ErrorOrdersScreen(paddingValues = paddingValues, stringResource(R.string.no_order_history))
+                    ErrorOrdersScreen(
+                        paddingValues = paddingValues,
+                        stringResource(R.string.no_order_history)
+                    )
                 }
-
                 is OrdersUiState.Error -> {
-                    ErrorOrdersScreen(paddingValues = paddingValues, stringResource(R.string.error_order_history))
+                    ErrorOrdersScreen(
+                        paddingValues = paddingValues,
+                        stringResource(R.string.error_order_history)
+                    )
                 }
             }
         }
