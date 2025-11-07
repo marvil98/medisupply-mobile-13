@@ -2,7 +2,7 @@ package com.example.medisupplyapp.data.remote.api
 
 import com.example.medisupplyapp.data.model.CreateOrderRequest
 import com.example.medisupplyapp.data.model.CreateOrderResponse
-import com.example.medisupplyapp.data.model.OrderDetail
+import com.example.medisupplyapp.data.model.OrderDetailResponse
 import retrofit2.http.GET
 import retrofit2.http.Path // Importa Path
 import com.example.medisupplyapp.data.remote.dto.OrderResponse
@@ -24,5 +24,5 @@ interface OrdersApi {
     // Usamos @Path para inyectar el valor en el placeholder
     suspend fun getOrderDetail(
         @Path("orderId") orderId: Int,
-    ): OrderDetail
+    ): OrderDetailResponse
 }

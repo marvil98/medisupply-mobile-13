@@ -6,6 +6,7 @@ import com.example.medisupplyapp.data.model.Item
 import com.example.medisupplyapp.data.model.Order
 import com.example.medisupplyapp.data.model.OrderDetail
 import com.example.medisupplyapp.data.model.OrderStatus
+import com.example.medisupplyapp.data.model.toOrderDetail
 
 
 import com.example.medisupplyapp.data.remote.api.OrdersApi
@@ -71,62 +72,59 @@ class OrdersRepository(var api: OrdersApi) {
     }
 
 
-    val mockOrderDetail = OrderDetail(
-        id = 1,
-        status = mapStatus("3"),
-        creationDate = createDate("2025-10-15"),
-        lastUpdate = createDate("2025-10-15"),
-        client = "Farmacia la especial",
-        orderValue = 899.9.toFloat(),
-        seller = "Juan Pérez",
-        address = "Cra 69i # 71 - 55",
-        estimatedReleaseDate=  createDate("2025-10-20"),
-        items = listOf(
-            Item(
-                productId = 1,
-                name = "Acetaminofén 500mg",
-                priceUnit = 8.5.toFloat(),
-                quantity = 100,
-                sku = "MED-001"
-            ),
-            Item(
-                productId = 4,
-                name = "Guantes Nitrilo Talla M",
-                priceUnit = 4.99.toFloat(),
-                quantity = 10,
-                sku = "SURG-002"
-            ),
-        )
-    )
 
     suspend fun getOrderDetail(orderId: Int): Result<OrderDetail> {
         return try {
-            // Simular delay de red (opcional)
-            kotlinx.coroutines.delay(500)
-
-            // Retornar el mock
-            Result.success(mockOrderDetail) // Usa el orderId recibido
-
-            /* Cuando el backend esté listo, descomenta esto:
+            // Llamar a la API que retorna OrderDetailResponse
             val response = api.getOrderDetail(orderId = orderId)
 
-            if (response.isSuccessful) {
-                val orderDetail = response.body()
-                if (orderDetail != null && isValidOrderDetail(orderDetail)) {
-                    Result.success(orderDetail)
-                } else {
-                    Result.failure(IllegalArgumentException("Datos del pedido inválidos"))
-                }
+            // Extraer el DTO y convertir al modelo de dominio
+            val orderDetailDto = response.order
+            val orderDetail = orderDetailDto.toOrderDetail()
+
+            // Validar el modelo convertido
+            if (isValidOrderDetail(orderDetail)) {
+                Result.success(orderDetail)
             } else {
-                when (response.code()) {
-                    404 -> Result.failure(IllegalArgumentException("Pedido no encontrado"))
-                    else -> Result.failure(IllegalStateException("Error HTTP ${response.code()}"))
-                }
+                Result.failure(IllegalArgumentException("Datos del pedido inválidos"))
             }
-            */
+
+        } catch (e: retrofit2.HttpException) {
+            when (e.code()) {
+                404 -> Result.failure(IllegalArgumentException("Pedido no encontrado"))
+                401 -> Result.failure(SecurityException("No autorizado"))
+                500 -> Result.failure(IllegalStateException("Error del servidor"))
+                else -> Result.failure(e)
+            }
+        } catch (e: java.net.UnknownHostException) {
+            Result.failure(IllegalStateException("Sin conexión a internet"))
+        } catch (e: java.net.SocketTimeoutException) {
+            Result.failure(IllegalStateException("Tiempo de espera agotado"))
+        } catch (e: com.google.gson.JsonSyntaxException) {
+            Result.failure(IllegalStateException("Error al procesar la respuesta del servidor"))
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
+    private fun isValidOrderDetail(orderDetail: OrderDetail): Boolean {
+        return try {
+            // Validar campos requeridos
+            orderDetail.id > 0 &&
+                    orderDetail.orderValue >= 0 &&
+                    orderDetail.clientName.isNotBlank() &&
+                    orderDetail.sellerName.isNotBlank() &&
+                    orderDetail.items.isNotEmpty() &&
+                    // Validar que todos los items tengan datos válidos
+                    orderDetail.items.all { item ->
+                        item.productId > 0 &&
+                                item.name.isNotBlank() &&
+                                item.priceUnit >= 0 &&
+                                item.quantity > 0 &&
+                                item.sku.isNotBlank()
+                    }
+        } catch (e: Exception) {
+            false
+        }
+    }
 }

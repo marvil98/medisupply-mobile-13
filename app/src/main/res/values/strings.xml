@@ -107,7 +107,7 @@
     <string name="estimated_delivery">Entrega estimada</string>
     <string name="client_id">Cliente</string>
     <string name="seller_id">Vendedor</string>
-    <string name="total_order">Valor total del pedido</string>
+    <string name="total_order">Total</string>
     <string name="products">Productos</string>
     <string name="quantity">Cantidad</string>
     <string name="unit_price">Precio unitario</string>

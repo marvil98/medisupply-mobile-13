@@ -30,7 +30,6 @@ import com.example.medisupplyapp.components.InfoRowWithIcon
 import com.example.medisupplyapp.components.ProductItemCard
 import com.example.medisupplyapp.components.SimpleTopBar
 import com.example.medisupplyapp.data.model.OrderDetail
-import com.example.medisupplyapp.data.model.Item
 import com.example.medisupplyapp.screen.LoadingScreen
 import com.tuempresa.medisupply.ui.theme.MediSupplyTheme
 import java.text.NumberFormat
@@ -186,7 +185,7 @@ fun OrderDetailContent(
                     InfoRowWithIcon(
                         icon = Icons.Default.Person,
                         label = stringResource(R.string.client_id),
-                        value = orderDetail.client
+                        value = orderDetail.clientName
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -194,7 +193,7 @@ fun OrderDetailContent(
                     InfoRowWithIcon(
                         icon = Icons.Default.Person,
                         label = stringResource(R.string.seller_id),
-                        value = orderDetail.seller
+                        value = orderDetail.sellerName
                     )
                 }
             }
@@ -265,7 +264,7 @@ fun OrderDetailContent(
                             text = stringResource(R.string.total_order),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                     Text(

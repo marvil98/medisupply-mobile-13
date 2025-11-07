@@ -105,7 +105,7 @@
     <string name="estimated_delivery">Estimated delivery time</string>
     <string name="client_id">Client</string>
     <string name="seller_id">Seller</string>
-    <string name="total_order">Total order value</string>
+    <string name="total_order">Total</string>
     <string name="products">Products</string>
     <string name="quantity">Quantity</string>
     <string name="unit_price">Unit price</string>
