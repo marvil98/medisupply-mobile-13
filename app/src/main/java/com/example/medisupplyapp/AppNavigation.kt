@@ -12,12 +12,11 @@ import com.example.medisupplyapp.screen.orders.CreateOrderScreen
 import com.example.medisupplyapp.utils.updateLocale
 import kotlinx.coroutines.launch
 import com.example.medisupplyapp.screen.orders.FollowOrderScreen
+import com.example.medisupplyapp.screen.orders.OrderDetailScreen
 import com.example.medisupplyapp.screen.visits.DailyRouteScreen
 import com.example.medisupplyapp.screen.visits.RegisterEvidenceScreen
 import com.example.medisupplyapp.screen.visits.RegisterVisitScreen
-import com.example.medisupplyapp.utils.updateLocale
-import java.text.SimpleDateFormat
-import java.util.Locale
+
 
 @Composable
 fun AppNavigation(userName: String) {
@@ -130,6 +129,20 @@ fun AppNavigation(userName: String) {
                 selectedRoute = "visits",
                 visitId = visitId,
                 clientId = clientId
+            )
+        }
+
+        composable(
+            route = "order_detail/{orderId}",
+            arguments = listOf(navArgument("orderId") {
+                type = NavType.IntType
+                defaultValue = 0
+            })
+        ) { backStackEntry ->
+            val orderId = backStackEntry.arguments?.getInt("orderId") ?: 0
+            OrderDetailScreen(
+                orderId = orderId,
+                onBack = { navController.popBackStack() }
             )
         }
     }
