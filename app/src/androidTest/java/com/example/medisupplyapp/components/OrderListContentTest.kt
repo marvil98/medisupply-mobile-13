@@ -21,9 +21,9 @@ class OrdersListContentTest {
 
     // Datos simulados para la lista
     private val mockOrders = listOf(
-        Order(id = "100", creationDate = Date(), estimatedReleaseDate = Date(), lastUpdate = Date(), status = OrderStatus.DELIVERED),
-        Order(id = "200", creationDate = Date(), estimatedReleaseDate = Date(), lastUpdate = Date(), status = OrderStatus.PROCESSING),
-        Order(id = "300", creationDate = Date(), estimatedReleaseDate = null, lastUpdate = Date(), status = OrderStatus.CANCELLED),
+        Order(id =100, creationDate = Date(), estimatedReleaseDate = Date(), lastUpdate = Date(), status = OrderStatus.DELIVERED),
+        Order(id = 200, creationDate = Date(), estimatedReleaseDate = Date(), lastUpdate = Date(), status = OrderStatus.PROCESSING),
+        Order(id = 300, creationDate = Date(), estimatedReleaseDate = null, lastUpdate = Date(), status = OrderStatus.CANCELLED),
     )
 
     @Test

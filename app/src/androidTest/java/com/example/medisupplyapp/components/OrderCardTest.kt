@@ -25,7 +25,7 @@ class OrderCardTest {
 
     // 1. Crear un objeto Order simulado
     private val mockOrder = Order(
-        id = "98765",
+        id = 98765,
         creationDate = Date(1698000000000L), // Oct 22, 2023
         estimatedReleaseDate = Date(1700000000000L), // Nov 14, 2023
         lastUpdate = Date(1705000000000L), // Jan 12, 2024

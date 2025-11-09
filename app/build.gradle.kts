@@ -61,6 +61,7 @@ dependencies {
     // Coroutines & ViewModel
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation(libs.androidx.compose.ui.text)
 
     // --- DEBUG (Tooling & Manifest) ---
     debugImplementation(libs.androidx.compose.ui.tooling)

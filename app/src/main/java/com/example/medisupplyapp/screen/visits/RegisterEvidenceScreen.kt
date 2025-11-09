@@ -42,6 +42,7 @@ fun RegisterEvidenceScreen(
     onBack: () -> Unit,
     selectedRoute: String,
     clientId: Int,
+    regionalCode: String
 ) {
     val viewModel: RegisterEvidenceViewModel = viewModel()
 
@@ -292,7 +293,8 @@ fun RegisterEvidenceScreen(
                                     viewModel.uploadEvidences(
                                         visitId = visitId,
                                         files = filesToSend,
-                                        clientId = clientId
+                                        clientId = clientId,
+                                        regionalCode = regionalCode
                                     )
                                 } else {
                                     toastMessage = noEvidencesToUpload

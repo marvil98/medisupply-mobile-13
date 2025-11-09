@@ -92,12 +92,16 @@
     <string name="no_available">Not available</string>
     <string name="reasoning_label">Reasoning</string>
     <string name="recommend">Recommend</string>
-    <string name="version_label">Version</string>
-    <string name="date_label">Update Date</string>
+    <string name="version_label">Version: %1$s</string>
+    <string name="date_label">Update Date: %1$s</string>
     <string name="upload_success_message">Evidence uploaded successfully.</string>
     <string name="no_evidences_to_upload">No evidence pending upload.</string>
     <string name="uploading_evidences_message">Uploading evidence, please wait...</string>
     <string name="processing_visit_message">Processing visit and generating recommendations...</string>
     <string name="uploading_progress_format">Uploading... %1$d%%</string>
     <string name="upload_error_message">Upload error. Try again.</string>
+    <string name="select_products">Select your products</string>
+    <string name="search">Search...</string>
+    <string name="search_placeholder_product">Search for product</string>
+    <string name="recommendations">Your recommended</string>
 </resources>

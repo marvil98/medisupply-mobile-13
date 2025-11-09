@@ -38,18 +38,18 @@ class OrdersRepositoryTest {
         // ARRANGE: Definir la respuesta simulada del servidor
         val apiResponse: List<OrderResponse>? = listOf(
             OrderResponse(
-                numero_pedido = "123",
-                fecha_creacion = Date(100),
-                fecha_entrega_estimada = Date(200),
-                fecha_ultima_actualizacion = Date(300),
-                estado_nombre = "Pendiente de aprobación"
+                order_id = 123,
+                creation_date = Date(100),
+                estimated_delivery_time = Date(200),
+                last_updated_date = Date(300),
+                status = "Pendiente de aprobación"
             ),
             OrderResponse(
-                numero_pedido = "456",
-                fecha_creacion = Date(400),
-                fecha_entrega_estimada = null,
-                fecha_ultima_actualizacion = Date(500),
-                estado_nombre = "Entregado"
+                order_id = 456,
+                creation_date = Date(400),
+                estimated_delivery_time = null,
+                last_updated_date = Date(500),
+                status = "Entregado"
             )
         )
 
@@ -65,11 +65,11 @@ class OrdersRepositoryTest {
         assertEquals(2, orders?.size, "Debería haber mapeado 2 órdenes")
 
         // Verificar el mapeo del primer objeto
-        assertEquals("123", orders?.get(0)?.id)
+        assertEquals(123, orders?.get(0)?.id)
         assertEquals(OrderStatus.PENDING_APPROVAL, orders?.get(0)?.status)
 
         // Verificar el mapeo del segundo objeto (incluyendo null en estimatedReleaseDate)
-        assertEquals("456", orders?.get(1)?.id)
+        assertEquals(456, orders?.get(1)?.id)
         assertEquals(OrderStatus.DELIVERED, orders?.get(1)?.status)
         assertTrue(orders?.get(1)?.estimatedReleaseDate == null, "La fecha estimada debe ser null")
     }

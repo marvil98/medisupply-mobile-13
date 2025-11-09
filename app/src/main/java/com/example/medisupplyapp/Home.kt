@@ -65,6 +65,20 @@ fun Home(userName: String, selectedRoute: String, onNavigate: (String) -> Unit) 
                 )
 
                 SectionCard(
+                    title = "Pedidos de cliente",
+                    options = listOf(Pair(stringResource(R.string.create_order), "create_order"),
+                        Pair(stringResource(R.string.follow_order), "follow_orders")),
+                    onOptionClick = { route ->
+                        val finalRoute = if (route == "create_order") {
+                            "create_order/1"
+                        } else {
+                            route
+                        }
+                        onNavigate(finalRoute)
+                    }
+                )
+
+                SectionCard(
                     title = stringResource(R.string.clients),
                     centered = true,
                     onClick = { onNavigate("clientes") }
