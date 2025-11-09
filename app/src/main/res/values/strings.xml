@@ -106,4 +106,18 @@
     <string name="search">Buscar...</string>
     <string name="search_placeholder_product">Buscar producto</string>
     <string name="recommendations">Tus recomendados</string>
+    <string name="order_detail">Detalle del Pedido</string>
+    <string name="creation_date">Fecha de creación</string>
+    <string name="estimated_delivery">Entrega estimada</string>
+    <string name="client_id">Cliente</string>
+    <string name="seller_id">Vendedor</string>
+    <string name="total_order">Total</string>
+    <string name="products">Productos</string>
+    <string name="quantity">Cantidad</string>
+    <string name="unit_price">Precio unitario</string>
+    <string name="subtotal">Subtotal</string>
+    <string name="error_loading_order">Error al cargar el pedido</string>
+    <string name="retry">Reintentar</string>
+    <string name="status">Estado</string>
+    <string name="delivery_address">Dirección de entrega</string>
 </resources>
