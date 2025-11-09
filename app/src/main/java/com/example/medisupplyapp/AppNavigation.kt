@@ -8,6 +8,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.medisupplyapp.data.CountryPreferencesRepository
+import com.example.medisupplyapp.screen.orders.CreateOrderClientScreen
 import com.example.medisupplyapp.screen.orders.CreateOrderScreen
 import com.example.medisupplyapp.utils.updateLocale
 import kotlinx.coroutines.launch
@@ -17,6 +18,15 @@ import com.example.medisupplyapp.screen.visits.DailyRouteScreen
 import com.example.medisupplyapp.screen.visits.RegisterEvidenceScreen
 import com.example.medisupplyapp.screen.visits.RegisterVisitScreen
 
+fun mapCountryToCode(countryName: String): String {
+    return when (countryName) {
+        "Colombia" -> "CO"
+        "Perú" -> "PE"
+        "Ecuador" -> "EC"
+        "México" -> "MX"
+        else -> "CO"
+    }
+}
 
 @Composable
 fun AppNavigation(userName: String) {
@@ -25,6 +35,8 @@ fun AppNavigation(userName: String) {
     val context = LocalContext.current
     val repository = remember { CountryPreferencesRepository(context) }
     val coroutineScope = rememberCoroutineScope()
+    val selectedCountry by repository.selectedCountry.collectAsState(initial = "Colombia")
+    val regionalCountryCode = mapCountryToCode(selectedCountry)
 
     NavHost(
         navController = navController,
@@ -128,7 +140,16 @@ fun AppNavigation(userName: String) {
                 onBack = { navController.popBackStack() },
                 selectedRoute = "visits",
                 visitId = visitId,
-                clientId = clientId
+                clientId = clientId,
+                regionalCode = regionalCountryCode
+            )
+        }
+
+        composable("create_order/{clientId}") {
+            CreateOrderClientScreen(
+                onNavigate = { route -> navController.navigate(route) },
+                onBack = { navController.popBackStack() },
+                onNavigateDetail = { route -> navController.navigate("home") },
             )
         }
 

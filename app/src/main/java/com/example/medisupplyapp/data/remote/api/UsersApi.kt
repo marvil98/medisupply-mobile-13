@@ -1,5 +1,6 @@
 package com.example.medisupplyapp.data.remote.api
 
+import com.example.medisupplyapp.data.model.ClientRecommendationResponse
 import com.example.medisupplyapp.data.model.ClientResponse
 import com.example.medisupplyapp.data.model.RecommendationRequest
 import com.example.medisupplyapp.data.model.RecommendationResponse
@@ -36,4 +37,9 @@ interface UsersApi {
     suspend fun getRecommendations(
         @Body requestBody: RecommendationRequest
     ): Response<RecommendationResponse>
+
+    @GET("users/recommendations/client/{clientId}")
+    suspend fun getRecommendationsByClient(
+        @Path("clientId") clientId: Int
+    ): Response<ClientRecommendationResponse>
 }

@@ -51,7 +51,7 @@ fun getAppVersionInfo(): Pair<String, String> {
             packageInfo.versionCode.toString()
         }
 
-        Pair("v$versionName ($versionCode)", compileDate)
+        Pair("v$versionName (build $versionCode)", compileDate)
     } catch (e: PackageManager.NameNotFoundException) {
         Pair(stringResource(R.string.visits), compileDate)
     }
@@ -100,12 +100,12 @@ fun RegionalSettingsScreen(
                     Spacer(modifier = Modifier.height(8.dp)) // Pequeño espacio superior
 
                     Text(
-                        text = stringResource(R.string.version_label, "2.0.0"),
+                        text = stringResource(R.string.version_label, versionText),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = stringResource(R.string.date_label, "02/11/2025"),
+                        text = stringResource(R.string.date_label, dateText),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
