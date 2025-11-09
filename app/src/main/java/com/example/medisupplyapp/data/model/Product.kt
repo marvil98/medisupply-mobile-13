@@ -15,3 +15,18 @@ data class ProductRequest(
     @SerializedName("product_id") val productId: String,
     @SerializedName("quantity") val quantity: Int
 )
+
+fun ProductSuggestion.toProduct(): Product {
+    return Product(
+        categoryName = this.category_name,
+        productId = this.product_id.toString(),
+        sku = this.sku,
+        totalQuantity = this.total_quantity,
+        value = this.value,
+        name = this.name
+    )
+}
+
+fun List<ProductSuggestion>.toProductList(): List<Product> {
+    return this.map { it.toProduct() }
+}

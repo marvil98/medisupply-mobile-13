@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.medisupplyapp.R
 import com.example.medisupplyapp.data.model.Recommendation
@@ -30,18 +31,23 @@ fun RecommendationsScreen(
                 )
             },
             bottomBar = {
-                Button(
-                    onClick = onBackToHome,
+                Row(
                     modifier = Modifier
-                        .padding(bottom = 48.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                        disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
-                        disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface
-                    )
+                        .fillMaxWidth()
+                        .padding(48.dp),
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Text(stringResource(R.string.recommend))
+                    Button(
+                        onClick = onBackToHome,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                            disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
+                            disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface
+                        )
+                    ) {
+                        Text(stringResource(R.string.recommend))
+                    }
                 }
             },
             containerColor = MaterialTheme.colorScheme.surface
@@ -94,12 +100,16 @@ fun RecommendationCard(recommendation: Recommendation) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
                         text = recommendation.product_name ?: stringResource(R.string.product_name_unavailable),
                         style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.weight(1f).padding(end = 8.dp),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
 
                     recommendation.score?.let { score ->

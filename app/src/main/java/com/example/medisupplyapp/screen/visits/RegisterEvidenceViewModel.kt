@@ -39,6 +39,7 @@ class RegisterEvidenceViewModel(application: Application) : AndroidViewModel(app
         visitId: Int,
         files: List<File>,
         clientId: Int,
+        regionalCode: String
     ) {
         if (isUploading.getAndSet(true)) return
 
@@ -63,7 +64,7 @@ class RegisterEvidenceViewModel(application: Application) : AndroidViewModel(app
                     .onSuccess {
                         files.forEach { it.delete() }
 
-                        requestRecommendations(clientId)
+                        requestRecommendations(clientId, visitId, regionalCode)
                     }
                     .onFailure { error ->
                         _uiState.value = UploadState.Error(error.message ?: "Fallo al subir evidencias.")
@@ -76,11 +77,11 @@ class RegisterEvidenceViewModel(application: Application) : AndroidViewModel(app
         }
     }
 
-    private fun requestRecommendations(clientId: Int) {
+    private fun requestRecommendations(clientId: Int, visitId: Int, regionalCode: String) {
         _uiState.value = UploadState.ProcesandoVisita
 
         viewModelScope.launch(Dispatchers.IO) {
-            val result = clientRepository.getRecommendations(clientId, regionalSetting = "CO")
+            val result = clientRepository.getRecommendations(clientId, regionalSetting = regionalCode, visitId)
 
             result
                 .onSuccess { response ->

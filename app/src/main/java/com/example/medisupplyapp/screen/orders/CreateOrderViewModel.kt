@@ -17,11 +17,25 @@ import com.example.medisupplyapp.data.remote.ApiConnection
 import com.example.medisupplyapp.data.remote.repository.ClientRepository
 import com.example.medisupplyapp.data.remote.repository.OrdersRepository
 import com.example.medisupplyapp.data.remote.repository.ProductRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
+sealed class RecommendationUiState {
+    object Loading : RecommendationUiState()
+    data class Success(val recommendedProducts: List<Product>) : RecommendationUiState()
+    data class Error(val message: String) : RecommendationUiState()
+}
+
+
 class CreateOrderViewModel(application: Application) : AndroidViewModel(application) {
+    private val clientRepository = ClientRepository(api = ApiConnection.api_users)
+    private val productRepository = ProductRepository(api = ApiConnection.api_products)
+    private val ordersRepository = OrdersRepository(api = ApiConnection.api)
+
+    // ESTADOS
     var selectedClient by mutableStateOf<Client?>(null)
     var clientError by mutableStateOf(false)
     var clients by mutableStateOf<List<Client>>(emptyList())
@@ -31,18 +45,19 @@ class CreateOrderViewModel(application: Application) : AndroidViewModel(applicat
     private val _orderState = MutableLiveData<OrderState>()
     val orderState: LiveData<OrderState> = _orderState
 
+    private val _uiState = MutableStateFlow<RecommendationUiState>(RecommendationUiState.Loading)
+    val uiState: StateFlow<RecommendationUiState> = _uiState
+
     init {
         viewModelScope.launch {
             try {
-                val repo = ClientRepository(api = ApiConnection.api_users)
-                val result = repo.fecthClientsBySellerID(1)
+                val result = clientRepository.fecthClientsBySellerID(1)
                 clients = result
             } catch (e: Exception) {
             }
 
             try {
-                val productRepo = ProductRepository(api = ApiConnection.api_products)
-                products = productRepo.fetchProducts()
+                products = productRepository.fetchProducts()
             } catch (e: Exception) {
             }
         }
@@ -85,7 +100,6 @@ class CreateOrderViewModel(application: Application) : AndroidViewModel(applicat
                         )
                     }
 
-                val orderRepo = OrdersRepository(api = ApiConnection.api)
                 val nowUtc = ZonedDateTime.now(ZoneOffset.UTC)
                 val futureUtc = nowUtc.plusDays(5)
 
@@ -96,7 +110,7 @@ class CreateOrderViewModel(application: Application) : AndroidViewModel(applicat
                     status_id = 3
                 )
 
-                val response = orderRepo.createOrder(request)
+                val response = ordersRepository.createOrder(request)
 
                 if (response.isSuccess) {
                     val orderResponse = response.getOrNull()
@@ -113,6 +127,20 @@ class CreateOrderViewModel(application: Application) : AndroidViewModel(applicat
                 }
             } catch (e: Exception) {
                 onError("Error al crear orden: ${e.message}")
+            }
+        }
+    }
+
+    fun loadRecommendations(clientId: Int) {
+        _uiState.value = RecommendationUiState.Loading
+
+        viewModelScope.launch {
+            try {
+                val products = clientRepository.fetchRecommendProducts(clientId)
+
+                _uiState.value = RecommendationUiState.Success(recommendedProducts=products)
+            } catch (e: Exception) {
+                _uiState.value = RecommendationUiState.Error("Fallo al cargar las recomendaciones: ${e.localizedMessage}")
             }
         }
     }

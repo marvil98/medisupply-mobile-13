@@ -50,5 +50,22 @@ data class Recommendation(
 
 data class RecommendationRequest(
     val client_id: Int,
-    val regional_setting: String
+    val regional_setting: String,
+    val visit_id: Int
+)
+
+data class ProductSuggestion(
+    val category_name: String,
+    val product_id: Int,
+    val sku: String,
+    val total_quantity: Int,
+    val value: Double,
+    val name: String,
+    val image_url: String? = null
+)
+
+data class ClientRecommendationResponse(
+    val client_id: Int,
+    val status: String,
+    val suggestions: List<ProductSuggestion>
 )
