@@ -8,6 +8,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.medisupplyapp.data.CountryPreferencesRepository
+import com.example.medisupplyapp.screen.auth.LoginScreen
+import com.example.medisupplyapp.screen.auth.SplashScreen
+import com.example.medisupplyapp.screen.auth.SplashScreenWithAutoNavigation
 import com.example.medisupplyapp.screen.orders.CreateOrderClientScreen
 import com.example.medisupplyapp.screen.orders.CreateOrderScreen
 import com.example.medisupplyapp.utils.updateLocale
@@ -40,8 +43,27 @@ fun AppNavigation(userName: String) {
 
     NavHost(
         navController = navController,
-        startDestination = "home"
+        startDestination = "splash_auto"
     ) {
+        composable("splash_auto") {
+            SplashScreenWithAutoNavigation(
+                onNavigateToSplash = {
+                    navController.navigate("splash") {
+                        popUpTo("splash_auto") { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable("splash") {
+            SplashScreen (
+                onNavigateToLogin = {
+                    navController.navigate("login") {
+                        popUpTo("splash") { inclusive = true }
+                    }
+                }
+            )
+        }
         composable("home") {
             Home(
                 userName = userName,
@@ -150,6 +172,16 @@ fun AppNavigation(userName: String) {
                 onNavigate = { route -> navController.navigate(route) },
                 onBack = { navController.popBackStack() },
                 onNavigateDetail = { route -> navController.navigate("home") },
+            )
+        }
+
+        composable("login") {
+            LoginScreen(
+                onLoginSuccess = {
+                    navController.navigate("home") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                }
             )
         }
 
