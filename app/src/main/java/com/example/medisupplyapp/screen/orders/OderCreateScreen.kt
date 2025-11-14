@@ -41,7 +41,7 @@ fun CreateOrderScreen(
         products.associate { it.productId to it.value }
     }
 
-    var selectedQuantities by remember { mutableStateOf(mapOf<String, Int>()) }
+    var selectedQuantities by remember { mutableStateOf(mapOf<Int, Int>()) }
 
     val totalAmount = remember(selectedQuantities) {
         selectedQuantities.entries.sumOf { (productId, quantity) ->

@@ -21,7 +21,7 @@ import com.example.medisupplyapp.components.ToastType
 @Composable
 fun ConfirmOrderScreen(
     selectedClient: String?,
-    selectedQuantities: Map<String, Int>,
+    selectedQuantities: Map<Int, Int>,
     products: List<Product>,
     totalAmount: Double,
     onCancel: () -> Unit,
