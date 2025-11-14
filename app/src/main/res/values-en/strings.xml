@@ -118,4 +118,11 @@
     <string name="retry">Retry</string>
     <string name="status">Status</string>
     <string name="delivery_address">Delivery address</string>
+    <string name="welcome">Welcome</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="forgot_password">Do you forgot your password?</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
 </resources>

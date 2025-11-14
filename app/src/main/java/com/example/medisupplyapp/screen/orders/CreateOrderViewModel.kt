@@ -31,7 +31,7 @@ sealed class RecommendationUiState {
 
 
 class CreateOrderViewModel(application: Application) : AndroidViewModel(application) {
-    private val clientRepository = ClientRepository(api = ApiConnection.api_users)
+    private val clientRepository = ClientRepository(api = ApiConnection.api_users, application)
     private val productRepository = ProductRepository(api = ApiConnection.api_products)
     private val ordersRepository = OrdersRepository(api = ApiConnection.api)
 
@@ -72,7 +72,7 @@ class CreateOrderViewModel(application: Application) : AndroidViewModel(applicat
     }
 
     fun createOrder(
-        selectedQuantities: Map<String, Int>,
+        selectedQuantities: Map<Int, Int>,
         onSuccess: (orderId: String, message: String) -> Unit,
         onError: (String) -> Unit
     ) {
@@ -96,7 +96,8 @@ class CreateOrderViewModel(application: Application) : AndroidViewModel(applicat
                     .map { (productId, quantity) ->
                         ProductRequest(
                             productId = productId,
-                            quantity = quantity
+                            quantity = quantity,
+                            price_unit = products.first { product -> product.productId == productId  }.value
                         )
                     }
 
@@ -104,7 +105,8 @@ class CreateOrderViewModel(application: Application) : AndroidViewModel(applicat
                 val futureUtc = nowUtc.plusDays(5)
 
                 val request = CreateOrderRequest(
-                    user_id = clientId.toString(),
+                    client_id = clientId,
+                    seller_id = 2,
                     products = productRequests,
                     estimated_delivery_time = futureUtc.toString(),
                     status_id = 3

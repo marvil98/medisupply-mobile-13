@@ -36,7 +36,7 @@ fun CreateOrderClientScreen(
         products.associate { it.productId to it.value }
     }
 
-    var selectedQuantities by remember { mutableStateOf(mapOf<String, Int>()) }
+    var selectedQuantities by remember { mutableStateOf(mapOf<Int, Int>()) }
 
     val totalAmount = remember(selectedQuantities) {
         selectedQuantities.entries.sumOf { (productId, quantity) ->
@@ -45,7 +45,7 @@ fun CreateOrderClientScreen(
         }
     }
 
-    val onQuantityChange: (String, Int) -> Unit = { productId, newQty ->
+    val onQuantityChange: (Int, Int) -> Unit = { productId, newQty ->
         selectedQuantities = if (newQty > 0) {
             selectedQuantities + (productId to newQty)
         } else {
@@ -165,8 +165,8 @@ fun CreateOrderClientScreen(
 @Composable
 fun RecommendationContent(
     state: RecommendationUiState,
-    selectedQuantities: Map<String, Int>,
-    onQuantityChange: (String, Int) -> Unit
+    selectedQuantities: Map<Int, Int>,
+    onQuantityChange: (Int, Int) -> Unit
 ) {
     when (state) {
         is RecommendationUiState.Loading -> {

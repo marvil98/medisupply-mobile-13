@@ -25,8 +25,8 @@ import kotlinx.coroutines.delay
 fun ProductSelector(
     label: String,
     products: List<Product>,
-    selectedQuantities: Map<String, Int>,
-    onQuantityChange: (String, Int) -> Unit,
+    selectedQuantities: Map<Int, Int>,
+    onQuantityChange: (Int, Int) -> Unit,
     errorMessage: String? = null,
     placeholder: String? = null,
 ) {
