@@ -55,7 +55,8 @@ class CreateOrderViewModel(application: Application) : AndroidViewModel(applicat
     init {
         viewModelScope.launch {
             try {
-                val result = clientRepository.fecthClientsBySellerID(1)
+                val sellerId = userRepository.getSellerId()
+                val result = clientRepository.fecthClientsBySellerID(sellerId!!)
                 clients = result
             } catch (e: Exception) {
             }

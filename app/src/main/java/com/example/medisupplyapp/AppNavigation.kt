@@ -8,6 +8,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.medisupplyapp.data.CountryPreferencesRepository
+import com.example.medisupplyapp.data.remote.ApiConnection
+import com.example.medisupplyapp.data.remote.repository.ClientRepository
 import com.example.medisupplyapp.screen.auth.LoginScreen
 import com.example.medisupplyapp.screen.auth.SplashScreen
 import com.example.medisupplyapp.screen.auth.SplashScreenWithAutoNavigation
@@ -37,6 +39,7 @@ fun AppNavigation() {
     var currentLanguage by remember { mutableStateOf("es") }
     val context = LocalContext.current
     val repository = remember { CountryPreferencesRepository(context) }
+
     val coroutineScope = rememberCoroutineScope()
     val selectedCountry by repository.selectedCountry.collectAsState(initial = "Colombia")
     val regionalCountryCode = mapCountryToCode(selectedCountry)

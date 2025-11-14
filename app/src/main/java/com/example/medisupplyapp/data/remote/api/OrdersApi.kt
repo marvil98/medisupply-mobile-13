@@ -14,7 +14,7 @@ interface OrdersApi {
     @GET("orders/track/{userId}")
     // Usamos @Path para inyectar el valor en el placeholder
     suspend fun getOrders(
-        @Path("userId") userId: String,
+        @Path("userId") userId: Int,
     ): List<OrderResponse>
 
     @POST("orders/")

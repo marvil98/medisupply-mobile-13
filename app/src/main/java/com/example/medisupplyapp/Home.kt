@@ -82,6 +82,7 @@ fun Home( selectedRoute: String, onNavigate: (String) -> Unit) {
                         onOptionClick = { route ->
                             val finalRoute = if (route == "create_order") {
                                 "create_order/${clientID}"
+                                "create_order/${clientID}"
                             } else {
                                 route
                             }
