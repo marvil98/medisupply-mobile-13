@@ -2,6 +2,8 @@ package com.example.medisupplyapp.data.remote.api
 
 import com.example.medisupplyapp.data.model.ClientRecommendationResponse
 import com.example.medisupplyapp.data.model.ClientResponse
+import com.example.medisupplyapp.data.model.LoginRequest
+import com.example.medisupplyapp.data.model.LoginResponse
 import com.example.medisupplyapp.data.model.RecommendationRequest
 import com.example.medisupplyapp.data.model.RecommendationResponse
 import com.example.medisupplyapp.data.model.RegisterVisitRequest
@@ -42,4 +44,9 @@ interface UsersApi {
     suspend fun getRecommendationsByClient(
         @Path("clientId") clientId: Int
     ): Response<ClientRecommendationResponse>
+
+    @POST("users/login")
+    suspend fun login(
+        @Body loginRequest: LoginRequest
+    ): Response<LoginResponse>
 }

@@ -1,12 +1,16 @@
 package com.example.medisupplyapp.screen.auth
-import androidx.lifecycle.ViewModel
+
+import android.app.Application
+import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.medisupplyapp.data.remote.ApiConnection
+import com.example.medisupplyapp.data.remote.repository.ClientRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.delay
 
 data class LoginUiState(
     val email: String = "",
@@ -19,7 +23,13 @@ data class LoginUiState(
     val isFormValid: Boolean = false
 )
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val repository = ClientRepository(
+        api = ApiConnection.api_users,
+        context = application
+    )
+
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
@@ -49,7 +59,8 @@ class LoginViewModel : ViewModel() {
         val email = _uiState.value.email
         val password = _uiState.value.password
 
-        val isEmailValid = email.isNotBlank() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+        val isEmailValid = email.isNotBlank() &&
+                android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
         val isPasswordValid = password.length >= 6
 
         _uiState.update {
@@ -86,40 +97,40 @@ class LoginViewModel : ViewModel() {
             _uiState.update { it.copy(isLoading = true, generalError = null) }
 
             try {
-                // TODO: Implementar llamada al backend
-                // TODO: Guardar datos en cache (id_user)
-                // val result = authRepository.login(email, password)
+                val result = repository.login(email, password)
 
-                // Simulación de llamada API
-                delay(1500)
-
-                // Simulación de respuesta exitosa
-                val success = true // Cambiar según respuesta del backend
-
-                if (success) {
+                result.onSuccess { _ ->
+                    Log.d("LOGIN", "Login exitoso")
                     _uiState.update {
                         it.copy(
                             isLoading = false,
                             isLoginSuccessful = true
                         )
                     }
-                } else {
+                }.onFailure { exception ->
+                    Log.e("LOGIN", "Error en login: ${exception.message}", exception)
+                    val errorMessage = when (exception) {
+                        is SecurityException -> "Credenciales inválidas"
+                        is IllegalArgumentException -> exception.message ?: "Usuario no encontrado"
+                        is IllegalStateException -> exception.message ?: "Error del servidor"
+                        else -> "Error desconocido"
+                    }
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            generalError = "Usuario no registrado"
+                            generalError = errorMessage
                         )
                     }
                 }
             } catch (e: Exception) {
+                Log.e("LOGIN", "Excepción no manejada: ${e.message}", e)
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        generalError = "Credenciales inválidas"
+                        generalError = "Error inesperado"
                     )
                 }
             }
         }
     }
 }
-

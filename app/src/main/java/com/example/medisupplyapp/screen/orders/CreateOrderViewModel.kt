@@ -31,7 +31,7 @@ sealed class RecommendationUiState {
 
 
 class CreateOrderViewModel(application: Application) : AndroidViewModel(application) {
-    private val clientRepository = ClientRepository(api = ApiConnection.api_users)
+    private val clientRepository = ClientRepository(api = ApiConnection.api_users, application)
     private val productRepository = ProductRepository(api = ApiConnection.api_products)
     private val ordersRepository = OrdersRepository(api = ApiConnection.api)
 

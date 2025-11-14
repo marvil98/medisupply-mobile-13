@@ -137,7 +137,7 @@ fun SplashScreen(
                         .height(50.dp),
                     shape = RoundedCornerShape(25.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.inverseSurface
+                        containerColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
                     Text(

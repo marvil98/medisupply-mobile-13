@@ -52,7 +52,7 @@ class RegisterVisitViewModel(application: Application) : AndroidViewModel(applic
     init {
         viewModelScope.launch {
             try {
-                val repo = ClientRepository(api = ApiConnection.api_users)
+                val repo = ClientRepository(api = ApiConnection.api_users, application)
                 val result = repo.fecthClientsBySellerID(1)
                 clients = result
             } catch (e: Exception) {
@@ -144,7 +144,7 @@ class RegisterVisitViewModel(application: Application) : AndroidViewModel(applic
 
                 val formattedDateString = zonedDateTime.format(iso8601Formatter)
 
-                val clientRepo = ClientRepository(api = ApiConnection.api_users)
+                val clientRepo = ClientRepository(api = ApiConnection.api_users, application)
                 val routesRepo = RoutesRepository(
                     api = ApiConnection.api_routes,
                     routeCacheDataStore = application.routeCacheDataStore

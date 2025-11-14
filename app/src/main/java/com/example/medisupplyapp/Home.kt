@@ -19,11 +19,12 @@ import com.tuempresa.medisupply.ui.components.Header
 import com.tuempresa.medisupply.ui.theme.MediSupplyTheme
 
 @Composable
-fun Home(userName: String, selectedRoute: String, onNavigate: (String) -> Unit) {
+fun Home( selectedRoute: String, onNavigate: (String) -> Unit) {
     val viewModel: HomeViewModel = viewModel()
 
     val dailyRoute by viewModel.dailyRoute.collectAsState()
     val visitsMade by viewModel.visitsMade.collectAsState()
+    val userName by viewModel.userName.collectAsState()
     MediSupplyTheme {
         Scaffold(
             topBar = { Header(userName, onNavigate) },

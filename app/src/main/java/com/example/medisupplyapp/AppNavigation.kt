@@ -32,7 +32,7 @@ fun mapCountryToCode(countryName: String): String {
 }
 
 @Composable
-fun AppNavigation(userName: String) {
+fun AppNavigation() {
     val navController = rememberNavController()
     var currentLanguage by remember { mutableStateOf("es") }
     val context = LocalContext.current
@@ -66,7 +66,6 @@ fun AppNavigation(userName: String) {
         }
         composable("home") {
             Home(
-                userName = userName,
                 selectedRoute = "home",
                 onNavigate = { route -> navController.navigate(route) }
             )
@@ -181,7 +180,10 @@ fun AppNavigation(userName: String) {
                     navController.navigate("home") {
                         popUpTo("login") { inclusive = true }
                     }
-                }
+                },
+                onBack = {navController.navigate("splash") {
+                    popUpTo("login") { inclusive = true }
+                } }
             )
         }
 

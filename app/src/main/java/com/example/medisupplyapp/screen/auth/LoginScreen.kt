@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medisupplyapp.R
+import com.example.medisupplyapp.components.SimpleTopBar
 import com.tuempresa.medisupply.ui.theme.MediSupplyTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,28 +44,11 @@ fun LoginScreen(
     MediSupplyTheme {
         Scaffold(
             topBar = {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = stringResource(R.string.login),
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowBackIosNew,
-                                contentDescription = "Volver",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background
-                    )
+                SimpleTopBar(
+                    title = stringResource(R.string.login),
+                    onBack = onBack
                 )
+
             },
             containerColor =MaterialTheme.colorScheme.background
         ) { paddingValues ->
@@ -105,7 +89,7 @@ fun LoginScreen(
                     placeholder = {
                         Text(
                             "example@example.com",
-                            color = MaterialTheme.colorScheme.inverseOnSurface
+                            color = MaterialTheme.colorScheme.inverseSurface
                         )
                     },
                     modifier = Modifier.fillMaxWidth(),
@@ -129,7 +113,7 @@ fun LoginScreen(
                     },
                     shape = RoundedCornerShape(8.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedBorderColor = MaterialTheme.colorScheme.inverseOnSurface,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.inverseSurface,
                         focusedBorderColor = MaterialTheme.colorScheme.primary,
                         unfocusedContainerColor = MaterialTheme.colorScheme.background,
                         focusedContainerColor =MaterialTheme.colorScheme.background
@@ -143,7 +127,7 @@ fun LoginScreen(
                     text = stringResource(R.string.password),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.inverseSurface
+                    color = MaterialTheme.colorScheme.primary
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -208,7 +192,7 @@ fun LoginScreen(
                     },
                     shape = RoundedCornerShape(8.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.inverseSurface,
                         focusedBorderColor = MaterialTheme.colorScheme.primary,
                         unfocusedContainerColor = MaterialTheme.colorScheme.background,
                         focusedContainerColor = MaterialTheme.colorScheme.background
@@ -237,7 +221,7 @@ fun LoginScreen(
                     shape = RoundedCornerShape(25.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
-                        disabledContainerColor = MaterialTheme.colorScheme.inverseOnSurface
+                        disabledContainerColor = Color(0xFFBDBDBD)
                     )
                 ) {
                     if (uiState.isLoading) {
