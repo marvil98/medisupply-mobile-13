@@ -43,6 +43,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val _userName = MutableStateFlow<String>("")
     val userName: StateFlow<String> = _userName
 
+    private val _role = MutableStateFlow<String>("")
+    val role: StateFlow<String> = _role
+
+    private val _clientID = MutableStateFlow<Int>(1)
+    val clientID: StateFlow<Int> = _clientID
+
     val visitsMade: StateFlow<Int> = repository.visitsMadeFlow
         .stateIn(
             scope = viewModelScope,
@@ -56,15 +62,29 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun loadInitialData() {
         viewModelScope.launch {
-            val dailyRoute = repository.getDailyRoute()
-            _dailyRoute.value = dailyRoute
             _userName.value = userRepository.getUserName()
-
-            if (dailyRoute.visits.isNotEmpty()) {
-                println("INFO: Se cargo la ruta diaria.")
-            } else {
-                println("INFO: No se cargaron clientes.")
+            _role.value = userRepository.getUserRole()
+            if(userRepository.getClientId() != null) {
+                _clientID.value = userRepository.getClientId()!!
             }
+            val sellerId = userRepository.getSellerId()
+
+            when (_role.value) {
+                "SELLER" -> loadSellerRoutes(sellerId!!)
+            }
+
+        }
+    }
+
+    private suspend fun loadSellerRoutes(sellerId: Int) {
+        val dailyRoute = repository.getDailyRoute(sellerId)
+        _dailyRoute.value = dailyRoute
+
+
+        if (dailyRoute.visits.isNotEmpty()) {
+            println("INFO: Se cargo la ruta diaria.")
+        } else {
+            println("INFO: No se cargaron clientes.")
         }
     }
 }

@@ -34,6 +34,10 @@ class CreateOrderViewModel(application: Application) : AndroidViewModel(applicat
     private val clientRepository = ClientRepository(api = ApiConnection.api_users, application)
     private val productRepository = ProductRepository(api = ApiConnection.api_products)
     private val ordersRepository = OrdersRepository(api = ApiConnection.api)
+    private val userRepository = ClientRepository(
+        api = ApiConnection.api_users,
+        application
+    )
 
     // ESTADOS
     var selectedClient by mutableStateOf<Client?>(null)
@@ -79,6 +83,7 @@ class CreateOrderViewModel(application: Application) : AndroidViewModel(applicat
         viewModelScope.launch {
             try {
                 val clientId = selectedClient?.userId
+                val sellerId = userRepository.getSellerId()
                 if (clientId == null) {
                     clientError = true
                     onError("Cliente inválido")
@@ -106,7 +111,7 @@ class CreateOrderViewModel(application: Application) : AndroidViewModel(applicat
 
                 val request = CreateOrderRequest(
                     client_id = clientId,
-                    seller_id = 2,
+                    seller_id = sellerId!!,
                     products = productRequests,
                     estimated_delivery_time = futureUtc.toString(),
                     status_id = 3

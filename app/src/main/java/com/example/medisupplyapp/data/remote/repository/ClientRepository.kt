@@ -1,6 +1,7 @@
 package com.example.medisupplyapp.data.remote.repository
 
 import android.content.Context
+import android.util.Log
 import com.example.medisupplyapp.data.model.Client
 import com.example.medisupplyapp.data.model.LoginRequest
 import com.example.medisupplyapp.data.model.LoginResponse
@@ -135,7 +136,7 @@ class ClientRepository(var api: UsersApi, private val context: Context) {
                 val loginResponse = response.body()
 
                 if (loginResponse != null && loginResponse.success) {
-                    // Guardar datos en Proto DataStore
+                    // 1. Guardar datos básicos del login
                     context.authCacheDataStore.updateData { currentAuth ->
                         currentAuth.toBuilder()
                             .setAccessToken(loginResponse.tokens.accessToken)
@@ -147,6 +148,17 @@ class ClientRepository(var api: UsersApi, private val context: Context) {
                             .setIdToken(loginResponse.tokens.idToken)
                             .setRefreshToken(loginResponse.tokens.refreshToken)
                             .build()
+                    }
+
+                    // 2. Obtener información adicional según el rol
+                    val roleInfoResult = fetchRoleInfo(
+                        userId = loginResponse.user.userId,
+                        role = loginResponse.user.role
+                    )
+
+                    roleInfoResult.onFailure { exception ->
+                        Log.w("AUTH", "No se pudo obtener info del rol: ${exception.message}")
+                        // No falla el login, solo muestra warning
                     }
 
                     Result.success(true)
@@ -174,6 +186,64 @@ class ClientRepository(var api: UsersApi, private val context: Context) {
         }
     }
 
+    // Obtener información adicional según el rol
+    private suspend fun fetchRoleInfo(userId: Int, role: String): Result<Unit> {
+        return try {
+            when (role.uppercase()) {
+                "CLIENT" -> {
+                    val response = api.getClientInfo(userId)
+                    if (response.isSuccessful) {
+                        val clientInfo = response.body()?.clientInfo
+                        if (clientInfo != null) {
+                            // Guardar información del cliente
+                            context.authCacheDataStore.updateData { currentAuth ->
+                                currentAuth.toBuilder()
+                                    .setClientId(clientInfo.clientId)
+                                    .setSellerId(clientInfo.sellerId)
+                                    .build()
+                            }
+                            Log.d("AUTH", "Info CLIENT guardada: clientId=${clientInfo.clientId}, sellerId=${clientInfo.sellerId}")
+                            Result.success(Unit)
+                        } else {
+                            Result.failure(IllegalStateException("Respuesta vacía"))
+                        }
+                    } else {
+                        Result.failure(IllegalStateException("Error ${response.code()}"))
+                    }
+                }
+
+                "SELLER" -> {
+                    val response = api.getSellerInfo(userId)
+                    if (response.isSuccessful) {
+                        val sellerInfo = response.body()?.sellerInfo
+                        if (sellerInfo != null) {
+                            // Guardar información del vendedor
+                            context.authCacheDataStore.updateData { currentAuth ->
+                                currentAuth.toBuilder()
+                                    .setSellerId(sellerInfo.sellerId)
+                                    .build()
+                            }
+                            Log.d("AUTH", "Info SELLER guardada: sellerId=${sellerInfo.sellerId}")
+                            Result.success(Unit)
+                        } else {
+                            Result.failure(IllegalStateException("Respuesta vacía"))
+                        }
+                    } else {
+                        Result.failure(IllegalStateException("Error ${response.code()}"))
+                    }
+                }
+
+                else -> {
+                    Log.w("AUTH", "Rol no reconocido: $role")
+                    Result.success(Unit) // No es error crítico
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("AUTH", "Error obteniendo info del rol: ${e.message}", e)
+            Result.failure(e)
+        }
+    }
+
     suspend fun logout() {
         context.authCacheDataStore.updateData { currentAuth ->
             AuthCacheProto.getDefaultInstance()
@@ -193,5 +263,19 @@ class ClientRepository(var api: UsersApi, private val context: Context) {
     suspend fun getUserName(): String {
         val authData = context.authCacheDataStore.data.first()
         return "${authData.name} ${authData.lastName}"
+    }
+    suspend fun getUserRole(): String {
+        val authData = context.authCacheDataStore.data.first()
+        return authData.role
+    }
+
+    suspend fun getClientId(): Int? {
+        val authData = context.authCacheDataStore.data.first()
+        return if (authData.clientId > 0) authData.clientId else null
+    }
+
+    suspend fun getSellerId(): Int? {
+        val authData = context.authCacheDataStore.data.first()
+        return if (authData.sellerId > 0) authData.sellerId else null
     }
 }

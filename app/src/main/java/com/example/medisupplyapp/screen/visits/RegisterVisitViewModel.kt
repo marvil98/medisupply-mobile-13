@@ -46,14 +46,14 @@ class RegisterVisitViewModel(application: Application) : AndroidViewModel(applic
 
     var findings: String by mutableStateOf("")
 
-
+    val repo = ClientRepository(api = ApiConnection.api_users, application)
     private val _registerState = MutableLiveData<OrderState>()
 
     init {
         viewModelScope.launch {
             try {
-                val repo = ClientRepository(api = ApiConnection.api_users, application)
-                val result = repo.fecthClientsBySellerID(1)
+                val sellerId = repo.getSellerId()
+                val result = repo.fecthClientsBySellerID(sellerId!!)
                 clients = result
             } catch (e: Exception) {
                 print(e)
@@ -149,10 +149,11 @@ class RegisterVisitViewModel(application: Application) : AndroidViewModel(applic
                     api = ApiConnection.api_routes,
                     routeCacheDataStore = application.routeCacheDataStore
                 )
+                val sellerId = repo.getSellerId()
 
                 val request = RegisterVisitRequest(
                     client_id = clientId,
-                    seller_id = 1,
+                    seller_id = sellerId!!,
                     date = formattedDateString,
                     findings = findings
                 )

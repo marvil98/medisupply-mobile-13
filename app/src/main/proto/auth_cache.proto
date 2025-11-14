@@ -12,4 +12,8 @@ message AuthCacheProto {
   string role = 6;
   string id_token = 7;
   string refresh_token = 8;
+
+  // Información adicional según rol
+  int32 client_id = 9;      // Para CLIENT
+  int32 seller_id = 10;     // Para CLIENT y SELLER
 }

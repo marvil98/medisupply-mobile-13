@@ -9,6 +9,8 @@ import com.example.medisupplyapp.data.model.RecommendationResponse
 import com.example.medisupplyapp.data.model.RegisterVisitRequest
 import com.example.medisupplyapp.data.model.RegisterVisitResponse
 import com.example.medisupplyapp.data.model.UploadEvidenceResponse
+import com.example.medisupplyapp.data.remote.dto.ClientInfoResponse
+import com.example.medisupplyapp.data.remote.dto.SellerInfoResponse
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -49,4 +51,10 @@ interface UsersApi {
     suspend fun login(
         @Body loginRequest: LoginRequest
     ): Response<LoginResponse>
+
+    @GET("users/clients/{userId}/info")
+    suspend fun getClientInfo(@Path("userId") userId: Int): Response<ClientInfoResponse>
+
+    @GET("users/seller/{userId}/info")
+    suspend fun getSellerInfo(@Path("userId") userId: Int): Response<SellerInfoResponse>
 }

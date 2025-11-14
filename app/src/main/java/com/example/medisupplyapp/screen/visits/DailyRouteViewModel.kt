@@ -8,10 +8,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.medisupplyapp.data.model.DailyRoute
 import com.example.medisupplyapp.data.provider.routeCacheDataStore
 import com.example.medisupplyapp.data.remote.ApiConnection
+import com.example.medisupplyapp.data.remote.repository.ClientRepository
 import com.example.medisupplyapp.data.remote.repository.RoutesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 // Sealed class para representar los diferentes estados
@@ -28,12 +31,25 @@ class DailyRouteViewModel(application: Application) : AndroidViewModel(applicati
         routeCacheDataStore = application.routeCacheDataStore
     )
 
+    private val userRepository = ClientRepository(
+        api = ApiConnection.api_users,
+        application
+    )
+
     private val _uiState = MutableStateFlow<DailyRouteUiState>(DailyRouteUiState.Loading)
     val uiState: StateFlow<DailyRouteUiState> = _uiState.asStateFlow()
 
     // Mantener el estado anterior para compatibilidad (opcional)
     private val _dailyRoute = MutableStateFlow(DailyRoute(0, 0, emptyList()))
     val dailyRoute: StateFlow<DailyRoute> = _dailyRoute.asStateFlow()
+
+
+    val visitsMade: StateFlow<Int> = repository.visitsMadeFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = 0 // El valor inicial que quieres mostrar
+        )
 
     init {
         loadDailyRoute()
@@ -43,8 +59,10 @@ class DailyRouteViewModel(application: Application) : AndroidViewModel(applicati
         viewModelScope.launch {
             _uiState.value = DailyRouteUiState.Loading
 
+            val sellerId = userRepository.getSellerId()
+
             try {
-                val dailyRoute = repository.getDailyRoute()
+                val dailyRoute = repository.getDailyRoute(sellerId!!)
                 _dailyRoute.value = dailyRoute
                 _uiState.value = DailyRouteUiState.Success(dailyRoute)
 

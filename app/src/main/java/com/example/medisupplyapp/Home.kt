@@ -25,6 +25,9 @@ fun Home( selectedRoute: String, onNavigate: (String) -> Unit) {
     val dailyRoute by viewModel.dailyRoute.collectAsState()
     val visitsMade by viewModel.visitsMade.collectAsState()
     val userName by viewModel.userName.collectAsState()
+    val role by viewModel.role.collectAsState()
+    val clientID by viewModel.clientID.collectAsState()
+
     MediSupplyTheme {
         Scaffold(
             topBar = { Header(userName, onNavigate) },
@@ -44,46 +47,48 @@ fun Home( selectedRoute: String, onNavigate: (String) -> Unit) {
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Spacer(modifier = Modifier.height(28.dp))
-                SectionCard(
-                    title = stringResource(R.string.routes_title),
-                    subtitle = "${visitsMade}/${dailyRoute.numberVisits} ${stringResource(R.string.routes_subtitle)}",
-                    centered = true,
-                    onClick = { onNavigate("routes") }
-                )
+                if (role == "SELLER") {
+                    SectionCard(
+                        title = stringResource(R.string.routes_title),
+                        subtitle = "${visitsMade}/${dailyRoute.numberVisits} ${stringResource(R.string.routes_subtitle)}",
+                        centered = true,
+                        onClick = { onNavigate("routes") }
+                    )
 
-                SectionCard(
-                    title = stringResource(R.string.visits),
-                    options = listOf(Pair(stringResource(R.string.register_visit), "register_visit"),
-                        Pair(stringResource(R.string.suggest_product),"suggest_product" )),
-                    onOptionClick = { onNavigate(it) }
-                )
+                    SectionCard(
+                        title = stringResource(R.string.visits),
+                        options = listOf(Pair(stringResource(R.string.register_visit), "register_visit"),
+                            Pair(stringResource(R.string.suggest_product),"suggest_product" )),
+                        onOptionClick = { onNavigate(it) }
+                    )
+                    SectionCard(
+                        title = stringResource(R.string.orders),
+                        options = listOf(Pair(stringResource(R.string.create_order), "create_order"),
+                            Pair(stringResource(R.string.follow_order), "follow_orders")),
+                        onOptionClick = { onNavigate(it) }
+                    )
 
-                SectionCard(
-                    title = stringResource(R.string.orders),
-                    options = listOf(Pair(stringResource(R.string.create_order), "create_order"),
-                        Pair(stringResource(R.string.follow_order), "follow_orders")),
-                    onOptionClick = { onNavigate(it) }
-                )
-
-                SectionCard(
-                    title = "Pedidos de cliente",
-                    options = listOf(Pair(stringResource(R.string.create_order), "create_order"),
-                        Pair(stringResource(R.string.follow_order), "follow_orders")),
-                    onOptionClick = { route ->
-                        val finalRoute = if (route == "create_order") {
-                            "create_order/1"
-                        } else {
-                            route
+                    SectionCard(
+                        title = stringResource(R.string.clients),
+                        centered = true,
+                        onClick = { onNavigate("clientes") }
+                    )
+                }
+                if (role == "CLIENT") {
+                    SectionCard(
+                        title = stringResource(R.string.orders),
+                        options = listOf(Pair(stringResource(R.string.create_order), "create_order"),
+                            Pair(stringResource(R.string.follow_order), "follow_orders")),
+                        onOptionClick = { route ->
+                            val finalRoute = if (route == "create_order") {
+                                "create_order/${clientID}"
+                            } else {
+                                route
+                            }
+                            onNavigate(finalRoute)
                         }
-                        onNavigate(finalRoute)
-                    }
-                )
-
-                SectionCard(
-                    title = stringResource(R.string.clients),
-                    centered = true,
-                    onClick = { onNavigate("clientes") }
-                )
+                    )
+                }
             }
         }
     }
