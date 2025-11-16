@@ -127,4 +127,7 @@
     <string name="forgot_password">¿Olvidaste tu contraseña?</string>
     <string name="show_password">Ocultar contraseña</string>
     <string name="hide_password">Mostrar contraseña</string>
+    <string name="logout">Cerrar sesión</string>
+    <string name="confirm_logout">¿Seguro quieres cerrar sesión?</string>
+    <string name="confirm">Confirmar</string>
 </resources>
