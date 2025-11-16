@@ -5,6 +5,7 @@ import android.util.Log
 import com.example.medisupplyapp.data.model.Client
 import com.example.medisupplyapp.data.model.LoginRequest
 import com.example.medisupplyapp.data.model.LoginResponse
+import com.example.medisupplyapp.data.model.LogoutRequest
 import com.example.medisupplyapp.data.model.Product
 import com.example.medisupplyapp.data.model.RecommendationResponse
 import com.example.medisupplyapp.data.model.RegisterVisitRequest
@@ -17,7 +18,9 @@ import retrofit2.HttpException
 import java.io.IOException
 import com.example.medisupplyapp.data.model.toProductList
 import com.example.medisupplyapp.data.provider.authCacheDataStore
+import com.example.medisupplyapp.data.provider.routeCacheDataStore
 import com.example.medisupplyapp.datastore.AuthCacheProto
+import com.example.medisupplyapp.datastore.RouteCacheProto
 import kotlinx.coroutines.flow.first
 import retrofit2.Response
 import retrofit2.http.Body
@@ -28,7 +31,7 @@ class ClientRepository(var api: UsersApi, private val context: Context) {
 
     companion object {
         // Duración de la sesión: 12 horas
-        private val SESSION_DURATION_MS = TimeUnit.HOURS.toMillis(12)
+        private val SESSION_DURATION_MS = TimeUnit.HOURS.toMillis(1)
     }
 
     suspend fun fetchClients(): List<Client> {
@@ -254,15 +257,52 @@ class ClientRepository(var api: UsersApi, private val context: Context) {
         }
     }
 
-    suspend fun logout() {
-        context.authCacheDataStore.updateData { currentAuth ->
-            AuthCacheProto.getDefaultInstance()
+    suspend fun logout(): Result<Boolean> {
+        return try {
+            val request = LogoutRequest(
+                accessToken = getAccessToken()!!
+            )
+
+            val response = api.logout(request)
+
+            if (response.isSuccessful) {
+                val logoutResponse = response.body()
+
+                if (logoutResponse != null && logoutResponse.success) {
+                    clearCache()
+                    Result.success(true)
+                } else {
+                    Result.failure(IllegalArgumentException(
+                        logoutResponse?.message ?: "Error en el login"
+                    ))
+                }
+            } else {
+                when (response.code()) {
+                    401 -> Result.failure(SecurityException("Credenciales inválidas"))
+                    404 -> Result.failure(IllegalArgumentException("Usuario no encontrado"))
+                    500 -> Result.failure(IllegalStateException("Error del servidor"))
+                    else -> Result.failure(
+                        IllegalStateException("Error HTTP ${response.code()}")
+                    )
+                }
+            }
+        } catch (e: java.net.UnknownHostException) {
+            Result.failure(IllegalStateException("Sin conexión a internet"))
+        } catch (e: java.net.SocketTimeoutException) {
+            Result.failure(IllegalStateException("Tiempo de espera agotado"))
+        } catch (e: Exception) {
+            Result.failure(e)
         }
+
     }
 
-    suspend fun isAuthenticated(): Boolean {
-        val authData = context.authCacheDataStore.data.first()
-        return authData.accessToken.isNotBlank()
+    private suspend fun clearCache() {
+        context.authCacheDataStore.updateData {
+            AuthCacheProto.getDefaultInstance()
+        }
+        context.routeCacheDataStore.updateData {
+            RouteCacheProto.getDefaultInstance()
+        }
     }
 
     suspend fun getAccessToken(): String? {

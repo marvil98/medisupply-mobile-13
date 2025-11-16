@@ -6,6 +6,7 @@ import androidx.compose.foundation.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.datastore.core.DataStore
@@ -14,6 +15,8 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medisupplyapp.components.SectionCard
+import com.example.medisupplyapp.data.provider.authCacheDataStore
+import com.example.medisupplyapp.datastore.AuthCacheProto
 import com.tuempresa.medisupply.ui.components.FooterNavigation
 import com.tuempresa.medisupply.ui.components.Header
 import com.tuempresa.medisupply.ui.theme.MediSupplyTheme
@@ -24,13 +27,26 @@ fun Home( selectedRoute: String, onNavigate: (String) -> Unit) {
 
     val dailyRoute by viewModel.dailyRoute.collectAsState()
     val visitsMade by viewModel.visitsMade.collectAsState()
-    val userName by viewModel.userName.collectAsState()
     val role by viewModel.role.collectAsState()
     val clientID by viewModel.clientID.collectAsState()
+    val context = LocalContext.current
+    val authData by context.authCacheDataStore.data.collectAsState(
+        initial = AuthCacheProto.getDefaultInstance()
+    )
 
     MediSupplyTheme {
         Scaffold(
-            topBar = { Header(userName, onNavigate) },
+            topBar = { Header(
+                userName = "${authData.name} ${authData.lastName}",
+                userRole = if (authData.role == "SELLER") stringResource(R.string.seller_id)
+                else stringResource(R.string.client_id),
+                pendingActivities = 3, // Obtener del ViewModel
+                onNavigate = onNavigate,
+                onLogout = {
+                    viewModel.logout()
+                    onNavigate("splash")
+                }
+            ) },
             bottomBar = { FooterNavigation(selectedRoute, onNavigate) },
                 containerColor = MaterialTheme.colorScheme.background
         ) { innerPadding ->

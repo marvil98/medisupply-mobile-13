@@ -131,4 +131,7 @@
     <string name="previous">Anterior</string>
     <string name="next">Siguiente</string>
     <string name="page_label">Página %1$d de %2$d</string>
+    <string name="logout">Cerrar sesión</string>
+    <string name="confirm_logout">¿Seguro quieres cerrar sesión?</string>
+    <string name="confirm">Confirmar</string>
 </resources>

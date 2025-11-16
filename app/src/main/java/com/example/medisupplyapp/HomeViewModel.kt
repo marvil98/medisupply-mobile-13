@@ -87,4 +87,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             println("INFO: No se cargaron clientes.")
         }
     }
+
+    fun logout() {
+        viewModelScope.launch {
+            userRepository.logout()
+        }
+    }
 }

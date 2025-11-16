@@ -129,4 +129,7 @@
     <string name="previous">Previous</string>
     <string name="next">Next</string>
     <string name="page_label">Page %1$d of %2$d</string>
+    <string name="logout">Logout</string>
+    <string name="confirm_logout">Are you sure you want to log out?</string>
+    <string name="confirm">Confirm</string>
 </resources>
