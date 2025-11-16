@@ -21,9 +21,16 @@ import com.example.medisupplyapp.datastore.AuthCacheProto
 import kotlinx.coroutines.flow.first
 import retrofit2.Response
 import retrofit2.http.Body
+import java.util.concurrent.TimeUnit
 
 
 class ClientRepository(var api: UsersApi, private val context: Context) {
+
+    companion object {
+        // Duración de la sesión: 12 horas
+        private val SESSION_DURATION_MS = TimeUnit.HOURS.toMillis(12)
+    }
+
     suspend fun fetchClients(): List<Client> {
         val response = api.getClients()
         if (response.isSuccessful) {
@@ -136,6 +143,8 @@ class ClientRepository(var api: UsersApi, private val context: Context) {
                 val loginResponse = response.body()
 
                 if (loginResponse != null && loginResponse.success) {
+                    // Guardar datos básicos del login + timestamp
+                    val currentTimestamp = System.currentTimeMillis()
                     // 1. Guardar datos básicos del login
                     context.authCacheDataStore.updateData { currentAuth ->
                         currentAuth.toBuilder()
@@ -147,6 +156,7 @@ class ClientRepository(var api: UsersApi, private val context: Context) {
                             .setRole(loginResponse.user.role)
                             .setIdToken(loginResponse.tokens.idToken)
                             .setRefreshToken(loginResponse.tokens.refreshToken)
+                            .setLoginTimestamp(currentTimestamp)
                             .build()
                     }
 
@@ -277,5 +287,31 @@ class ClientRepository(var api: UsersApi, private val context: Context) {
     suspend fun getSellerId(): Int? {
         val authData = context.authCacheDataStore.data.first()
         return if (authData.sellerId > 0) authData.sellerId else null
+    }
+
+    suspend fun isSessionValid(): Boolean {
+        val authData = context.authCacheDataStore.data.first()
+
+        // Verificar que tenga token
+        if (authData.accessToken.isBlank()) {
+            Log.d("AUTH", "No hay sesión activa - Token vacío")
+            return false
+        }
+
+        // Verificar que no haya expirado (12 horas)
+        val currentTime = System.currentTimeMillis()
+        val loginTime = authData.loginTimestamp
+        val timeSinceLogin = currentTime - loginTime
+
+        val isValid = timeSinceLogin < SESSION_DURATION_MS
+
+        if (isValid) {
+            val hoursRemaining = TimeUnit.MILLISECONDS.toHours(SESSION_DURATION_MS - timeSinceLogin)
+            Log.d("AUTH", "Sesión válida - Expira en $hoursRemaining horas")
+        } else {
+            Log.d("AUTH", "Sesión expirada - Han pasado ${TimeUnit.MILLISECONDS.toHours(timeSinceLogin)} horas")
+        }
+
+        return isValid
     }
 }
