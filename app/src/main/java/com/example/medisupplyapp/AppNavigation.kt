@@ -169,13 +169,20 @@ fun AppNavigation() {
             )
         }
 
-        composable("create_order/{clientId}") {
+        composable(
+            route = "create_order/{clientId}",
+            arguments = listOf(navArgument("clientId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val clientId = backStackEntry.arguments?.getInt("clientId") ?: -1
+
             CreateOrderClientScreen(
+                clientId = clientId,
                 onNavigate = { route -> navController.navigate(route) },
                 onBack = { navController.popBackStack() },
                 onNavigateDetail = { route -> navController.navigate("home") },
             )
         }
+
 
         composable("login") {
             LoginScreen(

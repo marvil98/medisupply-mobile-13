@@ -127,4 +127,8 @@
     <string name="forgot_password">¿Olvidaste tu contraseña?</string>
     <string name="show_password">Ocultar contraseña</string>
     <string name="hide_password">Mostrar contraseña</string>
+    <string name="your_recommendations">Tus recomendados</string>
+    <string name="previous">Anterior</string>
+    <string name="next">Siguiente</string>
+    <string name="page_label">Página %1$d de %2$d</string>
 </resources>
