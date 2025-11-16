@@ -20,12 +20,13 @@ import com.example.medisupplyapp.components.ToastType
 
 @Composable
 fun ConfirmOrderScreen(
-    selectedClient: String?,
+    selectedClient: String? = null,
     selectedQuantities: Map<Int, Int>,
     products: List<Product>,
     totalAmount: Double,
     onCancel: () -> Unit,
-    onNavigateDetail: (String) -> Unit
+    onNavigateDetail: (String) -> Unit,
+    clientId: Int? = null
 ) {
     val currencyFormatter = remember { NumberFormat.getCurrencyInstance(Locale.US) }
 
@@ -71,22 +72,24 @@ fun ConfirmOrderScreen(
                     visible = showToast,
                     onDismiss = { showToast = false }
                 )
+                val clientLabel = selectedClient?.trim()?.takeIf { it.isNotEmpty() }
+                    ?: stringResource(R.string.client_not_selected)
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(R.string.client_selected),
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                    )
-                    Text(
-                        text = selectedClient.takeIf { !it.isNullOrBlank() }
-                            ?: stringResource(R.string.client_not_selected)
-                        ,
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                if (selectedClient != null) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.client_selected),
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                        )
+                        Text(
+                            text = clientLabel,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -147,6 +150,7 @@ fun ConfirmOrderScreen(
                             onClick = {
                                 viewModel.createOrder(
                                     selectedQuantities,
+                                    clientId,
                                     onSuccess = { orderId, message ->
                                         toastMessage = successMessage
                                         toastType = ToastType.SUCCESS

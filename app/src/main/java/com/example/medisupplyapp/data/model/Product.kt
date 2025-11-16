@@ -31,3 +31,17 @@ fun ProductSuggestion.toProduct(): Product {
 fun List<ProductSuggestion>.toProductList(): List<Product> {
     return this.map { it.toProduct() }
 }
+
+data class ProductUpdate(
+    val product_id: Int,
+    val quantity: Int
+)
+
+data class ProductUpdateRequest(
+    val products: List<ProductUpdate>
+)
+
+data class UpdateResponse(
+    val message: String,
+    val updated: Int
+)
