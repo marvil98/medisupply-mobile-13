@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medisupplyapp.R
 import com.tuempresa.medisupply.ui.theme.MediSupplyTheme
 import kotlinx.coroutines.delay
@@ -24,13 +25,26 @@ import kotlinx.coroutines.delay
 // ============================================
 @Composable
 fun SplashScreenWithAutoNavigation(
+    viewModel: SplashViewModel = viewModel(),
+    onNavigateToHome: () -> Unit,
     onNavigateToSplash: () -> Unit  // Navega a SplashScreen
 ) {
+
+    var isCheckingSession by remember { mutableStateOf(true) }
     // Auto-navegar después de 2 segundos
     LaunchedEffect(Unit) {
         delay(2000)
-        onNavigateToSplash()
-    }
+        val hasValidSession = viewModel.checkSession()
+
+        if (hasValidSession) {
+            // Hay sesión válida → Ir directo a Home
+            onNavigateToHome()
+        } else {
+            // No hay sesión → Ir a SplashScreen con botón
+            onNavigateToSplash()
+        }
+
+        isCheckingSession = false    }
 
 
     MediSupplyTheme {

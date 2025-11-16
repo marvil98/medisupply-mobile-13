@@ -54,7 +54,12 @@ fun AppNavigation() {
                     navController.navigate("splash") {
                         popUpTo("splash_auto") { inclusive = true }
                     }
-                }
+                },
+                onNavigateToHome = {
+                    navController.navigate("home") {
+                        popUpTo("splash_auto") { inclusive = true }
+                    }
+                },
             )
         }
 

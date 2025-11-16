@@ -16,4 +16,6 @@ message AuthCacheProto {
   // Información adicional según rol
   int32 client_id = 9;      // Para CLIENT
   int32 seller_id = 10;     // Para CLIENT y SELLER
+
+  int64 login_timestamp = 11;
 }
