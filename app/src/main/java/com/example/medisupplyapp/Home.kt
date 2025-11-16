@@ -27,7 +27,6 @@ fun Home( selectedRoute: String, onNavigate: (String) -> Unit) {
 
     val dailyRoute by viewModel.dailyRoute.collectAsState()
     val visitsMade by viewModel.visitsMade.collectAsState()
-    val userName by viewModel.userName.collectAsState()
     val role by viewModel.role.collectAsState()
     val clientID by viewModel.clientID.collectAsState()
     val context = LocalContext.current
@@ -44,7 +43,7 @@ fun Home( selectedRoute: String, onNavigate: (String) -> Unit) {
                 pendingActivities = 3, // Obtener del ViewModel
                 onNavigate = onNavigate,
                 onLogout = {
-                    //viewModel.logout()
+                    viewModel.logout()
                     onNavigate("splash")
                 }
             ) },

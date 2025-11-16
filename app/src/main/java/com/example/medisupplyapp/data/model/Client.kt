@@ -55,6 +55,20 @@ data class LoginResponse(
     val user: UserDto
 )
 
+data class LogoutRequest(
+    @SerializedName("access_token")
+    val accessToken: String
+)
+
+data class LogoutResponse(
+    @SerializedName("message")
+    val message: String,
+    @SerializedName("success")
+    val success: Boolean
+)
+
+
+
 data class TokensDto(
     @SerializedName("access_token")
     val accessToken: String,

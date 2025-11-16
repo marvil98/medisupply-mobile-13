@@ -41,6 +41,7 @@ fun SplashScreenWithAutoNavigation(
             onNavigateToHome()
         } else {
             // No hay sesión → Ir a SplashScreen con botón
+            viewModel.logout()
             onNavigateToSplash()
         }
 

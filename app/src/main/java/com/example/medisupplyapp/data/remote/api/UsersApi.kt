@@ -4,6 +4,8 @@ import com.example.medisupplyapp.data.model.ClientRecommendationResponse
 import com.example.medisupplyapp.data.model.ClientResponse
 import com.example.medisupplyapp.data.model.LoginRequest
 import com.example.medisupplyapp.data.model.LoginResponse
+import com.example.medisupplyapp.data.model.LogoutRequest
+import com.example.medisupplyapp.data.model.LogoutResponse
 import com.example.medisupplyapp.data.model.RecommendationRequest
 import com.example.medisupplyapp.data.model.RecommendationResponse
 import com.example.medisupplyapp.data.model.RegisterVisitRequest
@@ -51,6 +53,9 @@ interface UsersApi {
     suspend fun login(
         @Body loginRequest: LoginRequest
     ): Response<LoginResponse>
+
+    @POST("users/logout")
+    suspend fun logout(@Body request: LogoutRequest): Response<LogoutResponse>
 
     @GET("users/clients/{userId}/info")
     suspend fun getClientInfo(@Path("userId") userId: Int): Response<ClientInfoResponse>
