@@ -28,10 +28,11 @@ fun FooterNavigation(
         initial = AuthCacheProto.getDefaultInstance()
     )
     val role = authData.role
+    val clientId = authData.clientId
+
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.primary
     ) {
-
         NavigationBarItem(
             icon = {
                 Icon(
@@ -50,9 +51,7 @@ fun FooterNavigation(
                 indicatorColor = MaterialTheme.colorScheme.secondary
             )
         )
-        if (role == "SELLER") {
-
-
+        if (role == "SELLER" || role == "ADMIN") {
             NavigationBarItem(
                 icon = {
                     Icon(
@@ -89,27 +88,26 @@ fun FooterNavigation(
                     indicatorColor = MaterialTheme.colorScheme.secondary
                 )
             )
-        }
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_box),
-                    contentDescription = stringResource(R.string.orders)
+            NavigationBarItem(
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_box),
+                        contentDescription = stringResource(R.string.orders)
+                    )
+                },
+                label = { Text(stringResource(R.string.orders)) },
+                selected = selectedRoute == "orders",
+                onClick = { onNavigate("create_order") },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = Color.White,
+                    selectedTextColor = Color.White,
+                    unselectedIconColor = Color.White,
+                    unselectedTextColor = Color.White,
+                    indicatorColor = MaterialTheme.colorScheme.secondary
                 )
-            },
-            label = { Text(stringResource(R.string.orders)) },
-            selected = selectedRoute == "orders",
-            onClick = { onNavigate("orders") },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color.White,
-                selectedTextColor = Color.White,
-                unselectedIconColor = Color.White,
-                unselectedTextColor = Color.White,
-                indicatorColor = MaterialTheme.colorScheme.secondary
             )
-        )
-        if (role == "SELLER") {
-
+        }
+        if (role == "SELLER" || role == "ADMIN") {
             NavigationBarItem(
                 icon = {
                     Icon(
@@ -120,6 +118,26 @@ fun FooterNavigation(
                 label = { Text(stringResource(R.string.users)) },
                 selected = selectedRoute == "users",
                 onClick = { onNavigate("users") },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = Color.White,
+                    selectedTextColor = Color.White,
+                    unselectedIconColor = Color.White,
+                    unselectedTextColor = Color.White,
+                    indicatorColor = MaterialTheme.colorScheme.secondary
+                )
+            )
+        }
+        if (role == "CLIENT") {
+            NavigationBarItem(
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_box),
+                        contentDescription = stringResource(R.string.orders)
+                    )
+                },
+                label = { Text(stringResource(R.string.orders)) },
+                selected = selectedRoute == "orders",
+                onClick = { onNavigate("create_order/${clientId}") },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = Color.White,
                     selectedTextColor = Color.White,

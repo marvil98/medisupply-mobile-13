@@ -21,11 +21,14 @@ class FollowOrdersViewModel(application: Application)  : AndroidViewModel(applic
         api = ApiConnection.api_users,
         application
     )
+
+    var clientIdState by mutableStateOf<Int?>(null)
+    private set
+
     var ordersState by mutableStateOf<OrdersUiState>(OrdersUiState.Loading)
         private set
 
     init {
-        // 🚀 NUEVO: Log para confirmar que el ViewModel se inicializa
         Log.d("ORDER_API", "ViewModel inicializado. Intentando cargar órdenes.")
         loadOrders()
     }
@@ -33,6 +36,7 @@ class FollowOrdersViewModel(application: Application)  : AndroidViewModel(applic
     fun loadOrders() {
         viewModelScope.launch {
             val clientId = userRepository.getClientId()
+            clientIdState = clientId
             ordersState = OrdersUiState.Loading
             repository.getOrders(clientId!!)
                 .onSuccess { orders ->

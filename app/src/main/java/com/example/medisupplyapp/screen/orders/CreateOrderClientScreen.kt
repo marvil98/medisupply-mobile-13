@@ -25,7 +25,8 @@ fun CreateOrderClientScreen(
     onBack: () -> Unit = {},
     onNavigate: (String) -> Unit = {},
     onNavigateDetail: (String) -> Unit,
-    clientId: Int
+    clientId: Int,
+    selectedRoute: String
 ) {
     val viewModel: CreateOrderViewModel = viewModel()
     val products = viewModel.products
@@ -139,7 +140,7 @@ fun CreateOrderClientScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        FooterNavigation("orders/create", onNavigate)
+                        FooterNavigation(selectedRoute, onNavigate)
                     }
                 },
                 containerColor = MaterialTheme.colorScheme.onPrimary

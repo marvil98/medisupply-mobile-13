@@ -8,8 +8,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.medisupplyapp.data.CountryPreferencesRepository
-import com.example.medisupplyapp.data.remote.ApiConnection
-import com.example.medisupplyapp.data.remote.repository.ClientRepository
+import com.example.medisupplyapp.data.model.Client
 import com.example.medisupplyapp.screen.auth.LoginScreen
 import com.example.medisupplyapp.screen.auth.SplashScreen
 import com.example.medisupplyapp.screen.auth.SplashScreenWithAutoNavigation
@@ -19,6 +18,8 @@ import com.example.medisupplyapp.utils.updateLocale
 import kotlinx.coroutines.launch
 import com.example.medisupplyapp.screen.orders.FollowOrderScreen
 import com.example.medisupplyapp.screen.orders.OrderDetailScreen
+import com.example.medisupplyapp.screen.users.ClientDetailScreen
+import com.example.medisupplyapp.screen.users.ClientListScreen
 import com.example.medisupplyapp.screen.visits.DailyRouteScreen
 import com.example.medisupplyapp.screen.visits.RegisterEvidenceScreen
 import com.example.medisupplyapp.screen.visits.RegisterVisitScreen
@@ -87,8 +88,13 @@ fun AppNavigation() {
             )
         }
 
-        composable("clientes") {
-            ClientesScreen()
+        composable("users") {
+            ClientListScreen(
+                onNavigate = { route -> navController.navigate(route) },
+                selectedRoute = "users",
+                onBack = { navController.popBackStack() },
+                navController = navController
+            )
         }
 
         composable("ajustes_regionales") {
@@ -120,6 +126,7 @@ fun AppNavigation() {
             RegisterVisitScreen(
                 onNavigate = { route -> navController.navigate(route) },
                 onBack = { navController.popBackStack() },
+                selectedRoute = "visits",
             )
         }
 
@@ -127,6 +134,7 @@ fun AppNavigation() {
             RegisterVisitScreen(
                 onNavigate = { route -> navController.navigate(route) },
                 onBack = { navController.popBackStack() },
+                selectedRoute = "visits",
             )
         }
 
@@ -148,9 +156,10 @@ fun AppNavigation() {
 
         composable("create_order") {
             CreateOrderScreen(
-                    onNavigate = { route -> navController.navigate(route) },
-                    onBack = { navController.popBackStack() },
-                    onNavigateDetail = { route -> navController.navigate("home") },
+                onNavigate = { route -> navController.navigate(route) },
+                selectedRoute = "orders",
+                onBack = { navController.popBackStack() },
+                onNavigateDetail = { route -> navController.navigate("home") },
             )
         }
 
@@ -185,6 +194,7 @@ fun AppNavigation() {
                 onNavigate = { route -> navController.navigate(route) },
                 onBack = { navController.popBackStack() },
                 onNavigateDetail = { route -> navController.navigate("home") },
+                selectedRoute = "orders",
             )
         }
 
@@ -212,18 +222,23 @@ fun AppNavigation() {
             val orderId = backStackEntry.arguments?.getInt("orderId") ?: 0
             OrderDetailScreen(
                 orderId = orderId,
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
             )
         }
+
+        composable("clientDetail") {
+            val client = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<Client>("client")
+
+            client?.let {
+                ClientDetailScreen(
+                    client = it,
+                    onBack = { navController.popBackStack() },
+                    selectedRoute = "users",
+                    onNavigate = { route -> navController.navigate(route) }
+                )
+            }
+        }
     }
-}
-
-@Composable
-fun ClientesScreen() {
-    TODO("Not yet implemented")
-}
-
-@Composable
-fun RutasScreen() {
-    TODO("Not yet implemented")
 }

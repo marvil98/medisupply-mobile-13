@@ -50,7 +50,7 @@ fun LoginScreen(
                 )
 
             },
-            containerColor =MaterialTheme.colorScheme.background
+            containerColor =MaterialTheme.colorScheme.surface
         ) { paddingValues ->
             Column(
                 modifier = Modifier

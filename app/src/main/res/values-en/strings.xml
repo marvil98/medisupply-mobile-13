@@ -132,4 +132,16 @@
     <string name="logout">Logout</string>
     <string name="confirm_logout">Are you sure you want to log out?</string>
     <string name="confirm">Confirm</string>
+    <string name="no_user_history">Oops! No clients were found.</string>
+    <string name="error_user_history">Oops! We couldn\'t retrieve the clients. Please try again.</string>
+    <string name="client_list">Clients List</string>
+    <string name="client_detail">Client Detail</string>
+    <string name="contact_info">Contact details</string>
+    <string name="label_client_user">Client:</string>
+    <string name="label_phone">Phone:</string>
+    <string name="label_email">Email:</string>
+    <string name="no_data">No data</string>
+    <string name="no_data_orders">This customer has not yet registered any orders</string>
+    <string name="statement">Account statement</string>
+    <string name="available">Balance available</string>
 </resources>
