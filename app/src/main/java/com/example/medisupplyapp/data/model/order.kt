@@ -14,7 +14,8 @@ data class Order(
 )
 
 data class CreateOrderRequest(
-    val user_id: String,
+    val client_id: Int,
+    val seller_id: Int,
     val products: List<ProductRequest>,
     val estimated_delivery_time: String,
     val status_id: Int

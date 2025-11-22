@@ -22,6 +22,7 @@ fun FollowOrderScreen(
     onBack: () -> Unit,
 ) {
     val uiState = viewModel.ordersState
+    val clientId = viewModel.clientIdState
 
     MediSupplyTheme {
         Scaffold(
@@ -42,7 +43,8 @@ fun FollowOrderScreen(
                     OrdersListContent(
                         orders = uiState.orders,
                         paddingValues = paddingValues,
-                        onNavigate = onNavigate
+                        onNavigate = onNavigate,
+                        clientId = clientId
                     )
                 }
                 is OrdersUiState.Empty -> {

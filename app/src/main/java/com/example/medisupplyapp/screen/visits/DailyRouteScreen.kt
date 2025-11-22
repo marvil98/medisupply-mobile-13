@@ -40,7 +40,7 @@ fun DailyRouteScreen(
                 }
 
                 is DailyRouteUiState.Success -> {
-                    if (state.dailyRoute.numberVisits > 0) {
+                    if (state.dailyRoute.numberVisits > 0 && state.dailyRoute.visits.isNotEmpty()) {
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()

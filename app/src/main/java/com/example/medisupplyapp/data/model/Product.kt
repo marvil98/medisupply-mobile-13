@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class Product(
     @SerializedName("category_name") val categoryName: String,
-    @SerializedName("product_id") val productId: String,
+    @SerializedName("product_id") val productId: Int,
     @SerializedName("sku") val sku: String,
     @SerializedName("total_quantity") val totalQuantity: Int,
     @SerializedName("value") val value: Double,
@@ -12,14 +12,15 @@ data class Product(
 )
 
 data class ProductRequest(
-    @SerializedName("product_id") val productId: String,
+    @SerializedName("product_id") val productId: Int,
+    @SerializedName("price_unit") val price_unit: Double,
     @SerializedName("quantity") val quantity: Int
 )
 
 fun ProductSuggestion.toProduct(): Product {
     return Product(
         categoryName = this.category_name,
-        productId = this.product_id.toString(),
+        productId = this.product_id,
         sku = this.sku,
         totalQuantity = this.total_quantity,
         value = this.value,
@@ -30,3 +31,17 @@ fun ProductSuggestion.toProduct(): Product {
 fun List<ProductSuggestion>.toProductList(): List<Product> {
     return this.map { it.toProduct() }
 }
+
+data class ProductUpdate(
+    val product_id: Int,
+    val quantity: Int
+)
+
+data class ProductUpdateRequest(
+    val products: List<ProductUpdate>
+)
+
+data class UpdateResponse(
+    val message: String,
+    val updated: Int
+)

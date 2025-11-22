@@ -13,9 +13,29 @@ import androidx.compose.ui.res.*
 import androidx.compose.ui.semantics.*
 import com.example.medisupplyapp.R
 import androidx.compose.ui.unit.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.runtime.*
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.example.medisupplyapp.components.LogoutConfirmationDialog
+import com.example.medisupplyapp.components.MenuDialog
+import kotlinx.coroutines.launch
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Header(userName: String, onNavigate: (String) -> Unit) {
+fun Header(
+    userName: String,
+    userRole: String = "Administrador",
+    onNavigate: (String) -> Unit,
+    onLogout: () -> Unit
+) {
+    var showMenuDialog by remember { mutableStateOf(false) }
+    var showLogoutDialog by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -27,7 +47,7 @@ fun Header(userName: String, onNavigate: (String) -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f) ) {
                 Box(
                     modifier = Modifier
                         .size(48.dp)
@@ -45,7 +65,7 @@ fun Header(userName: String, onNavigate: (String) -> Unit) {
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = stringResource(R.string.greeting),
                         style = MaterialTheme.typography.titleMedium,
@@ -54,7 +74,8 @@ fun Header(userName: String, onNavigate: (String) -> Unit) {
                     Text(
                         text = userName,
                         style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.onBackground,
+                        maxLines = 2,
                     )
                 }
             }
@@ -76,11 +97,13 @@ fun Header(userName: String, onNavigate: (String) -> Unit) {
 
                 Spacer(modifier = Modifier.width(12.dp))
 
+                // Botón de configuración que abre el modal
                 Box(
                     modifier = Modifier
                         .size(40.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.secondary)
+                        .clickable { showMenuDialog = true }
                         .padding(6.dp)
                 ) {
                     Image(
@@ -92,4 +115,30 @@ fun Header(userName: String, onNavigate: (String) -> Unit) {
             }
         }
     }
+
+    // Modal del menú
+    if (showMenuDialog) {
+        MenuDialog(
+            userName = userName,
+            userRole = userRole,
+            onDismiss = { showMenuDialog = false },
+            onLogoutClick = {
+                showMenuDialog = false
+                showLogoutDialog = true
+            },
+        )
+    }
+
+    // Modal de confirmación de logout
+    if (showLogoutDialog) {
+        LogoutConfirmationDialog(
+            onDismiss = { showLogoutDialog = false },
+            onConfirm = {
+                showLogoutDialog = false
+                onLogout()
+            }
+        )
+    }
 }
+
+

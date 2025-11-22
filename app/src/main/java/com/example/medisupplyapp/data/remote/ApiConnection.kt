@@ -11,7 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiConnection {
     // Hemos confirmado que esta URL es correcta para el emulador
-    private const val BASE_URL = "http://MediSu-MediS-5XPY2MhrDivI-109634141.us-east-1.elb.amazonaws.com"
+    private const val BASE_URL = "http://MediSu-MediS-5XPY2MhrDivI-109634141.us-east-1.elb.amazonaws.com/"
 
     // Cliente OkHttp con logging configurado
     private val okHttpClient = OkHttpClientBuilder.build()

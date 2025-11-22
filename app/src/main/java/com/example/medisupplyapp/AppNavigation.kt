@@ -8,12 +8,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.medisupplyapp.data.CountryPreferencesRepository
+import com.example.medisupplyapp.data.model.Client
+import com.example.medisupplyapp.screen.auth.LoginScreen
+import com.example.medisupplyapp.screen.auth.SplashScreen
+import com.example.medisupplyapp.screen.auth.SplashScreenWithAutoNavigation
 import com.example.medisupplyapp.screen.orders.CreateOrderClientScreen
 import com.example.medisupplyapp.screen.orders.CreateOrderScreen
 import com.example.medisupplyapp.utils.updateLocale
 import kotlinx.coroutines.launch
 import com.example.medisupplyapp.screen.orders.FollowOrderScreen
 import com.example.medisupplyapp.screen.orders.OrderDetailScreen
+import com.example.medisupplyapp.screen.users.ClientDetailScreen
+import com.example.medisupplyapp.screen.users.ClientListScreen
 import com.example.medisupplyapp.screen.visits.DailyRouteScreen
 import com.example.medisupplyapp.screen.visits.RegisterEvidenceScreen
 import com.example.medisupplyapp.screen.visits.RegisterVisitScreen
@@ -29,22 +35,46 @@ fun mapCountryToCode(countryName: String): String {
 }
 
 @Composable
-fun AppNavigation(userName: String) {
+fun AppNavigation() {
     val navController = rememberNavController()
     var currentLanguage by remember { mutableStateOf("es") }
     val context = LocalContext.current
     val repository = remember { CountryPreferencesRepository(context) }
+
     val coroutineScope = rememberCoroutineScope()
     val selectedCountry by repository.selectedCountry.collectAsState(initial = "Colombia")
     val regionalCountryCode = mapCountryToCode(selectedCountry)
 
     NavHost(
         navController = navController,
-        startDestination = "home"
+        startDestination = "splash_auto"
     ) {
+        composable("splash_auto") {
+            SplashScreenWithAutoNavigation(
+                onNavigateToSplash = {
+                    navController.navigate("splash") {
+                        popUpTo("splash_auto") { inclusive = true }
+                    }
+                },
+                onNavigateToHome = {
+                    navController.navigate("home") {
+                        popUpTo("splash_auto") { inclusive = true }
+                    }
+                },
+            )
+        }
+
+        composable("splash") {
+            SplashScreen (
+                onNavigateToLogin = {
+                    navController.navigate("login") {
+                        popUpTo("splash") { inclusive = true }
+                    }
+                }
+            )
+        }
         composable("home") {
             Home(
-                userName = userName,
                 selectedRoute = "home",
                 onNavigate = { route -> navController.navigate(route) }
             )
@@ -58,8 +88,13 @@ fun AppNavigation(userName: String) {
             )
         }
 
-        composable("clientes") {
-            ClientesScreen()
+        composable("users") {
+            ClientListScreen(
+                onNavigate = { route -> navController.navigate(route) },
+                selectedRoute = "users",
+                onBack = { navController.popBackStack() },
+                navController = navController
+            )
         }
 
         composable("ajustes_regionales") {
@@ -91,6 +126,7 @@ fun AppNavigation(userName: String) {
             RegisterVisitScreen(
                 onNavigate = { route -> navController.navigate(route) },
                 onBack = { navController.popBackStack() },
+                selectedRoute = "visits",
             )
         }
 
@@ -98,6 +134,7 @@ fun AppNavigation(userName: String) {
             RegisterVisitScreen(
                 onNavigate = { route -> navController.navigate(route) },
                 onBack = { navController.popBackStack() },
+                selectedRoute = "visits",
             )
         }
 
@@ -119,9 +156,10 @@ fun AppNavigation(userName: String) {
 
         composable("create_order") {
             CreateOrderScreen(
-                    onNavigate = { route -> navController.navigate(route) },
-                    onBack = { navController.popBackStack() },
-                    onNavigateDetail = { route -> navController.navigate("home") },
+                onNavigate = { route -> navController.navigate(route) },
+                selectedRoute = "orders",
+                onBack = { navController.popBackStack() },
+                onNavigateDetail = { route -> navController.navigate("home") },
             )
         }
 
@@ -145,11 +183,32 @@ fun AppNavigation(userName: String) {
             )
         }
 
-        composable("create_order/{clientId}") {
+        composable(
+            route = "create_order/{clientId}",
+            arguments = listOf(navArgument("clientId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val clientId = backStackEntry.arguments?.getInt("clientId") ?: -1
+
             CreateOrderClientScreen(
+                clientId = clientId,
                 onNavigate = { route -> navController.navigate(route) },
                 onBack = { navController.popBackStack() },
                 onNavigateDetail = { route -> navController.navigate("home") },
+                selectedRoute = "orders",
+            )
+        }
+
+
+        composable("login") {
+            LoginScreen(
+                onLoginSuccess = {
+                    navController.navigate("home") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                },
+                onBack = {navController.navigate("splash") {
+                    popUpTo("login") { inclusive = true }
+                } }
             )
         }
 
@@ -163,18 +222,23 @@ fun AppNavigation(userName: String) {
             val orderId = backStackEntry.arguments?.getInt("orderId") ?: 0
             OrderDetailScreen(
                 orderId = orderId,
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
             )
         }
+
+        composable("clientDetail") {
+            val client = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<Client>("client")
+
+            client?.let {
+                ClientDetailScreen(
+                    client = it,
+                    onBack = { navController.popBackStack() },
+                    selectedRoute = "users",
+                    onNavigate = { route -> navController.navigate(route) }
+                )
+            }
+        }
     }
-}
-
-@Composable
-fun ClientesScreen() {
-    TODO("Not yet implemented")
-}
-
-@Composable
-fun RutasScreen() {
-    TODO("Not yet implemented")
 }

@@ -12,8 +12,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlin.isInitialized
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
 
-private val CACHE_EXPIRATION_MILLIS = 1.days.inWholeMilliseconds
+private val CACHE_EXPIRATION_MILLIS = 10.minutes.inWholeMilliseconds
 
 class RoutesRepository(
     var api: RoutesApi,
@@ -35,19 +36,19 @@ class RoutesRepository(
                 0
             }
         }
-    suspend fun getDailyRoute(): DailyRoute {
+    suspend fun getDailyRoute(sellerId: Int?): DailyRoute {
         val currentTime = System.currentTimeMillis()
         val cachedData = routeCacheDataStore.data.first()
         val isCacheValid = cachedData.route.isInitialized &&
                 (currentTime - cachedData.timestamp < CACHE_EXPIRATION_MILLIS)
-        if (isCacheValid && cachedData.route.visitsList.isNotEmpty()) {
+        if (isCacheValid) {
             // CACHÉ VÁLIDA: Devolver los datos guardados
             println("Datos obtenidos desde la caché. Tiempo restante: ${(CACHE_EXPIRATION_MILLIS - (currentTime - cachedData.timestamp)) / 3600000} horas.")
             return cachedData.toDailyRoute()
         }
 
         try {
-            val response = api.getSellerDailyRoute(1)
+            val response = api.getSellerDailyRoute(sellerId!!)
 
             if (response.isSuccessful) {
                 val dailyRoute = response.body()
@@ -96,14 +97,26 @@ class RoutesRepository(
                 totalVisits
             }
 
-            // 3. Construir el nuevo DailyRouteProto con el valor validado
+            // 3. Crear una copia mutable de la lista de visitas (las listas de Protobuf son inmutables)
+            val mutableVisitsList = currentRouteProto.visitsList.toMutableList()
+
+            // 4. Eliminar el primer elemento de la lista (asumiendo que es la visita completada).
+            if (mutableVisitsList.isNotEmpty()) {
+                // Eliminamos el primer elemento (índice 0)
+                mutableVisitsList.removeAt(0)
+            }
+
+            // --- CONSTRUCCIÓN DEL NUEVO PROTO ---
+
+            // 5. Construir el nuevo DailyRouteProto con el valor validado y la lista actualizada
             val updatedRouteProto: DailyRouteProto = currentRouteProto.toBuilder()
                 .setVisitsMade(finalVisitsMade) // <-- Usar el valor validado
-                .setNumberVisits(totalVisits) // Mantener el total
-                .addAllVisits(currentRouteProto.visitsList) // Mantener la lista de visitas
+                .setNumberVisits(totalVisits)   // Mantener el total original
+                .clearVisits()                  // ⚠️ Limpiar la lista existente antes de agregar la nueva
+                .addAllVisits(mutableVisitsList) // Agregar la lista modificada
                 .build()
 
-            // 4. Construir y retornar el RouteCacheProto actualizado
+            // 6. Construir y retornar el RouteCacheProto actualizado
             currentCacheProto.toBuilder()
                 .setRoute(updatedRouteProto)
                 .build()

@@ -31,9 +31,13 @@ sealed class RecommendationUiState {
 
 
 class CreateOrderViewModel(application: Application) : AndroidViewModel(application) {
-    private val clientRepository = ClientRepository(api = ApiConnection.api_users)
+    private val clientRepository = ClientRepository(api = ApiConnection.api_users, application)
     private val productRepository = ProductRepository(api = ApiConnection.api_products)
     private val ordersRepository = OrdersRepository(api = ApiConnection.api)
+    private val userRepository = ClientRepository(
+        api = ApiConnection.api_users,
+        application
+    )
 
     // ESTADOS
     var selectedClient by mutableStateOf<Client?>(null)
@@ -51,7 +55,8 @@ class CreateOrderViewModel(application: Application) : AndroidViewModel(applicat
     init {
         viewModelScope.launch {
             try {
-                val result = clientRepository.fecthClientsBySellerID(1)
+                val sellerId = userRepository.getSellerId()
+                val result = clientRepository.fecthClientsBySellerID(sellerId!!)
                 clients = result
             } catch (e: Exception) {
             }
@@ -72,14 +77,17 @@ class CreateOrderViewModel(application: Application) : AndroidViewModel(applicat
     }
 
     fun createOrder(
-        selectedQuantities: Map<String, Int>,
+        selectedQuantities: Map<Int, Int>,
+        clientId: Int? = null,
         onSuccess: (orderId: String, message: String) -> Unit,
         onError: (String) -> Unit
     ) {
         viewModelScope.launch {
             try {
-                val clientId = selectedClient?.userId
-                if (clientId == null) {
+                val finalClientId = clientId ?: selectedClient?.userId
+                val sellerId = userRepository.getSellerId()
+
+                if (finalClientId == null) {
                     clientError = true
                     onError("Cliente inválido")
                     return@launch
@@ -96,7 +104,8 @@ class CreateOrderViewModel(application: Application) : AndroidViewModel(applicat
                     .map { (productId, quantity) ->
                         ProductRequest(
                             productId = productId,
-                            quantity = quantity
+                            quantity = quantity,
+                            price_unit = products.first { product -> product.productId == productId }.value
                         )
                     }
 
@@ -104,7 +113,8 @@ class CreateOrderViewModel(application: Application) : AndroidViewModel(applicat
                 val futureUtc = nowUtc.plusDays(5)
 
                 val request = CreateOrderRequest(
-                    user_id = clientId.toString(),
+                    client_id = finalClientId,
+                    seller_id = sellerId!!,
                     products = productRequests,
                     estimated_delivery_time = futureUtc.toString(),
                     status_id = 3
@@ -116,7 +126,15 @@ class CreateOrderViewModel(application: Application) : AndroidViewModel(applicat
                     val orderResponse = response.getOrNull()
                     if (orderResponse != null) {
                         _orderState.value = OrderState.Success(orderResponse)
-                        onSuccess(orderResponse.order_id, "Orden creada con éxito")
+
+                        try {
+                            for ((productId, quantity) in selectedQuantities) {
+                                productRepository.updateProductStock(productId, quantity)
+                            }
+                            onSuccess(orderResponse.order_id, "Orden creada y stock actualizado con éxito")
+                        } catch (e: Exception) {
+                            onError("Orden creada pero error al actualizar stock: ${e.message}")
+                        }
                     } else {
                         onError("Respuesta vacía del servidor")
                     }
@@ -130,6 +148,7 @@ class CreateOrderViewModel(application: Application) : AndroidViewModel(applicat
             }
         }
     }
+
 
     fun loadRecommendations(clientId: Int) {
         _uiState.value = RecommendationUiState.Loading

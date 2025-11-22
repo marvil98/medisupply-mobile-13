@@ -29,7 +29,7 @@ sealed class UploadState {
 
 class RegisterEvidenceViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val clientRepository = ClientRepository(api = ApiConnection.api_users)
+    private val clientRepository = ClientRepository(api = ApiConnection.api_users, application)
 
     private val isUploading = AtomicBoolean(false)
     private val _uiState = MutableStateFlow<UploadState>(UploadState.Idle)

@@ -7,11 +7,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.res.*
 import androidx.compose.ui.text.font.*
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medisupplyapp.R
 import com.example.medisupplyapp.components.*
-import com.example.medisupplyapp.screen.LoadingScreen
+import com.example.medisupplyapp.data.model.Product
 import com.tuempresa.medisupply.ui.components.FooterNavigation
 import com.tuempresa.medisupply.ui.theme.MediSupplyTheme
 import java.text.NumberFormat
@@ -24,19 +25,20 @@ fun CreateOrderClientScreen(
     onBack: () -> Unit = {},
     onNavigate: (String) -> Unit = {},
     onNavigateDetail: (String) -> Unit,
+    clientId: Int,
+    selectedRoute: String
 ) {
     val viewModel: CreateOrderViewModel = viewModel()
     val products = viewModel.products
-
     val recommendationState by viewModel.uiState.collectAsState()
 
-    val selectedRoute = "orders/create"
+    var selectedQuantities by remember { mutableStateOf(mapOf<Int, Int>()) }
+    var showConfirmation by remember { mutableStateOf(false) }
 
+    val currencyFormatter = remember { NumberFormat.getCurrencyInstance(Locale.US) }
     val productPriceMap = remember(products) {
         products.associate { it.productId to it.value }
     }
-
-    var selectedQuantities by remember { mutableStateOf(mapOf<String, Int>()) }
 
     val totalAmount = remember(selectedQuantities) {
         selectedQuantities.entries.sumOf { (productId, quantity) ->
@@ -45,7 +47,7 @@ fun CreateOrderClientScreen(
         }
     }
 
-    val onQuantityChange: (String, Int) -> Unit = { productId, newQty ->
+    val onQuantityChange: (Int, Int) -> Unit = { productId, newQty ->
         selectedQuantities = if (newQty > 0) {
             selectedQuantities + (productId to newQty)
         } else {
@@ -53,157 +55,213 @@ fun CreateOrderClientScreen(
         }
     }
 
-    val handleSearch: (String) -> Unit = { query ->
-        println("Iniciando búsqueda de productos")
-    }
-
-    val currencyFormatter = remember { NumberFormat.getCurrencyInstance(Locale.US) }
-
     LaunchedEffect(key1 = true) {
-        viewModel.loadRecommendations(clientId = 100)
+        viewModel.loadRecommendations(clientId = clientId)
     }
 
-    MediSupplyTheme {
-        Scaffold(
-            topBar = {
-                SimpleTopBar(
-                    title = stringResource(R.string.orders),
-                    onBack = onBack
-                )
+    fun filterProducts(
+        recommended: List<Product>,
+        products: List<Product>,
+        query: String
+    ): Pair<List<Product>, List<Product>> {
+        if (query.isBlank()) return recommended to products
+
+        val filteredRecommended = recommended.filter {
+            it.name.contains(query, ignoreCase = true)
+        }
+        val filteredProducts = products.filter {
+            it.name.contains(query, ignoreCase = true)
+        }
+        return filteredRecommended to filteredProducts
+    }
+
+
+    if (showConfirmation) {
+        ConfirmOrderScreen(
+            selectedQuantities = selectedQuantities,
+            products = products,
+            totalAmount = totalAmount,
+            onCancel = {
+                showConfirmation = false
             },
-            bottomBar = {
+            onNavigateDetail = onNavigateDetail,
+            clientId = clientId
+        )
+    } else {
+        MediSupplyTheme {
+            Scaffold(
+                topBar = { SimpleTopBar(title = stringResource(R.string.orders), onBack = onBack) },
+                bottomBar = {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(R.string.total),
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Bold
+                                ),
+                            )
+                            Text(
+                                text = currencyFormatter.format(totalAmount),
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Button(
+                            onClick = {
+                                val productsSelected = selectedQuantities.values.sum() > 0
+                                if (productsSelected) {
+                                    showConfirmation = true
+                                }
+                            },
+                            enabled = totalAmount > 0,
+                            modifier = Modifier.height(48.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary,
+                                disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
+                                disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface
+                            )
+                        ) {
+                            Text(text = stringResource(R.string.create_order), fontWeight = FontWeight.Bold)
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        FooterNavigation(selectedRoute, onNavigate)
+                    }
+                },
+                containerColor = MaterialTheme.colorScheme.onPrimary
+            ) { innerPadding ->
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .padding(innerPadding)
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(16.dp)
                 ) {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = stringResource(R.string.create_order),
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.headlineLarge,
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(R.string.total),
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold
-                            ),
-                        )
+                    // 🔹 Buscador
+                    var searchQuery by remember { mutableStateOf("") }
+                    SearchInput(
+                        modifier = Modifier.padding(bottom = 16.dp),
+                        onSearch = { query -> searchQuery = query },
+                        placeholderText = stringResource(R.string.search_placeholder_product)
+                    )
 
-                        Text(
-                            text = stringResource(R.string.total_label, currencyFormatter.format(totalAmount)),
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    }
+                    // 🔹 Filtrar productos
+                    val (filteredRecommended, filteredProducts) = filterProducts(
+                        (recommendationState as? RecommendationUiState.Success)?.recommendedProducts ?: emptyList(),
+                        products,
+                        searchQuery
+                    )
 
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Button(
-                        onClick = {
-                            val productsSelected = selectedQuantities.values.sum() > 0
-                        },
-                        enabled = viewModel.isFormValid() && totalAmount > 0,
-                        modifier = Modifier
-                            .height(48.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary,
-                            disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
-                            disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface
-                        )
-                    ) {
-                        Text(text = stringResource(R.string.create_order), fontWeight = FontWeight.Bold)
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    FooterNavigation(selectedRoute, onNavigate)
+                    PaginatedProductList(
+                        recommended = filteredRecommended,
+                        products = filteredProducts,
+                        selectedQuantities = selectedQuantities,
+                        onQuantityChange = onQuantityChange,
+                        pageSize = 3
+                    )
                 }
-            },
-            containerColor = MaterialTheme.colorScheme.onPrimary,
-        ) { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.create_order),
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.headlineLarge,
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = stringResource(R.string.select_products),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                SearchInput(
-                    modifier = Modifier.padding(bottom = 16.dp),
-                    onSearch = handleSearch,
-                    placeholderText = stringResource(R.string.search_placeholder_product)
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                RecommendationContent(
-                    state = recommendationState,
-                    selectedQuantities = selectedQuantities,
-                    onQuantityChange = onQuantityChange
-                )
             }
         }
     }
 }
+
 
 @Composable
-fun RecommendationContent(
-    state: RecommendationUiState,
-    selectedQuantities: Map<String, Int>,
-    onQuantityChange: (String, Int) -> Unit
+fun PaginatedProductList(
+    recommended: List<Product>,
+    products: List<Product>,
+    selectedQuantities: Map<Int, Int>,
+    onQuantityChange: (Int, Int) -> Unit,
+    pageSize: Int = 3
 ) {
-    when (state) {
-        is RecommendationUiState.Loading -> {
-            LoadingScreen()
-        }
-        is RecommendationUiState.Error -> {
-            null
-        }
-        is RecommendationUiState.Success -> {
-            val recommendedProducts = state.recommendedProducts
+    var currentPage by remember { mutableStateOf(0) }
 
-            if (recommendedProducts.isEmpty()) {
+    data class ProductWithBlock(val product: Product, val blockTitle: String)
+
+    val allProducts = buildList {
+        recommended.forEach { add(ProductWithBlock(it, stringResource(R.string.your_recommendations))) }
+        products.forEach { add(ProductWithBlock(it, stringResource(R.string.products))) }
+    }
+
+    val totalPages = (allProducts.size + pageSize - 1) / pageSize
+    val startIndex = currentPage * pageSize
+    val endIndex = minOf(startIndex + pageSize, allProducts.size)
+    val visible = allProducts.subList(startIndex, endIndex)
+
+    Column {
+        var lastHeader: String? = null
+        visible.forEach { pwb ->
+            if (pwb.blockTitle != lastHeader) {
                 Text(
-                    text = stringResource(R.string.recommend),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(vertical = 16.dp)
+                    text = pwb.blockTitle,
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
                 )
-            } else {
-                recommendedProducts.forEach { product ->
-                    val quantity = selectedQuantities[product.productId] ?: 0
-                    Text(
-                        text = stringResource(R.string.recommendations),
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    ProductCard(
-                        product = product,
-                        quantity = quantity,
-                        onQuantityChange = { newQty ->
-                            onQuantityChange(product.productId, newQty)
-                        },
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+                lastHeader = pwb.blockTitle
+            }
+
+            val quantity = selectedQuantities[pwb.product.productId] ?: 0
+            ProductCard(
+                product = pwb.product,
+                quantity = quantity,
+                onQuantityChange = { newQty ->
+                    onQuantityChange(pwb.product.productId, newQty)
                 }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(
+                onClick = { if (currentPage > 0) currentPage-- },
+                enabled = currentPage > 0
+            ) {
+                Text(stringResource(R.string.previous))
+            }
+
+            Text(
+                text = stringResource(R.string.page_label, currentPage + 1, totalPages),
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Button(
+                onClick = { if (currentPage < totalPages - 1) currentPage++ },
+                enabled = currentPage < totalPages - 1
+            ) {
+                Text(stringResource(R.string.next))
             }
         }
     }
 }
+

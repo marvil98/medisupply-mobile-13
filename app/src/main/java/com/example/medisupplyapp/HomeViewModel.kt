@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 
 
 import com.example.medisupplyapp.data.provider.routeCacheDataStore
+import com.example.medisupplyapp.data.remote.repository.ClientRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 
@@ -30,9 +31,23 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         routeCacheDataStore = application.routeCacheDataStore
     )
 
+    private val userRepository = ClientRepository(
+        api = ApiConnection.api_users,
+        application
+    )
+
     // Estado observable para la UI (opcional)
     private val _dailyRoute = MutableStateFlow<DailyRoute>( DailyRoute(0,visits = emptyList()))
     val dailyRoute: StateFlow<DailyRoute> = _dailyRoute
+
+    private val _userName = MutableStateFlow<String>("")
+    val userName: StateFlow<String> = _userName
+
+    private val _role = MutableStateFlow<String>("")
+    val role: StateFlow<String> = _role
+
+    private val _clientID = MutableStateFlow<Int>(1)
+    val clientID: StateFlow<Int> = _clientID
 
     val visitsMade: StateFlow<Int> = repository.visitsMadeFlow
         .stateIn(
@@ -47,14 +62,35 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun loadInitialData() {
         viewModelScope.launch {
-            val dailyRoute = repository.getDailyRoute()
-            _dailyRoute.value = dailyRoute
-
-            if (dailyRoute.visits.isNotEmpty()) {
-                println("INFO: Se cargo la ruta diaria.")
-            } else {
-                println("INFO: No se cargaron clientes.")
+            _userName.value = userRepository.getUserName()
+            _role.value = userRepository.getUserRole()
+            if(userRepository.getClientId() != null) {
+                _clientID.value = userRepository.getClientId()!!
             }
+            val sellerId = userRepository.getSellerId()
+
+            when (_role.value) {
+                "SELLER" -> loadSellerRoutes(sellerId!!)
+            }
+
+        }
+    }
+
+    private suspend fun loadSellerRoutes(sellerId: Int) {
+        val dailyRoute = repository.getDailyRoute(sellerId)
+        _dailyRoute.value = dailyRoute
+
+
+        if (dailyRoute.visits.isNotEmpty()) {
+            println("INFO: Se cargo la ruta diaria.")
+        } else {
+            println("INFO: No se cargaron clientes.")
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            userRepository.logout()
         }
     }
 }

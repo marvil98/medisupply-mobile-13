@@ -33,6 +33,7 @@ import com.tuempresa.medisupply.ui.theme.MediSupplyTheme
 fun RegisterVisitScreen(
     onBack: () -> Unit = {},
     onNavigate: (String) -> Unit = {},
+    selectedRoute: String
 ) {
     val viewModel: RegisterVisitViewModel = viewModel()
 
@@ -53,8 +54,6 @@ fun RegisterVisitScreen(
     var generatedVisitId by remember { mutableStateOf<Int?>(null) }
 
     var isDatePickerVisible by remember { mutableStateOf(false) }
-
-    val selectedRoute = "visits"
 
     var visitSuccess by remember { mutableStateOf(false) }
     var showConfirmation by remember { mutableStateOf(false) }

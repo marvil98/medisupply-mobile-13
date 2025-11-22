@@ -16,7 +16,7 @@ import java.util.Date
 import java.util.Locale
 
 class OrdersRepository(var api: OrdersApi) {
-    suspend fun getOrders(userID: String): Result<List<Order>> {
+    suspend fun getOrders(userID: Int): Result<List<Order>> {
         return try {
             val response = api.getOrders(userId = userID)
 
