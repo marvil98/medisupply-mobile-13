@@ -21,6 +21,7 @@ fun OrdersListContent(
     orders: List<Order>,
     paddingValues: PaddingValues,
     onNavigate: (String) -> Unit,
+    clientId: Int?
 ) {
     LazyColumn(
         modifier = Modifier
@@ -36,7 +37,7 @@ fun OrdersListContent(
         item {
             RoundedButton(
                 title = stringResource(R.string.create_order),
-                navigation = "create_order",
+                navigation = "create_order/${clientId}",
                 onOptionClick = { onNavigate(it) }
             )
         }

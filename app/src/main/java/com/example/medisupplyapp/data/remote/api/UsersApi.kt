@@ -11,6 +11,7 @@ import com.example.medisupplyapp.data.model.RecommendationResponse
 import com.example.medisupplyapp.data.model.RegisterVisitRequest
 import com.example.medisupplyapp.data.model.RegisterVisitResponse
 import com.example.medisupplyapp.data.model.UploadEvidenceResponse
+import com.example.medisupplyapp.data.remote.dto.ClientDetailResponse
 import com.example.medisupplyapp.data.remote.dto.ClientInfoResponse
 import com.example.medisupplyapp.data.remote.dto.SellerInfoResponse
 import okhttp3.MultipartBody
@@ -62,4 +63,7 @@ interface UsersApi {
 
     @GET("users/seller/{userId}/info")
     suspend fun getSellerInfo(@Path("userId") userId: Int): Response<SellerInfoResponse>
+
+    @GET("users/detail/{userId}")
+    suspend fun getClientDetail(@Path("userId") userId: Int): Response<ClientDetailResponse>
 }

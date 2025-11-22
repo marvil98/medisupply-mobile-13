@@ -40,7 +40,7 @@ import java.util.Locale
 fun OrderDetailScreen(
     orderId: Int,
     viewModel: OrderDetailViewModel = viewModel(),
-    onBack: () -> Unit
+    onBack: () -> Unit,
 ) {
     LaunchedEffect(orderId) {
         viewModel.loadOrderDetail(orderId)

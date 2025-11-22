@@ -134,4 +134,17 @@
     <string name="logout">Cerrar sesión</string>
     <string name="confirm_logout">¿Seguro quieres cerrar sesión?</string>
     <string name="confirm">Confirmar</string>
+    <string name="no_user_history">¡Ups! No se encontró ningún cliente.</string>
+    <string name="error_user_history">¡Ups! No pudimos obtener los clientes. Intenta nuevamente.</string>
+    <string name="client_list">Listado Clientes</string>
+    <string name="client_detail">Detalle Cliente</string>
+    <string name="contact_info">Datos de contacto</string>
+    <string name="label_client_user">Cliente:</string>
+    <string name="label_phone">Teléfono:</string>
+    <string name="label_email">Correo:</string>
+    <string name="no_data">Sin datos</string>
+    <string name="no_data_orders">Este cliente aún no registra pedidos</string>
+    <string name="statement">Estado de cuenta</string>
+    <string name="available">Balance disponible</string>
+    <string name="admin" translatable="false">ADMIN</string>
 </resources>

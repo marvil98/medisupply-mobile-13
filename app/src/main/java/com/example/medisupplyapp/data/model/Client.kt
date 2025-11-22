@@ -1,7 +1,10 @@
 package com.example.medisupplyapp.data.model
 
 import com.google.gson.annotations.SerializedName
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class Client(
     @SerializedName("client_id") val userId: Int,
     @SerializedName("name") val name: String,
@@ -9,8 +12,7 @@ data class Client(
     @SerializedName("latitude") val latitude: String,
     @SerializedName("phone") val phone: String,
     @SerializedName("longitude") val longitude: String,
-) {
-}
+): Parcelable
 
 data class ClientResponse(
     @SerializedName("clients") val clients: List<Client>

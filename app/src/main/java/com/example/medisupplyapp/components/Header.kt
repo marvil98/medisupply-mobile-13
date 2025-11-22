@@ -30,14 +30,12 @@ import kotlinx.coroutines.launch
 fun Header(
     userName: String,
     userRole: String = "Administrador",
-    pendingActivities: Int = 0,
     onNavigate: (String) -> Unit,
     onLogout: () -> Unit
 ) {
     var showMenuDialog by remember { mutableStateOf(false) }
     var showLogoutDialog by remember { mutableStateOf(false) }
 
-    // Header principal
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -49,7 +47,7 @@ fun Header(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f) ) {
                 Box(
                     modifier = Modifier
                         .size(48.dp)
@@ -67,7 +65,7 @@ fun Header(
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = stringResource(R.string.greeting),
                         style = MaterialTheme.typography.titleMedium,
@@ -76,7 +74,8 @@ fun Header(
                     Text(
                         text = userName,
                         style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.onBackground,
+                        maxLines = 2,
                     )
                 }
             }

@@ -9,10 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medisupplyapp.components.SectionCard
 import com.example.medisupplyapp.data.provider.authCacheDataStore
@@ -39,8 +35,8 @@ fun Home( selectedRoute: String, onNavigate: (String) -> Unit) {
             topBar = { Header(
                 userName = "${authData.name} ${authData.lastName}",
                 userRole = if (authData.role == "SELLER") stringResource(R.string.seller_id)
+                else if (authData.role == "ADMIN") stringResource(R.string.admin)
                 else stringResource(R.string.client_id),
-                pendingActivities = 3, // Obtener del ViewModel
                 onNavigate = onNavigate,
                 onLogout = {
                     viewModel.logout()
@@ -63,7 +59,7 @@ fun Home( selectedRoute: String, onNavigate: (String) -> Unit) {
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Spacer(modifier = Modifier.height(28.dp))
-                if (role == "SELLER") {
+                if (role == "SELLER" || role == "ADMIN") {
                     SectionCard(
                         title = stringResource(R.string.routes_title),
                         subtitle = "${visitsMade}/${dailyRoute.numberVisits} ${stringResource(R.string.routes_subtitle)}",
@@ -73,21 +69,19 @@ fun Home( selectedRoute: String, onNavigate: (String) -> Unit) {
 
                     SectionCard(
                         title = stringResource(R.string.visits),
-                        options = listOf(Pair(stringResource(R.string.register_visit), "register_visit"),
-                            Pair(stringResource(R.string.suggest_product),"suggest_product" )),
+                        options = listOf(Pair(stringResource(R.string.register_visit), "register_visit")),
                         onOptionClick = { onNavigate(it) }
                     )
                     SectionCard(
                         title = stringResource(R.string.orders),
-                        options = listOf(Pair(stringResource(R.string.create_order), "create_order"),
-                            Pair(stringResource(R.string.follow_order), "follow_orders")),
+                        options = listOf(Pair(stringResource(R.string.create_order), "create_order")),
                         onOptionClick = { onNavigate(it) }
                     )
 
                     SectionCard(
                         title = stringResource(R.string.clients),
                         centered = true,
-                        onClick = { onNavigate("clientes") }
+                        onClick = { onNavigate("users") }
                     )
                 }
                 if (role == "CLIENT") {

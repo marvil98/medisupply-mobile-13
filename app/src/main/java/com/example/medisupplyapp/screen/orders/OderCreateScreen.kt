@@ -27,6 +27,7 @@ fun CreateOrderScreen(
     onBack: () -> Unit = {},
     onNavigate: (String) -> Unit = {},
     onNavigateDetail: (String) -> Unit,
+    selectedRoute: String
 ) {
     val viewModel: CreateOrderViewModel = viewModel()
 
@@ -36,7 +37,6 @@ fun CreateOrderScreen(
     val products = viewModel.products
     var showConfirmation by remember { mutableStateOf(false) }
 
-    val selectedRoute = "orders/create"
     val productPriceMap = remember(products) {
         products.associate { it.productId to it.value }
     }

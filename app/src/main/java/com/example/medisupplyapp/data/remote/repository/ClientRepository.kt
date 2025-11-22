@@ -19,11 +19,10 @@ import java.io.IOException
 import com.example.medisupplyapp.data.model.toProductList
 import com.example.medisupplyapp.data.provider.authCacheDataStore
 import com.example.medisupplyapp.data.provider.routeCacheDataStore
+import com.example.medisupplyapp.data.remote.dto.ClientDetailResponse
 import com.example.medisupplyapp.datastore.AuthCacheProto
 import com.example.medisupplyapp.datastore.RouteCacheProto
 import kotlinx.coroutines.flow.first
-import retrofit2.Response
-import retrofit2.http.Body
 import java.util.concurrent.TimeUnit
 
 
@@ -47,6 +46,8 @@ class ClientRepository(var api: UsersApi, private val context: Context) {
         val response = api.getClientsBySellerID(sellerId)
         if (response.isSuccessful) {
             return response.body()?.clients ?: emptyList()
+        } else if(response.code() == 404) {
+            return emptyList()
         } else {
             throw Exception("Error al obtener clientes: ${response.code()}")
         }
@@ -327,6 +328,15 @@ class ClientRepository(var api: UsersApi, private val context: Context) {
     suspend fun getSellerId(): Int? {
         val authData = context.authCacheDataStore.data.first()
         return if (authData.sellerId > 0) authData.sellerId else null
+    }
+
+    suspend fun fetchClientInfo(userId: Int): ClientDetailResponse? {
+        val response = api.getClientDetail(userId)
+        return if (response.isSuccessful) {
+            response.body()
+        } else {
+            null
+        }
     }
 
     suspend fun isSessionValid(): Boolean {
