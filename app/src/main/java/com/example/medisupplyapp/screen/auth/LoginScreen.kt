@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -29,7 +30,7 @@ import com.example.medisupplyapp.R
 import com.example.medisupplyapp.components.SimpleTopBar
 import com.tuempresa.medisupply.ui.theme.MediSupplyTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = viewModel(),
@@ -37,6 +38,33 @@ fun LoginScreen(
     onBack: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    // Manejo de la navegación exitosa
+    LaunchedEffect(uiState.isLoginSuccessful) {
+        if (uiState.isLoginSuccessful) {
+            onLoginSuccess()
+        }
+    }
+
+    // Llamamos al contenido puro
+    LoginContent(
+        uiState = uiState,
+        onEmailChange = viewModel::onEmailChange,
+        onPasswordChange = viewModel::onPasswordChange,
+        onLoginClick = viewModel::login,
+        onBack = onBack
+    )
+}
+
+// ESTE ES EL COMPONENTE QUE PROBAREMOS
+@Composable
+fun LoginContent(
+    uiState: LoginUiState, // Asegúrate de importar tu data class
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onLoginClick: () -> Unit,
+    onBack: () -> Unit
+) {
     val focusManager = LocalFocusManager.current
 
     MediSupplyTheme {
@@ -46,9 +74,8 @@ fun LoginScreen(
                     title = stringResource(R.string.login),
                     onBack = onBack
                 )
-
             },
-            containerColor =MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.surface
         ) { paddingValues ->
             Column(
                 modifier = Modifier
@@ -83,14 +110,14 @@ fun LoginScreen(
                 // Campo de Email
                 OutlinedTextField(
                     value = uiState.email,
-                    onValueChange = { viewModel.onEmailChange(it) },
+                    onValueChange = { onEmailChange(it) },
                     placeholder = {
                         Text(
                             "example@example.com",
                             color = MaterialTheme.colorScheme.inverseSurface
                         )
                     },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().testTag("email_field"),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Email,
@@ -135,14 +162,14 @@ fun LoginScreen(
 
                 OutlinedTextField(
                     value = uiState.password,
-                    onValueChange = { viewModel.onPasswordChange(it) },
+                    onValueChange = { onPasswordChange(it) },
                     placeholder = {
                         Text(
                             "••••••••",
                             color = MaterialTheme.colorScheme.inverseSurface
                         )
                     },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().testTag("password_field"),
                     singleLine = true,
                     visualTransformation = if (passwordVisible) {
                         VisualTransformation.None
@@ -157,7 +184,7 @@ fun LoginScreen(
                         onDone = {
                             focusManager.clearFocus()
                             if (uiState.isFormValid) {
-                                viewModel.login()
+                                onLoginClick()
                             }
                         }
                     ),
@@ -211,10 +238,10 @@ fun LoginScreen(
 
                 // Botón de Login
                 Button(
-                    onClick = { viewModel.login() },
+                    onClick = { onLoginClick },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp),
+                        .height(50.dp).testTag("login_button"),
                     enabled = uiState.isFormValid && !uiState.isLoading,
                     shape = RoundedCornerShape(25.dp),
                     colors = ButtonDefaults.buttonColors(
@@ -240,13 +267,6 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
             }
-        }
-    }
-
-    // Navegar cuando el login sea exitoso
-    LaunchedEffect(uiState.isLoginSuccessful) {
-        if (uiState.isLoginSuccessful) {
-            onLoginSuccess()
         }
     }
 }
