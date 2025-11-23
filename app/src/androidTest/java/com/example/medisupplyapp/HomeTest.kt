@@ -103,8 +103,8 @@ class HomeTest {
             .performScrollTo()
             .performClick()
 
-        // THEN: La ruta capturada debe ser "clientes"
-        assert(lastRoute == "clientes")
+        // THEN: La ruta capturada debe ser "users"
+        assert(lastRoute == "users")
     }
 
     @Test

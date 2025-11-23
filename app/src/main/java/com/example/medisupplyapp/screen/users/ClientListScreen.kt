@@ -89,7 +89,10 @@ fun ClientListScreen(
                         }
 
                         if (filteredClients.isEmpty()) {
-                            Text(text = stringResource(R.string.users))
+                            ErrorUsersScreen(
+                                paddingValues = PaddingValues(0.dp),
+                                stringResource(R.string.no_user_history)
+                            )
                         } else {
                             LazyColumn(
                                 modifier = Modifier.fillMaxSize(),
