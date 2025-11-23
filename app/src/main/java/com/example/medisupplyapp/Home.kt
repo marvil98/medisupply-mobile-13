@@ -18,33 +18,62 @@ import com.tuempresa.medisupply.ui.components.Header
 import com.tuempresa.medisupply.ui.theme.MediSupplyTheme
 
 @Composable
-fun Home( selectedRoute: String, onNavigate: (String) -> Unit) {
+fun Home(selectedRoute: String, onNavigate: (String) -> Unit) {
     val viewModel: HomeViewModel = viewModel()
 
+    // Recolectamos estados
     val dailyRoute by viewModel.dailyRoute.collectAsState()
     val visitsMade by viewModel.visitsMade.collectAsState()
     val role by viewModel.role.collectAsState()
     val clientID by viewModel.clientID.collectAsState()
+
     val context = LocalContext.current
     val authData by context.authCacheDataStore.data.collectAsState(
         initial = AuthCacheProto.getDefaultInstance()
     )
 
+    // Llamamos al componente sin estado pasándole SOLO lo que necesita
+    HomeContent(
+        role = role ?: "CLIENT", // Valor por defecto seguro
+        userName = "${authData.name} ${authData.lastName}",
+        userRoleLabel = if (authData.role == "SELLER") stringResource(R.string.seller_id) else stringResource(R.string.client_id),
+        visitsMade = visitsMade,
+        totalVisits = dailyRoute.numberVisits,
+        clientID = clientID ?: 0,
+        selectedRoute = selectedRoute,
+        onNavigate = onNavigate,
+        onLogout = {
+            viewModel.logout()
+            onNavigate("splash")
+        }
+    )
+}
+
+// ESTE es el componente que probaremos con Espresso/Compose Test
+@Composable
+fun HomeContent(
+    role: String,
+    userName: String,
+    userRoleLabel: String,
+    visitsMade: Int,
+    totalVisits: Int,
+    clientID: Int,
+    selectedRoute: String,
+    onNavigate: (String) -> Unit,
+    onLogout: () -> Unit
+) {
     MediSupplyTheme {
         Scaffold(
-            topBar = { Header(
-                userName = "${authData.name} ${authData.lastName}",
-                userRole = if (authData.role == "SELLER") stringResource(R.string.seller_id)
-                else if (authData.role == "ADMIN") stringResource(R.string.admin)
-                else stringResource(R.string.client_id),
-                onNavigate = onNavigate,
-                onLogout = {
-                    viewModel.logout()
-                    onNavigate("splash")
-                }
-            ) },
+            topBar = {
+                Header(
+                    userName = userName,
+                    userRole = userRoleLabel,
+                    onNavigate = onNavigate,
+                    onLogout = onLogout
+                )
+            },
             bottomBar = { FooterNavigation(selectedRoute, onNavigate) },
-                containerColor = MaterialTheme.colorScheme.background
+            containerColor = MaterialTheme.colorScheme.background
         ) { innerPadding ->
             val scrollState = rememberScrollState()
             Column(
@@ -59,18 +88,18 @@ fun Home( selectedRoute: String, onNavigate: (String) -> Unit) {
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Spacer(modifier = Modifier.height(28.dp))
-                if (role == "SELLER" || role == "ADMIN") {
+
+                if (role == "SELLER") {
                     SectionCard(
                         title = stringResource(R.string.routes_title),
-                        subtitle = "${visitsMade}/${dailyRoute.numberVisits} ${stringResource(R.string.routes_subtitle)}",
+                        subtitle = "$visitsMade/$totalVisits ${stringResource(R.string.routes_subtitle)}",
                         centered = true,
                         onClick = { onNavigate("routes") }
                     )
-
                     SectionCard(
-                        title = stringResource(R.string.visits),
-                        options = listOf(Pair(stringResource(R.string.register_visit), "register_visit")),
-                        onOptionClick = { onNavigate(it) }
+                            title = stringResource(R.string.visits),
+                    options = listOf(Pair(stringResource(R.string.register_visit), "register_visit")),
+                    onOptionClick = { onNavigate(it) }
                     )
                     SectionCard(
                         title = stringResource(R.string.orders),
@@ -81,9 +110,10 @@ fun Home( selectedRoute: String, onNavigate: (String) -> Unit) {
                     SectionCard(
                         title = stringResource(R.string.clients),
                         centered = true,
-                        onClick = { onNavigate("users") }
+                        onClick = { onNavigate("clientes") }
                     )
                 }
+
                 if (role == "CLIENT") {
                     SectionCard(
                         title = stringResource(R.string.orders),
