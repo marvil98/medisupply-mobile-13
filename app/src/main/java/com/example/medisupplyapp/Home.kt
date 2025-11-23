@@ -110,7 +110,7 @@ fun HomeContent(
                     SectionCard(
                         title = stringResource(R.string.clients),
                         centered = true,
-                        onClick = { onNavigate("clientes") }
+                        onClick = { onNavigate("users") }
                     )
                 }
 
