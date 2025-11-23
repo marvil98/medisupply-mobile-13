@@ -162,7 +162,9 @@
     <string name="select_address">Selecciona tu dirección</string>
     <string name="phone_invalid">Teléfono Inválido</string>
     <string name="email_invalid">Correo Inválido</string>
-    <string name="psswd_invalid">Contraseña Inválida</string>
+    <string name="psswd_invalid">
+        La contraseña debe tener mínimo 8 caracteres, incluir mayúscula, minúscula, número y carácter especial.
+    </string>
     <string name="create_account">Crear Cuenta</string>
     <string name="user_success">Usuario creado exitosamente.</string>
     <string name="user_error">¡Ups! No fue posible crear el usuario. Intenta nuevamente.</string>

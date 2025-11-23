@@ -158,7 +158,9 @@
     <string name="select_address">Select your address</string>
     <string name="phone_invalid">Invalid Phone Number</string>
     <string name="email_invalid">Invalid Email</string>
-    <string name="psswd_invalid">Invalid Password</string>
+    <string name="psswd_invalid">
+        The password must be at least 8 characters long and include uppercase letters, lowercase letters, numbers, and special characters.
+    </string>
     <string name="create_account">Create Account</string>
     <string name="user_success">User created successfully.</string>
     <string name="user_error">Oops! User could not be created. Please try again.</string>
