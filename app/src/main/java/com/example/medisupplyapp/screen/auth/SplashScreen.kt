@@ -27,31 +27,28 @@ import kotlinx.coroutines.delay
 fun SplashScreenWithAutoNavigation(
     viewModel: SplashViewModel = viewModel(),
     onNavigateToHome: () -> Unit,
-    onNavigateToSplash: () -> Unit  // Navega a SplashScreen
+    onNavigateToSplash: () -> Unit
 ) {
-
     var isCheckingSession by remember { mutableStateOf(true) }
-    // Auto-navegar después de 2 segundos
+
     LaunchedEffect(Unit) {
         delay(2000)
-        val hasValidSession = viewModel.checkSession()
+        // ... (tu lógica original de sesión)
+        val hasValidSession = viewModel.checkSession() // Simulado
+        if (hasValidSession) onNavigateToHome() else onNavigateToSplash()
+        isCheckingSession = false
+    }
 
-        if (hasValidSession) {
-            // Hay sesión válida → Ir directo a Home
-            onNavigateToHome()
-        } else {
-            // No hay sesión → Ir a SplashScreen con botón
-            viewModel.logout()
-            onNavigateToSplash()
-        }
+    // Llamamos a la UI pura
+    SplashLoadingContent()
+}
 
-        isCheckingSession = false    }
-
-
+@Composable
+fun SplashLoadingContent() {
     MediSupplyTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary // Fondo de color primario
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -61,26 +58,19 @@ fun SplashScreenWithAutoNavigation(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    // Logo con animación
                     Image(
                         painter = painterResource(id = R.drawable.ic_white_logo),
                         contentDescription = "MediSupply Logo",
-                        modifier = Modifier
-                            .size(200.dp)
+                        modifier = Modifier.size(200.dp)
                     )
-
                     Spacer(modifier = Modifier.height(24.dp))
-
-                    // Texto "Medi"
                     Text(
                         text = "Medi",
                         fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.background,
+                        color = MaterialTheme.colorScheme.background, // Texto blanco/fondo
                         letterSpacing = 1.sp
                     )
-
-                    // Texto "Supply"
                     Text(
                         text = "Supply",
                         fontSize = 40.sp,
