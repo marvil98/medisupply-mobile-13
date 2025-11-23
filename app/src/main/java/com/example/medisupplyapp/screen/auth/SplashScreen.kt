@@ -2,6 +2,7 @@ package com.example.medisupplyapp.screen.auth
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -16,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.medisupplyapp.R
 import com.tuempresa.medisupply.ui.theme.MediSupplyTheme
 import kotlinx.coroutines.delay
@@ -27,7 +29,7 @@ import kotlinx.coroutines.delay
 fun SplashScreenWithAutoNavigation(
     viewModel: SplashViewModel = viewModel(),
     onNavigateToHome: () -> Unit,
-    onNavigateToSplash: () -> Unit
+    onNavigateToSplash: () -> Unit // Navega a SplashScreen
 ) {
     var isCheckingSession by remember { mutableStateOf(true) }
 
@@ -89,7 +91,8 @@ fun SplashLoadingContent() {
 // ============================================
 @Composable
 fun SplashScreen(
-    onNavigateToLogin: () -> Unit
+    onNavigateToLogin: () -> Unit,
+    navController: NavController
 ) {
     MediSupplyTheme {
         Surface(
@@ -150,6 +153,21 @@ fun SplashScreen(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.background
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row {
+                    Text(stringResource(id = R.string.no_account))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(id = R.string.register),
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.clickable {
+                            navController.navigate("register")
+                        }
                     )
                 }
             }

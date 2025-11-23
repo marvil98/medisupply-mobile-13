@@ -2,6 +2,10 @@ package com.example.medisupplyapp.data.remote.api
 
 import com.example.medisupplyapp.data.model.ClientRecommendationResponse
 import com.example.medisupplyapp.data.model.ClientResponse
+import com.example.medisupplyapp.data.model.CreateClientRequest
+import com.example.medisupplyapp.data.model.CreateClientResponse
+import com.example.medisupplyapp.data.model.CreateUserRequest
+import com.example.medisupplyapp.data.model.CreateUserResponse
 import com.example.medisupplyapp.data.model.LoginRequest
 import com.example.medisupplyapp.data.model.LoginResponse
 import com.example.medisupplyapp.data.model.LogoutRequest
@@ -66,4 +70,10 @@ interface UsersApi {
 
     @GET("users/detail/{userId}")
     suspend fun getClientDetail(@Path("userId") userId: Int): Response<ClientDetailResponse>
+
+    @POST("users/create")
+    suspend fun createUser(@Body request: CreateUserRequest): Response<CreateUserResponse>
+
+    @POST("users/clients/create")
+    suspend fun createClient(@Body request: CreateClientRequest): Response<CreateClientResponse>
 }
