@@ -25,7 +25,7 @@
         </activity>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDLjtkb9wf48fZk_BW9GMljYHX9UqqxrDg"/>
+            android:value="@string/google_maps_key"/>
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.medisupplyapp.provider"

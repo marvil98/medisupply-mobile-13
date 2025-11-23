@@ -2,6 +2,7 @@ package com.example.medisupplyapp.screen.auth
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -16,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.medisupplyapp.R
 import com.tuempresa.medisupply.ui.theme.MediSupplyTheme
 import kotlinx.coroutines.delay
@@ -27,31 +29,28 @@ import kotlinx.coroutines.delay
 fun SplashScreenWithAutoNavigation(
     viewModel: SplashViewModel = viewModel(),
     onNavigateToHome: () -> Unit,
-    onNavigateToSplash: () -> Unit  // Navega a SplashScreen
+    onNavigateToSplash: () -> Unit // Navega a SplashScreen
 ) {
-
     var isCheckingSession by remember { mutableStateOf(true) }
-    // Auto-navegar después de 2 segundos
+
     LaunchedEffect(Unit) {
         delay(2000)
-        val hasValidSession = viewModel.checkSession()
+        // ... (tu lógica original de sesión)
+        val hasValidSession = viewModel.checkSession() // Simulado
+        if (hasValidSession) onNavigateToHome() else onNavigateToSplash()
+        isCheckingSession = false
+    }
 
-        if (hasValidSession) {
-            // Hay sesión válida → Ir directo a Home
-            onNavigateToHome()
-        } else {
-            // No hay sesión → Ir a SplashScreen con botón
-            viewModel.logout()
-            onNavigateToSplash()
-        }
+    // Llamamos a la UI pura
+    SplashLoadingContent()
+}
 
-        isCheckingSession = false    }
-
-
+@Composable
+fun SplashLoadingContent() {
     MediSupplyTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary // Fondo de color primario
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -61,26 +60,19 @@ fun SplashScreenWithAutoNavigation(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    // Logo con animación
                     Image(
                         painter = painterResource(id = R.drawable.ic_white_logo),
                         contentDescription = "MediSupply Logo",
-                        modifier = Modifier
-                            .size(200.dp)
+                        modifier = Modifier.size(200.dp)
                     )
-
                     Spacer(modifier = Modifier.height(24.dp))
-
-                    // Texto "Medi"
                     Text(
                         text = "Medi",
                         fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.background,
+                        color = MaterialTheme.colorScheme.background, // Texto blanco/fondo
                         letterSpacing = 1.sp
                     )
-
-                    // Texto "Supply"
                     Text(
                         text = "Supply",
                         fontSize = 40.sp,
@@ -99,7 +91,8 @@ fun SplashScreenWithAutoNavigation(
 // ============================================
 @Composable
 fun SplashScreen(
-    onNavigateToLogin: () -> Unit
+    onNavigateToLogin: () -> Unit,
+    navController: NavController
 ) {
     MediSupplyTheme {
         Surface(
@@ -160,6 +153,21 @@ fun SplashScreen(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.background
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row {
+                    Text(stringResource(id = R.string.no_account))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(id = R.string.register),
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.clickable {
+                            navController.navigate("register")
+                        }
                     )
                 }
             }

@@ -3,6 +3,10 @@ package com.example.medisupplyapp.data.remote.repository
 import android.content.Context
 import android.util.Log
 import com.example.medisupplyapp.data.model.Client
+import com.example.medisupplyapp.data.model.CreateClientRequest
+import com.example.medisupplyapp.data.model.CreateClientResponse
+import com.example.medisupplyapp.data.model.CreateUserRequest
+import com.example.medisupplyapp.data.model.CreateUserResponse
 import com.example.medisupplyapp.data.model.LoginRequest
 import com.example.medisupplyapp.data.model.LoginResponse
 import com.example.medisupplyapp.data.model.LogoutRequest
@@ -131,6 +135,33 @@ class ClientRepository(var api: UsersApi, private val context: Context) {
         } else {
             val errorBody = response.errorBody()?.string()
             throw Exception("Error al obtener recomendaciones: ${response.code()}. Detalles: $errorBody")
+        }
+    }
+
+    suspend fun createUser(request: CreateUserRequest): CreateUserResponse {
+        val response = api.createUser(request)
+
+        if (response.isSuccessful) {
+            val body = response.body()
+            if (body != null) {
+                return body
+            } else {
+                throw Exception("Respuesta vacía del servidor")
+            }
+        } else {
+            val errorBody = response.errorBody()?.string()
+            throw Exception("Error al crear usuario: ${response.code()}. Detalles: $errorBody")
+        }
+    }
+
+    suspend fun createClient(request: CreateClientRequest): CreateClientResponse {
+        val response = api.createClient(request)
+
+        if (response.isSuccessful) {
+            return response.body() ?: throw Exception("Respuesta vacía del servidor")
+        } else {
+            val errorBody = response.errorBody()?.string()
+            throw Exception("Error al crear cliente: ${response.code()} - $errorBody")
         }
     }
 
