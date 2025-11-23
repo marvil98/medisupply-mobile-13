@@ -30,13 +30,17 @@ import com.tuempresa.medisupply.ui.components.FooterNavigation
 import com.tuempresa.medisupply.ui.theme.MediSupplyTheme
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavController
+import com.example.medisupplyapp.data.provider.authCacheDataStore
+import com.example.medisupplyapp.datastore.AuthCacheProto
 
 @Composable
 fun ClientListScreen(
@@ -48,7 +52,10 @@ fun ClientListScreen(
 ) {
     val uiState = viewModel.clientsState
     var searchQuery by remember { mutableStateOf("") }
-
+    val context = LocalContext.current
+    val authData by context.authCacheDataStore.data.collectAsState(
+        initial = AuthCacheProto.getDefaultInstance()
+    )
     MediSupplyTheme {
         Scaffold(
             topBar = {
@@ -60,71 +67,78 @@ fun ClientListScreen(
             bottomBar = { FooterNavigation(selectedRoute, onNavigate) },
             containerColor = MaterialTheme.colorScheme.surface
         ) { paddingValues ->
-            Column(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.client_list),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                SearchInput(
-                    modifier = Modifier.padding(bottom = 16.dp),
-                    onSearch = { query -> searchQuery = query },
-                    placeholderText = stringResource(R.string.search_placeholder_product)
-                )
+            if (authData.role == "SELLER"){
+                Column(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .fillMaxSize()
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.client_list),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    SearchInput(
+                        modifier = Modifier.padding(bottom = 16.dp),
+                        onSearch = { query -> searchQuery = query },
+                        placeholderText = stringResource(R.string.search_placeholder_user)
+                    )
 
-                when (uiState) {
-                    is UsersUiState.Loading -> {
-                        LoadingScreen()
-                    }
-
-                    is UsersUiState.Success -> {
-                        val filteredClients = uiState.users.filter {
-                            it.name.contains(searchQuery, ignoreCase = true)
+                    when (uiState) {
+                        is UsersUiState.Loading -> {
+                            LoadingScreen()
                         }
 
-                        if (filteredClients.isEmpty()) {
+                        is UsersUiState.Success -> {
+                            val filteredClients = uiState.users.filter {
+                                it.name.contains(searchQuery, ignoreCase = true)
+                            }
+
+                            if (filteredClients.isEmpty()) {
+                                ErrorUsersScreen(
+                                    paddingValues = PaddingValues(0.dp),
+                                    stringResource(R.string.no_user_history)
+                                )
+                            } else {
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxSize(),
+                                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    items(filteredClients) { client ->
+                                        ClientItem(
+                                            client = client,
+                                            onClick = { selectedClient ->
+                                                navController.currentBackStackEntry?.savedStateHandle?.set("client", selectedClient)
+                                                navController.navigate("clientDetail")
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        is UsersUiState.Empty -> {
                             ErrorUsersScreen(
                                 paddingValues = PaddingValues(0.dp),
                                 stringResource(R.string.no_user_history)
                             )
-                        } else {
-                            LazyColumn(
-                                modifier = Modifier.fillMaxSize(),
-                                verticalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                items(filteredClients) { client ->
-                                    ClientItem(
-                                        client = client,
-                                        onClick = { selectedClient ->
-                                            navController.currentBackStackEntry?.savedStateHandle?.set("client", selectedClient)
-                                            navController.navigate("clientDetail")
-                                        }
-                                    )
-                                }
-                            }
+                        }
+
+                        is UsersUiState.Error -> {
+                            ErrorUsersScreen(
+                                paddingValues = PaddingValues(0.dp),
+                                stringResource(R.string.error_user_history)
+                            )
                         }
                     }
-
-                    is UsersUiState.Empty -> {
-                        ErrorUsersScreen(
-                            paddingValues = PaddingValues(0.dp),
-                            stringResource(R.string.no_user_history)
-                        )
-                    }
-
-                    is UsersUiState.Error -> {
-                        ErrorUsersScreen(
-                            paddingValues = PaddingValues(0.dp),
-                            stringResource(R.string.error_user_history)
-                        )
-                    }
                 }
+            } else {
+                ErrorUsersScreen(
+                    paddingValues = PaddingValues(0.dp),
+                    stringResource(R.string.no_access)
+                )
             }
         }
     }

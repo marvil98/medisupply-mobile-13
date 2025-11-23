@@ -166,4 +166,6 @@
     <string name="create_account">Crear Cuenta</string>
     <string name="user_success">Usuario creado exitosamente.</string>
     <string name="user_error">¡Ups! No fue posible crear el usuario. Intenta nuevamente.</string>
+    <string name="search_placeholder_user">Buscar usuario</string>
+    <string name="no_access">¡Ups! Acceso denegado</string>
 </resources>
