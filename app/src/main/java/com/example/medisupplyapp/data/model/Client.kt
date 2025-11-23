@@ -100,3 +100,35 @@ data class UserDto(
     @SerializedName("user_id")
     val userId: Int
 )
+
+data class CreateUserRequest(
+    val name: String,
+    val lastname: String,
+    val identification: String,
+    val email: String,
+    val password: String,
+    val phone: String,
+    val active: Boolean = true,
+    val role: String = "CLIENT"
+)
+
+data class CreateUserResponse(
+    val success: Boolean,
+    val user_id: Int,
+    val warnings: List<String>
+)
+
+data class CreateClientRequest(
+    val user_id: Int,
+    val nit: String,
+    val name: String,
+    val address: String,
+    val latitude: Double,
+    val longitude: Double
+)
+
+data class CreateClientResponse(
+    val client_id: Int,
+    val success: Boolean,
+    val user_id: Int
+)

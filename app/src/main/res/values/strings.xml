@@ -147,4 +147,23 @@
     <string name="statement">Estado de cuenta</string>
     <string name="available">Balance disponible</string>
     <string name="admin" translatable="false">ADMIN</string>
+    <string name="no_account">¿No tienes cuenta?</string>
+    <string name="register">Regístrate</string>
+    <string name="google_maps_key">AIzaSyDLjtkb9wf48fZk_BW9GMljYHX9UqqxrDg</string>
+    <string name="register_label">Registro</string>
+    <string name="name">Nombre</string>
+    <string name="lastname">Apellido</string>
+    <string name="identification">Número de identificación</string>
+    <string name="label_phone_register">Teléfono</string>
+    <string name="data_company">Datos de la Empresa</string>
+    <string name="nit">Número de Identificación Tributaria</string>
+    <string name="company_name">Nombre de la Empresa</string>
+    <string name="search_address">Buscar dirección</string>
+    <string name="select_address">Selecciona tu dirección</string>
+    <string name="phone_invalid">Teléfono Inválido</string>
+    <string name="email_invalid">Correo Inválido</string>
+    <string name="psswd_invalid">Contraseña Inválida</string>
+    <string name="create_account">Crear Cuenta</string>
+    <string name="user_success">Usuario creado exitosamente.</string>
+    <string name="user_error">¡Ups! No fue posible crear el usuario. Intenta nuevamente.</string>
 </resources>

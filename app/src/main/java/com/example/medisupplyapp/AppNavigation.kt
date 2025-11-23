@@ -9,7 +9,9 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.medisupplyapp.data.CountryPreferencesRepository
 import com.example.medisupplyapp.data.model.Client
+import com.example.medisupplyapp.screen.auth.ClientRegistrationScreen
 import com.example.medisupplyapp.screen.auth.LoginScreen
+import com.example.medisupplyapp.screen.auth.RegisterViewModel
 import com.example.medisupplyapp.screen.auth.SplashScreen
 import com.example.medisupplyapp.screen.auth.SplashScreenWithAutoNavigation
 import com.example.medisupplyapp.screen.orders.CreateOrderClientScreen
@@ -35,7 +37,7 @@ fun mapCountryToCode(countryName: String): String {
 }
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(registerViewModel: RegisterViewModel) {
     val navController = rememberNavController()
     var currentLanguage by remember { mutableStateOf("es") }
     val context = LocalContext.current
@@ -60,7 +62,7 @@ fun AppNavigation() {
                     navController.navigate("home") {
                         popUpTo("splash_auto") { inclusive = true }
                     }
-                },
+                }
             )
         }
 
@@ -70,7 +72,8 @@ fun AppNavigation() {
                     navController.navigate("login") {
                         popUpTo("splash") { inclusive = true }
                     }
-                }
+                },
+                navController = navController
             )
         }
         composable("home") {
@@ -209,6 +212,13 @@ fun AppNavigation() {
                 onBack = {navController.navigate("splash") {
                     popUpTo("login") { inclusive = true }
                 } }
+            )
+        }
+
+        composable("register") {
+            ClientRegistrationScreen(
+                registerViewModel,
+                onNavigateDetail = { route -> navController.navigate("login") },
             )
         }
 
