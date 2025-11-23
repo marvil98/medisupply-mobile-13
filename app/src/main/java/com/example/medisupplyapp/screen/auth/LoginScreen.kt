@@ -238,7 +238,7 @@ fun LoginContent(
 
                 // Botón de Login
                 Button(
-                    onClick = { onLoginClick },
+                    onClick = { onLoginClick() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp).testTag("login_button"),
