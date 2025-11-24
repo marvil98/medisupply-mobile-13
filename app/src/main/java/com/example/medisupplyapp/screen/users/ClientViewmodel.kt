@@ -38,7 +38,8 @@ class ClientViewmodel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             clientsState = UsersUiState.Loading
             try {
-                val clients = repository.fecthClientsBySellerID(1)
+                val sellerId = repository.getSellerId()
+                val clients = repository.fecthClientsBySellerID(sellerId!!)
 
                 clientsState = if (clients.isEmpty()) {
                     UsersUiState.Empty

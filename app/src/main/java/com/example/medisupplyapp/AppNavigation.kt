@@ -219,6 +219,7 @@ fun AppNavigation(registerViewModel: RegisterViewModel) {
             ClientRegistrationScreen(
                 registerViewModel,
                 onNavigateDetail = { route -> navController.navigate("login") },
+                onBack = { route -> navController.navigate("splash") },
             )
         }
 

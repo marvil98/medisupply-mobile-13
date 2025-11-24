@@ -38,7 +38,7 @@ import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.tuempresa.medisupply.ui.theme.MediSupplyTheme
 
 @Composable
-fun ClientRegistrationScreen(viewModel: RegisterViewModel, onNavigateDetail: (String) -> Unit, ) {
+fun ClientRegistrationScreen(viewModel: RegisterViewModel, onNavigateDetail: (String) -> Unit, onBack: (String) -> Unit, ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
@@ -81,7 +81,7 @@ fun ClientRegistrationScreen(viewModel: RegisterViewModel, onNavigateDetail: (St
             topBar = {
                 SimpleTopBar(
                     title = stringResource(R.string.register_label),
-                    onBack = {}
+                    onBack = {onBack("splash")}
                 )
 
             },

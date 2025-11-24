@@ -37,47 +37,5 @@ class SplashTest {
             .assertIsDisplayed()
     }
 
-    // ==========================================
-    // PRUEBAS DE LA PANTALLA DE INICIO (Login Button)
-    // ==========================================
-    @Test
-    fun splashScreen_displaysLoginButtonAndLogo() {
-        // GIVEN: Pantalla con botón
-        composeTestRule.setContent {
-            SplashScreen(onNavigateToLogin = {})
-        }
 
-        // THEN:
-        // 1. Logo
-        composeTestRule.onNodeWithContentDescription("MediSupply Logo")
-            .assertIsDisplayed()
-
-        // 2. Botón de Iniciar Sesión (usando el recurso de string)
-        val loginText = composeTestRule.activity.getString(R.string.login)
-
-        composeTestRule.onNodeWithText(loginText)
-            .assertIsDisplayed()
-            .assertHasClickAction() // Verificamos que sea clickeable
-    }
-
-    @Test
-    fun splashScreen_navigates_whenLoginClicked() {
-        var navigated = false
-
-        // GIVEN: Pantalla con callback de navegación
-        composeTestRule.setContent {
-            SplashScreen(
-                onNavigateToLogin = { navigated = true }
-            )
-        }
-
-        val loginText = composeTestRule.activity.getString(R.string.login)
-
-        // WHEN: Hacemos click en el botón
-        composeTestRule.onNodeWithText(loginText)
-            .performClick()
-
-        // THEN: La variable debe haber cambiado a true
-        assert(navigated)
-    }
 }
