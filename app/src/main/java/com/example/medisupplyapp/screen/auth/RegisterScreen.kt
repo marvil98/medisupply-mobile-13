@@ -95,12 +95,6 @@ fun ClientRegistrationScreen(viewModel: RegisterViewModel, onNavigateDetail: (St
                     .padding(horizontal = 24.dp),
                 horizontalAlignment = Alignment.Start
             ) {
-                FloatingToast(
-                    message = toastMessage,
-                    type = toastType,
-                    visible = showToast,
-                    onDismiss = { showToast = false }
-                )
                 Text(
                     text = stringResource(R.string.welcome),
                     fontSize = 32.sp,
@@ -543,6 +537,13 @@ fun ClientRegistrationScreen(viewModel: RegisterViewModel, onNavigateDetail: (St
                     Text(stringResource(R.string.search_address), style = MaterialTheme.typography.bodySmall)
                 }
 
+                FloatingToast(
+                    message = toastMessage,
+                    type = toastType,
+                    visible = showToast,
+                    onDismiss = { showToast = false }
+                )
+
                 Spacer(Modifier.height(24.dp))
                 Button(
                     onClick = {
@@ -559,7 +560,7 @@ fun ClientRegistrationScreen(viewModel: RegisterViewModel, onNavigateDetail: (St
                                     userSuccess = true
                                 },
                                 onError = { errorMessage ->
-                                    toastMessage = mssgError
+                                    toastMessage = errorMessage
                                     toastType = ToastType.ERROR
                                     showToast = true
                                 }

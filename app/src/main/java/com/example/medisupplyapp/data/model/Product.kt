@@ -12,9 +12,15 @@ data class Product(
 )
 
 data class ProductRequest(
-    @SerializedName("product_id") val productId: Int,
-    @SerializedName("price_unit") val price_unit: Double,
-    @SerializedName("quantity") val quantity: Int
+    val product_id: Int,
+    val name: String,
+    val sku: String,
+    val category_name: String,
+    val total_quantity: Int,
+    val value: Double,
+    val image_url: String?,
+    val quantity: Int,
+    val price_unit: Double
 )
 
 fun ProductSuggestion.toProduct(): Product {

@@ -28,7 +28,6 @@ fun FooterNavigation(
         initial = AuthCacheProto.getDefaultInstance()
     )
     val role = authData.role
-    val clientId = authData.clientId
 
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.primary
@@ -137,7 +136,7 @@ fun FooterNavigation(
                 },
                 label = { Text(stringResource(R.string.orders)) },
                 selected = selectedRoute == "orders",
-                onClick = { onNavigate("create_order/${clientId}") },
+                onClick = { onNavigate("orders") },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = Color.White,
                     selectedTextColor = Color.White,

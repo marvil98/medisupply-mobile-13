@@ -26,8 +26,15 @@ import com.example.medisupplyapp.data.provider.routeCacheDataStore
 import com.example.medisupplyapp.data.remote.dto.ClientDetailResponse
 import com.example.medisupplyapp.datastore.AuthCacheProto
 import com.example.medisupplyapp.datastore.RouteCacheProto
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.first
 import java.util.concurrent.TimeUnit
+
+
+data class ErrorResponse(
+    val errors: List<String>,
+    val success: Boolean
+)
 
 
 class ClientRepository(var api: UsersApi, private val context: Context) {
@@ -150,7 +157,13 @@ class ClientRepository(var api: UsersApi, private val context: Context) {
             }
         } else {
             val errorBody = response.errorBody()?.string()
-            throw Exception("Error al crear usuario: ${response.code()}. Detalles: $errorBody")
+            val errorMessage = try {
+                val errorResponse = Gson().fromJson(errorBody, ErrorResponse::class.java)
+                errorResponse.errors.firstOrNull() ?: "Error desconocido"
+            } catch (e: Exception) {
+                "Error inesperado: ${e.message}"
+            }
+            throw Exception(errorMessage)
         }
     }
 

@@ -166,4 +166,5 @@
     <string name="user_error">Oops! User could not be created. Please try again.</string>
     <string name="search_placeholder_user">Search user</string>
     <string name="no_access">Oops! Access denied</string>
+    <string name="access_restricted_message">This section is not available for your profile</string>
 </resources>

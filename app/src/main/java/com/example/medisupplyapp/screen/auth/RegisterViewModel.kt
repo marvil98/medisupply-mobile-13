@@ -144,7 +144,7 @@ class RegisterViewModel(application: Application)  : AndroidViewModel(applicatio
                     onError("Error al crear usuario: ${userResponse.warnings.joinToString()}")
                 }
             } catch (e: Exception) {
-                onError("Error en la creación: ${e.message}")
+                onError("${e.message}")
             }
         }
     }

@@ -5,9 +5,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medisupplyapp.components.SectionCard
@@ -72,7 +74,11 @@ fun HomeContent(
                     onLogout = onLogout
                 )
             },
-            bottomBar = { FooterNavigation(selectedRoute, onNavigate) },
+            bottomBar = {
+                if (role != "PROVIDER") {
+                    FooterNavigation(selectedRoute, onNavigate)
+                }
+            },
             containerColor = MaterialTheme.colorScheme.background
         ) { innerPadding ->
             val scrollState = rememberScrollState()
@@ -83,10 +89,12 @@ fun HomeContent(
                     .verticalScroll(scrollState)
                     .padding(16.dp)
             ) {
-                Text(
-                    text = stringResource(R.string.activity_prompt),
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                if (role != "PROVIDER") {
+                    Text(
+                        text = stringResource(R.string.activity_prompt),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
                 Spacer(modifier = Modifier.height(28.dp))
 
                 if (role == "SELLER") {
@@ -129,6 +137,25 @@ fun HomeContent(
                             onNavigate(finalRoute)
                         }
                     )
+                }
+
+                if (role == "PROVIDER") {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.access_restricted_message),
+                            style = MaterialTheme.typography.displaySmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 78.dp)
+                        )
+                    }
                 }
             }
         }
