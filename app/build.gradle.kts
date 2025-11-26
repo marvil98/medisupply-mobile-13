@@ -14,7 +14,7 @@ android {
         applicationId = "com.example.medisupplyapp"
         minSdk = 31
         targetSdk = 36
-        versionName = "2.0.0"
+        versionName = "3.0.0"
         versionCode = 2030100
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

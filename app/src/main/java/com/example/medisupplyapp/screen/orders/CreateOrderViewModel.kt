@@ -102,10 +102,17 @@ class CreateOrderViewModel(application: Application) : AndroidViewModel(applicat
                 val productRequests = selectedQuantities
                     .filter { it.value > 0 }
                     .map { (productId, quantity) ->
+                        val product = products.first { it.productId == productId }
                         ProductRequest(
-                            productId = productId,
+                            product_id = product.productId,
+                            name = product.name,
+                            sku = product.sku,
+                            category_name = product.categoryName,
+                            total_quantity = product.totalQuantity,
+                            value = product.value,
+                            image_url = null,
                             quantity = quantity,
-                            price_unit = products.first { product -> product.productId == productId }.value
+                            price_unit = product.value
                         )
                     }
 
